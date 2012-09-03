@@ -7,9 +7,12 @@
                                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
                                 http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.1.xsd">
 
+    <context:annotation-config />
     <context:component-scan base-package="com.raccoonfink.cruisemonkey.server" />
 
-    <bean id="userRestService" class="com.raccoonfink.cruisemonkey.server.MockUserRestServiceImpl" />
+    <bean id="userRestService" class="com.raccoonfink.cruisemonkey.server.MockUserRestServiceImpl">
+        <property name="userDao" ref="userDao" />
+    </bean>
 
     <bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" />
 
