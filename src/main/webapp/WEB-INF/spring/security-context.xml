@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	">
 
-	<bean id="userDetailsService" class="com.raccoonfink.cruisemonkey.security.DefaultUserDetailsService">
-		<property name="userDao" ref="userDao" />
-	</bean>
+    <context:annotation-config />
+
+	<bean id="userDetailsService" class="com.raccoonfink.cruisemonkey.security.DefaultUserDetailsService" />
 
 	<security:global-method-security secured-annotations="enabled" />
 
@@ -15,9 +21,7 @@
 		<security:http-basic />
 	</security:http>
 
-	<bean id="authenticationProvider" class="com.raccoonfink.cruisemonkey.security.DefaultAuthenticationProvider">
-	    <property name="userDao" ref="userDao" />
-	</bean>
+	<bean id="authenticationProvider" class="com.raccoonfink.cruisemonkey.security.DefaultAuthenticationProvider" />
 
 	<security:authentication-manager>
 		<security:authentication-provider ref="authenticationProvider" />

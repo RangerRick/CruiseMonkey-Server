@@ -1,6 +1,7 @@
 package com.raccoonfink.cruisemonkey.security;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,17 +10,14 @@ import org.springframework.util.Assert;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 
 public class DefaultUserDetailsService implements UserDetailsService, InitializingBean {
+	@Autowired
 	private UserDao m_userDao;
 
 	public DefaultUserDetailsService() {
 	}
 
-	public void setUserDao(final UserDao userDao) {
+	public DefaultUserDetailsService(final UserDao userDao) {
 		m_userDao = userDao;
-	}
-
-	public UserDao getUserDao() {
-		return m_userDao;
 	}
 
 	@Override

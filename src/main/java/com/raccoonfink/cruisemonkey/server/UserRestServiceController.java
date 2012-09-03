@@ -14,19 +14,33 @@ import com.raccoonfink.cruisemonkey.model.User;
 @Controller
 public class UserRestServiceController {
 	@Autowired
-	UserRestService m_userService;
+	UserRestService m_userRestService;
 
-	@RequestMapping(value="/all")
+	public UserRestServiceController() {}
+
+	public UserRestServiceController(final UserRestService userRestService) {
+		m_userRestService = userRestService;
+	}
+
+	void setUserRestService(final UserRestService userRestService) {
+		m_userRestService = userRestService;
+	}
+
+	UserRestService getUserRestService() {
+		return m_userRestService;
+	}
+
+	@RequestMapping(value="/users/list")
 	public ModelAndView getAllUsers() {
-		final List<User> users = m_userService.getUsers();
-		final ModelAndView mav = new ModelAndView("userXmlView", BindingResult.MODEL_KEY_PREFIX + "users", users);
+		final List<User> users = m_userRestService.getUsers();
+		final ModelAndView mav = new ModelAndView("xmlView", BindingResult.MODEL_KEY_PREFIX + "users", users);
 		return mav;
 	}
 	
-	@RequestMapping(value="/{username}")
+	@RequestMapping(value="/users/{username}")
 	public ModelAndView getUser(@PathVariable final String username) {
-		final User user = m_userService.getUser(username);
-		final ModelAndView mav = new ModelAndView("userXmlView", BindingResult.MODEL_KEY_PREFIX + "user", user);
+		final User user = m_userRestService.getUser(username);
+		final ModelAndView mav = new ModelAndView("xmlView", BindingResult.MODEL_KEY_PREFIX + "user", user);
 		return mav;
 	}
 }

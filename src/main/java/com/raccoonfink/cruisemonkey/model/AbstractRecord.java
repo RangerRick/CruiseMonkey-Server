@@ -2,10 +2,20 @@ package com.raccoonfink.cruisemonkey.model;
 
 import java.util.Date;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("record")
 public class AbstractRecord implements Record {
+	@XStreamAlias("created-by")
 	private String m_createdBy;
+
+	@XStreamAlias("created")
 	private Date m_createdDate;
+
+	@XStreamAlias("last-modified-by")
 	private String m_lastModifiedBy;
+
+	@XStreamAlias("last-modified-by")
 	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {

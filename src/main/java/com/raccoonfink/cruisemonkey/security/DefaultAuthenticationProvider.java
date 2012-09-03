@@ -1,6 +1,7 @@
 package com.raccoonfink.cruisemonkey.security;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -12,15 +13,8 @@ import org.springframework.util.StringUtils;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 
 public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements InitializingBean {
+	@Autowired
 	private UserDao m_userDao;
-
-	public void setUserDao(final UserDao userDao) {
-		m_userDao = userDao;
-	}
-	
-	public UserDao getUserDao() {
-		return m_userDao;
-	}
 
 	@Override
 	protected void doAfterPropertiesSet() throws Exception {

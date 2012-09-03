@@ -1,8 +1,10 @@
 package com.raccoonfink.cruisemonkey.model;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("user")
-public class User implements UserDetails {
+public class User implements UserDetails, Comparable<User>, Serializable {
 	private static final long serialVersionUID = -4560511838361243686L;
 
 	@XStreamAlias("username")
@@ -78,5 +80,13 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	@Override
+	public int compareTo(final User that) {
+		return new CompareToBuilder()
+			.append(this.m_username, that.m_username)
+			.append(this.m_name,     that.m_name)
+			.toComparison();
 	}
 }

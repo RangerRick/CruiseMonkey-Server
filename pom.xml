@@ -12,8 +12,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<spring.version>3.1.2.RELEASE</spring.version>
+
+		<guava.version>13.0.1</guava.version>
+		<jackson.version>1.9.9</jackson.version>
+		<junit.version>4.9</junit.version>
 		<servlet-api.version>2.5</servlet-api.version>
+		<spring.version>3.1.2.RELEASE</spring.version>
+		<xstream.version>1.4.3</xstream.version>
 	</properties>
 
 	<build>
@@ -100,16 +105,33 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>13.0.1</version>
+			<version>${guava.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.4.3</version>
+			<version>${xstream.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+		</dependency>
+
 	</dependencies>
 
 </project>
