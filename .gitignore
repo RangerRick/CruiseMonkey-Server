@@ -3,4 +3,8 @@
 .project
 .classpath
 .DS_Store
+cruisemonkey.log
+cruisemonkey.properties
+cruisemonkey.script
+cruisemonkey.tmp
 target

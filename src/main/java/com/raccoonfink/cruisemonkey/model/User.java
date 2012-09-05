@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,16 +15,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@Entity
 @XStreamAlias("user")
-public class User implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = -4560511838361243686L;
+public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
+	private static final long serialVersionUID = 1L;
 
+	@Id
+	@Column(name="username", length=64, unique=true)
 	@XStreamAlias("username")
 	private String m_username;
 	
+	@Column(name="name", length=256)
 	@XStreamAlias("name")
 	private String m_name;
 	
+	@Column(name="password", length=32)
 	@XStreamAlias("password")
 	private String m_password;
 

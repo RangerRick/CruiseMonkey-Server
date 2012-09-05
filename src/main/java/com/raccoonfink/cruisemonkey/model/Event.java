@@ -1,25 +1,41 @@
 package com.raccoonfink.cruisemonkey.model;
 
+import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@Entity
 @XStreamAlias("event")
-public class Event extends AbstractRecord {
+public class Event extends AbstractRecord implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@Column(name="id")
+	@GeneratedValue
 	@XStreamAlias("id")
 	@XStreamAsAttribute
 	private int m_id;
 
+	@Column(name="summary", length=100)
 	@XStreamAlias("summary")
 	private String m_summary;
 
+	@Column(name="description", length=2048, nullable=true)
 	@XStreamAlias("description")
 	private String m_description;
 
+	@Column(name="start")
 	@XStreamAlias("start")
 	private Date m_start;
 
+	@Column(name="end")
 	@XStreamAlias("end")
 	private Date m_end;
 	

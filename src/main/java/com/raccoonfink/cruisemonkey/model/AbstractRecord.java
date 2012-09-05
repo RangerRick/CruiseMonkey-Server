@@ -2,20 +2,27 @@ package com.raccoonfink.cruisemonkey.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("record")
-public class AbstractRecord implements Record {
+public abstract class AbstractRecord implements Record {
+	@Column(name="created_by")
 	@XStreamAlias("created-by")
 	private String m_createdBy;
 
+	@Column(name="created")
 	@XStreamAlias("created")
 	private Date m_createdDate;
 
+	@Column(name="last_modified_by")
 	@XStreamAlias("last-modified-by")
 	private String m_lastModifiedBy;
 
-	@XStreamAlias("last-modified-by")
+	@Column(name="last_modified")
+	@XStreamAlias("last-modified")
 	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {
