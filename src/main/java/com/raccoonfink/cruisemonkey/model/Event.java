@@ -21,7 +21,7 @@ public class Event extends AbstractRecord implements Serializable {
 	@GeneratedValue
 	@XStreamAlias("id")
 	@XStreamAsAttribute
-	private int m_id;
+	private Integer m_id;
 
 	@Column(name="summary", length=100)
 	@XStreamAlias("summary")
@@ -31,11 +31,11 @@ public class Event extends AbstractRecord implements Serializable {
 	@XStreamAlias("description")
 	private String m_description;
 
-	@Column(name="start")
+	@Column(name="startDate")
 	@XStreamAlias("start")
 	private Date m_start;
 
-	@Column(name="end")
+	@Column(name="endDate")
 	@XStreamAlias("end")
 	private Date m_end;
 	
@@ -43,7 +43,7 @@ public class Event extends AbstractRecord implements Serializable {
 		super();
 	}
 
-	public Event(final int id, final String summary, final String description, final Date start, final Date end, final String createdBy) {
+	public Event(final Integer id, final String summary, final String description, final Date start, final Date end, final String createdBy) {
 		super(createdBy);
 		m_id          = id;
 		m_summary     = summary;
@@ -52,8 +52,8 @@ public class Event extends AbstractRecord implements Serializable {
 		m_end         = end;
 	}
 
-	public int getId() { return m_id; }
-	public void setId(final int id) { m_id = id; }
+	public Integer getId() { return m_id; }
+	public void setId(final Integer id) { m_id = id; }
 		
 	public String getSummary() { return m_summary; }
 	public void setSummary(final String summary) { m_summary = summary; }

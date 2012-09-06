@@ -3,13 +3,14 @@ package com.raccoonfink.cruisemonkey.model;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@MappedSuperclass
 @XStreamAlias("record")
 public abstract class AbstractRecord implements Record {
-	@Column(name="created_by")
+	@Column(name="created_by", length=64)
 	@XStreamAlias("created-by")
 	private String m_createdBy;
 
@@ -17,7 +18,7 @@ public abstract class AbstractRecord implements Record {
 	@XStreamAlias("created")
 	private Date m_createdDate;
 
-	@Column(name="last_modified_by")
+	@Column(name="last_modified_by", length=64)
 	@XStreamAlias("last-modified-by")
 	private String m_lastModifiedBy;
 
