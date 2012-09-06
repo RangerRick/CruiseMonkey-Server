@@ -33,7 +33,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller"/>
+	<bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller" />
 
 	<bean id="xmlMessageConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
 		<constructor-arg ref="xstreamMarshaller"/>

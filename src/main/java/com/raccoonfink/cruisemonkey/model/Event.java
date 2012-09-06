@@ -16,29 +16,22 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class Event extends AbstractRecord implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@Column(name="id")
-	@GeneratedValue
 	@XStreamAlias("id")
 	@XStreamAsAttribute
 	private Integer m_id;
 
-	@Column(name="summary", length=100)
 	@XStreamAlias("summary")
 	private String m_summary;
 
-	@Column(name="description", length=2048, nullable=true)
 	@XStreamAlias("description")
 	private String m_description;
 
-	@Column(name="startDate")
 	@XStreamAlias("start")
-	private Date m_start;
+	private Date m_startDate;
 
-	@Column(name="endDate")
 	@XStreamAlias("end")
-	private Date m_end;
-	
+	private Date m_endDate;
+
 	public Event() {
 		super();
 	}
@@ -48,22 +41,29 @@ public class Event extends AbstractRecord implements Serializable {
 		m_id          = id;
 		m_summary     = summary;
 		m_description = description;
-		m_start       = start;
-		m_end         = end;
+		m_startDate   = start;
+		m_endDate     = end;
 	}
 
+	@Id
+	@Column(name="id")
+	@GeneratedValue
 	public Integer getId() { return m_id; }
 	public void setId(final Integer id) { m_id = id; }
-		
+
+	@Column(name="summary", length=100)
 	public String getSummary() { return m_summary; }
 	public void setSummary(final String summary) { m_summary = summary; }
-	
+
+	@Column(name="description", length=2048, nullable=true)
 	public String getDescription() { return m_description; }
 	public void setDescription(final String description) { m_description = description; }
-	
-	public Date getStart() { return m_start; }
-	public void setStart(final Date start) { m_start = start; }
-	
-	public Date getEnd() { return m_end; }
-	public void setEnd(final Date end) { m_end = end; }
+
+	@Column(name="start_date")
+	public Date getStartDate() { return m_startDate; }
+	public void setStartDate(final Date startDate) { m_startDate = startDate; }
+
+	@Column(name="end_date")
+	public Date getEndDate() { return m_endDate; }
+	public void setEndDate(final Date endDate) { m_endDate = endDate; }
 }

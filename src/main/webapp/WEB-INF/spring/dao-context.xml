@@ -9,7 +9,7 @@
 
     <context:annotation-config />
 
-    <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.mock.MockUserDao" />
-    <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.mock.MockEventDao" />
+    <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateUserDao" />
+    <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao" />
 
 </beans>

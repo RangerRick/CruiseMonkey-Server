@@ -10,26 +10,21 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @MappedSuperclass
 @XStreamAlias("record")
 public abstract class AbstractRecord implements Record {
-	@Column(name="created_by", length=64)
 	@XStreamAlias("created-by")
 	private String m_createdBy;
 
-	@Column(name="created")
-	@XStreamAlias("created")
+	@XStreamAlias("created-date")
 	private Date m_createdDate;
 
-	@Column(name="last_modified_by", length=64)
 	@XStreamAlias("last-modified-by")
 	private String m_lastModifiedBy;
 
-	@Column(name="last_modified")
-	@XStreamAlias("last-modified")
+	@XStreamAlias("last-modified-date")
 	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {
-		final Date now = new Date();
-		m_createdDate = now;
-		m_lastModifiedDate = now;
+		m_createdDate = new Date();
+		m_lastModifiedDate = new Date(m_createdDate.getTime());
 	}
 
 	public AbstractRecord(final String createdBy) {
@@ -39,6 +34,7 @@ public abstract class AbstractRecord implements Record {
 	}
 
 	@Override
+	@Column(name="created_by", length=64)
 	public String getCreatedBy() {
 		return m_createdBy;
 	}
@@ -49,6 +45,7 @@ public abstract class AbstractRecord implements Record {
 	}
 
 	@Override
+	@Column(name="created_date")
 	public Date getCreatedDate() {
 		return m_createdDate;
 	}
@@ -59,6 +56,7 @@ public abstract class AbstractRecord implements Record {
 	}
 
 	@Override
+	@Column(name="last_modified_by", length=64)
 	public String getLastModifiedBy() {
 		return m_lastModifiedBy;
 	}
@@ -68,6 +66,7 @@ public abstract class AbstractRecord implements Record {
 	}
 
 	@Override
+	@Column(name="last_modified_date")
 	public Date getLastModifiedDate() {
 		return m_lastModifiedDate;
 	}

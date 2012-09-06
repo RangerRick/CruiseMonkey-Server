@@ -25,8 +25,9 @@
 			* create: creates the schema, destroying previous data.
 			* create-drop: drop the schema at the end of the session.
 		-->
-		<!-- JDBC connection pool (use the built-in) -->
+
 		<property name="hibernate.connection.pool_size">1</property>
+		<property name="hibernate.connection.autocommit">true</property>
 		<property name="hibernate.current_session_context_class">thread</property>
 
 		<mapping class="com.raccoonfink.cruisemonkey.model.Event" />

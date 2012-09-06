@@ -25,7 +25,7 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
-	public Event get(int id) {
+	public Event get(Integer id) {
 		for (final Event event : m_events) {
 			if (event.getId() == id) {
 				return event;
@@ -47,8 +47,8 @@ public class MockEventDao implements EventDao {
 		final List<Event> events = new ArrayList<Event>();
 
 		for (final Event event : m_events) {
-			final long eventStartTime = event.getStart().getTime();
-			final long eventEndTime   = event.getEnd().getTime();
+			final long eventStartTime = event.getStartDate().getTime();
+			final long eventEndTime   = event.getEndDate().getTime();
 			if (eventStartTime < startTime && eventEndTime >= startTime) {
 				// event overlaps with the start of the range
 				events.add(event);
@@ -75,8 +75,8 @@ public class MockEventDao implements EventDao {
 			@Override
 			public int compare(final Event left, final Event right) {
 				return new CompareToBuilder()
-					.append(left.getStart(), right.getStart())
-					.append(left.getEnd(), right.getEnd())
+					.append(left.getStartDate(), right.getStartDate())
+					.append(left.getEndDate(), right.getEndDate())
 					.append(left.getSummary(), right.getSummary())
 					.append(left.getId(), right.getId())
 					.append(left.getDescription(), right.getDescription())

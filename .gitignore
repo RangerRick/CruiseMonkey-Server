@@ -3,6 +3,7 @@
 .project
 .classpath
 .DS_Store
+cruisemonkey.lck
 cruisemonkey.log
 cruisemonkey.properties
 cruisemonkey.script
