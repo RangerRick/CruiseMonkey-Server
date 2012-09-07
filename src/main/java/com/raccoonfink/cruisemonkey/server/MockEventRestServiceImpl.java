@@ -21,7 +21,7 @@ public class MockEventRestServiceImpl implements EventRestService, InitializingB
 	}
 
 	@Override
-	public Event getEvent(final int id) {
+	public Event getEvent(final String id) {
 		return m_eventDao.get(id);
 	}
 

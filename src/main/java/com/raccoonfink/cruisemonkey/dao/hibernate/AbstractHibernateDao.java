@@ -24,7 +24,7 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		return m_sessionFactory;
 	}
 	
-	protected Session createSession() throws HibernateException {
+	public Session createSession() throws HibernateException {
 		return m_sessionFactory.getCurrentSession();
 	}
 

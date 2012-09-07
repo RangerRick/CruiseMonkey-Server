@@ -8,8 +8,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
+import org.hibernate.Session;
 
 import com.google.common.collect.Lists;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
@@ -21,11 +23,11 @@ public class MockEventDao implements EventDao {
 	public MockEventDao() {
 		final Date now = new Date();
 		final Date hourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-		m_events.add(new Event(1, "test", "test description", hourAgo, now, "ranger"));
+		m_events.add(new Event(UUID.randomUUID().toString(), "test description", hourAgo, now, "ranger"));
 	}
 
 	@Override
-	public Event get(Integer id) {
+	public Event get(final String id) {
 		for (final Event event : m_events) {
 			if (event.getId() == id) {
 				return event;
@@ -68,6 +70,11 @@ public class MockEventDao implements EventDao {
 	public void save(final Event event) {
 		m_events.add(event);
 	}
+	
+	@Override
+	public void save(final Event event, final Session session) {
+	        m_events.add(event);
+	}
 
 	private List<Event> sortedEventList(final Collection<Event> events) {
 		final List<Event> newList = Lists.newArrayList(events);
@@ -77,7 +84,6 @@ public class MockEventDao implements EventDao {
 				return new CompareToBuilder()
 					.append(left.getStartDate(), right.getStartDate())
 					.append(left.getEndDate(), right.getEndDate())
-					.append(left.getSummary(), right.getSummary())
 					.append(left.getId(), right.getId())
 					.append(left.getDescription(), right.getDescription())
 					.toComparison();

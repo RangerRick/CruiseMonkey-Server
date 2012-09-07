@@ -46,6 +46,12 @@
 				<configuration>
 					<contextPath>/opennms</contextPath>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<systemProperties>
+						<systemProperty>
+							<name>java.awt.headless</name>
+							<value>true</value>
+						</systemProperty>
+					</systemProperties>
 					<connectors>
 						<connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
 							<port>8088</port>
@@ -62,6 +68,12 @@
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
+			<version>1.0.3</version>
 		</dependency>
 
 		<dependency>

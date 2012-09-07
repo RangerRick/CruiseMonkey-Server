@@ -31,7 +31,7 @@ public class EventRestServiceController {
 	}
 	
 	@RequestMapping(value="/events/{id}")
-	public ModelAndView getUser(@PathVariable final int id) {
+	public ModelAndView getUser(@PathVariable final String id) {
 		final Event event = m_eventRestService.getEvent(id);
 		final ModelAndView mav = new ModelAndView("xmlView", BindingResult.MODEL_KEY_PREFIX + "event", event);
 		return mav;

@@ -27,7 +27,7 @@
 		-->
 
 		<property name="hibernate.connection.pool_size">1</property>
-		<property name="hibernate.connection.autocommit">true</property>
+		<property name="hibernate.connection.autocommit">false</property>
 		<property name="hibernate.current_session_context_class">thread</property>
 
 		<mapping class="com.raccoonfink.cruisemonkey.model.Event" />

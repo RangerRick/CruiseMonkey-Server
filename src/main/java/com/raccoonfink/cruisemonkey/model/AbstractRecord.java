@@ -23,8 +23,9 @@ public abstract class AbstractRecord implements Record {
 	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {
-		m_createdDate = new Date();
-		m_lastModifiedDate = new Date(m_createdDate.getTime());
+	        final long time = System.currentTimeMillis();
+		m_createdDate = new Date(time);
+		m_lastModifiedDate = new Date(time);
 	}
 
 	public AbstractRecord(final String createdBy) {
@@ -39,7 +40,7 @@ public abstract class AbstractRecord implements Record {
 		return m_createdBy;
 	}
 	
-	protected void setCreatedBy(final String username) {
+	public void setCreatedBy(final String username) {
 		m_createdBy = username;
 		if (m_lastModifiedBy == null) m_lastModifiedBy = username;
 	}
@@ -50,7 +51,7 @@ public abstract class AbstractRecord implements Record {
 		return m_createdDate;
 	}
 
-	protected void setCreatedDate(final Date created) {
+	public void setCreatedDate(final Date created) {
 		m_createdDate = created;
 		if (m_lastModifiedDate == null) m_lastModifiedDate = created;
 	}
@@ -61,7 +62,7 @@ public abstract class AbstractRecord implements Record {
 		return m_lastModifiedBy;
 	}
 
-	protected void setLastModifiedBy(final String username) {
+	public void setLastModifiedBy(final String username) {
 		m_lastModifiedBy = username;
 	}
 
@@ -71,7 +72,7 @@ public abstract class AbstractRecord implements Record {
 		return m_lastModifiedDate;
 	}
 	
-	protected void setLastModifiedDate(final Date modified) {
+	public void setLastModifiedDate(final Date modified) {
 		m_lastModifiedDate = modified;
 	}
 

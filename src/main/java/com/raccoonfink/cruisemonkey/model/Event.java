@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -18,10 +20,7 @@ public class Event extends AbstractRecord implements Serializable {
 
 	@XStreamAlias("id")
 	@XStreamAsAttribute
-	private Integer m_id;
-
-	@XStreamAlias("summary")
-	private String m_summary;
+	private String m_id;
 
 	@XStreamAlias("description")
 	private String m_description;
@@ -32,14 +31,17 @@ public class Event extends AbstractRecord implements Serializable {
 	@XStreamAlias("end")
 	private Date m_endDate;
 
+	@XStreamAlias("public")
+	@XStreamAsAttribute
+	private Boolean m_isPublic = false;
+
 	public Event() {
 		super();
 	}
 
-	public Event(final Integer id, final String summary, final String description, final Date start, final Date end, final String createdBy) {
+	public Event(final String id, final String description, final Date start, final Date end, final String createdBy) {
 		super(createdBy);
 		m_id          = id;
-		m_summary     = summary;
 		m_description = description;
 		m_startDate   = start;
 		m_endDate     = end;
@@ -47,13 +49,10 @@ public class Event extends AbstractRecord implements Serializable {
 
 	@Id
 	@Column(name="id")
-	@GeneratedValue
-	public Integer getId() { return m_id; }
-	public void setId(final Integer id) { m_id = id; }
-
-	@Column(name="summary", length=100)
-	public String getSummary() { return m_summary; }
-	public void setSummary(final String summary) { m_summary = summary; }
+	@GeneratedValue(generator="system-uuid")
+	@GenericGenerator(name="system-uuid", strategy="uuid")
+	public String getId() { return m_id; }
+	public void setId(final String id) { m_id = id; }
 
 	@Column(name="description", length=2048, nullable=true)
 	public String getDescription() { return m_description; }
@@ -66,4 +65,8 @@ public class Event extends AbstractRecord implements Serializable {
 	@Column(name="end_date")
 	public Date getEndDate() { return m_endDate; }
 	public void setEndDate(final Date endDate) { m_endDate = endDate; }
+	
+	@Column(name="public")
+	public Boolean getIsPublic() { return m_isPublic; }
+	public void setIsPublic(final Boolean isPublic) { m_isPublic = isPublic; }
 }

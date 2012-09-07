@@ -3,6 +3,7 @@ package com.raccoonfink.cruisemonkey.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -49,8 +50,8 @@ public class HibernateTest {
 			Session session = factory.getCurrentSession();
 			Transaction tx = session.beginTransaction();
 			
-			final Event event = new Event(1, "Test", "Test description.", new Date(), new Date(), "ranger");
-			final Integer id = (Integer)session.save(event);
+			final Event event = new Event(UUID.randomUUID().toString(), "Test description.", new Date(), new Date(), "ranger");
+			final String id = (String)session.save(event);
 			System.err.println("id = " + id);
 			tx.commit();
 		} finally {

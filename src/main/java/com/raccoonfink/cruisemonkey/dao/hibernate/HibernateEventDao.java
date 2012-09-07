@@ -12,7 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 
-public class HibernateEventDao extends AbstractHibernateDao<Event, Integer> implements EventDao {
+public class HibernateEventDao extends AbstractHibernateDao<Event,String> implements EventDao {
 
 	@Override
 	public List<Event> findInRange(final Date start, final Date end) {
@@ -31,6 +31,15 @@ public class HibernateEventDao extends AbstractHibernateDao<Event, Integer> impl
 	}
 
 	@Override
+	public void save(final Event event, final Session session) {
+	    if (session == null) {
+	        save(event);
+	    } else {
+	        session.save(event);
+	    }
+	}
+
+	@Override
 	protected Class<Event> getClassType() {
 		return Event.class;
 	}
@@ -39,7 +48,6 @@ public class HibernateEventDao extends AbstractHibernateDao<Event, Integer> impl
 	protected List<Event> resultWithDefaultSort(final Criteria criteria) {
 		final Criteria resultCriteria = criteria
 				.addOrder(Order.asc("startDate"))
-				.addOrder(Order.asc("summary"))
 				.addOrder(Order.asc("lastModifiedDate"));
 
 		return (List<Event>)resultCriteria.list();
