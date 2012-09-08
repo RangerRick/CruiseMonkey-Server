@@ -37,7 +37,28 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		final Session session = createSession();
 		final Transaction tx = session.beginTransaction();
 		try {
-			return resultWithDefaultSort(session.createCriteria(getClassType()));
+			return findAll(session);
+		} finally {
+			tx.commit();
+		}
+	}
+
+	@Override
+	public List<T> findAll(final Session session) {
+		return resultWithDefaultSort(session.createCriteria(getClassType()));
+	}
+
+	@Override
+	public List<T> find(final Criteria criteria) {
+		return resultWithDefaultSort(criteria);
+	}
+	
+	@Override
+	public T get(final K id) {
+		final Session session = createSession();
+		final Transaction tx = session.beginTransaction();
+		try {
+			return get(id, session);
 		} finally {
 			tx.commit();
 		}
@@ -45,15 +66,25 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public T get(final K id) {
+	public T get(final K id, final Session session) {
+		return (T)session.get(getClassType(), id);
+	}
+
+	@Override
+	public void delete(final T obj) {
 		final Session session = createSession();
 		final Transaction tx = session.beginTransaction();
 		
 		try {
-			return (T)session.get(getClassType(), id);
+			delete(obj, session);
 		} finally {
 			tx.commit();
 		}
+	}
+
+	@Override
+	public void delete(final T obj, final Session session) {
+		session.delete(obj);
 	}
 
 	@Override
@@ -62,9 +93,15 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		final Transaction tx = session.beginTransaction();
 		
 		try {
-			session.save(obj);
+			save(obj, session);
 		} finally {
 			tx.commit();
 		}
 	}
+
+	@Override
+	public void save(final T obj, final Session session) {
+		session.save(obj);
+	}
+
 }

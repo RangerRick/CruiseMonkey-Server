@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 
 import com.google.common.collect.Lists;
@@ -23,7 +24,7 @@ public class MockEventDao implements EventDao {
 	public MockEventDao() {
 		final Date now = new Date();
 		final Date hourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-		m_events.add(new Event(UUID.randomUUID().toString(), "test description", hourAgo, now, "ranger"));
+		m_events.add(new Event(UUID.randomUUID().toString(), "test", "test description", hourAgo, now, "ranger"));
 	}
 
 	@Override
@@ -37,8 +38,23 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
+	public Event get(final String id, final Session session) {
+		return get(id);
+	}
+
+	@Override
 	public List<Event> findAll() {
 		return sortedEventList(m_events);
+	}
+
+	@Override
+	public List<Event> findAll(Session session) {
+		return findAll();
+	}
+
+	@Override
+	public List<Event> find(final Criteria criteria) {
+		throw new UnsupportedOperationException("not implemented");
 	}
 
 	@Override
@@ -67,13 +83,23 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
+	public void delete(final Event event) {
+		m_events.remove(event);
+	}
+
+	@Override
+	public void delete(final Event event, final Session session) {
+		delete(event);
+	}
+
+	@Override
 	public void save(final Event event) {
 		m_events.add(event);
 	}
 	
 	@Override
 	public void save(final Event event, final Session session) {
-	        m_events.add(event);
+		save(event);
 	}
 
 	private List<Event> sortedEventList(final Collection<Event> events) {
@@ -84,8 +110,9 @@ public class MockEventDao implements EventDao {
 				return new CompareToBuilder()
 					.append(left.getStartDate(), right.getStartDate())
 					.append(left.getEndDate(), right.getEndDate())
-					.append(left.getId(), right.getId())
+					.append(left.getSummary(), right.getSummary())
 					.append(left.getDescription(), right.getDescription())
+					.append(left.getId(), right.getId())
 					.toComparison();
 			}
 		});

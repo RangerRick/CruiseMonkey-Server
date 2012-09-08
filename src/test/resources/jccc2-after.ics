@@ -47,26 +47,7 @@ LAST-MODIFIED:20120613T193002Z
 LOCATION:Culinary Arts Center
 SEQUENCE:4
 STATUS:CONFIRMED
-SUMMARY:DRAMA CLUB with Bill Corbett & Peter Sagal - Culinary Arts Center
-TRANSP:OPAQUE
-END:VEVENT
-BEGIN:VEVENT
-DTSTART:20120221T160000Z
-DTEND:20120221T163000Z
-DTSTAMP:20120907T023131Z
-UID:9p9ueqvvu0t9moajheeodo4ros@google.com
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=JoCo C
- ruise Crazy 2 Events Calendar;X-NUM-GUESTS=0:mailto:nh76o8dgn9d86b7n3p3uofg
- 1q0@group.calendar.google.com
-CREATED:20111111T192025Z
-DESCRIPTION:Gather in the Vista Lounge for the Official JCCC2 Group Photo\,
-  scheduled to be taken on the Westerdam bow (weather permitting). "Koko's K
- itten" photo to be taken at this time as well.
-LAST-MODIFIED:20120327T185044Z
-LOCATION:Vista Lounge
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:JCCC2 "Official" Group Photo
+SUMMARY:DRAMA CLUB with Bill Corbett & Peter Sagal - Culinary Arts Center 2
 TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT

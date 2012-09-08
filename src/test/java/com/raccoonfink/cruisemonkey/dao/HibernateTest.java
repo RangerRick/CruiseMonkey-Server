@@ -50,7 +50,7 @@ public class HibernateTest {
 			Session session = factory.getCurrentSession();
 			Transaction tx = session.beginTransaction();
 			
-			final Event event = new Event(UUID.randomUUID().toString(), "Test description.", new Date(), new Date(), "ranger");
+			final Event event = new Event(UUID.randomUUID().toString(), "test", "Test description.", new Date(), new Date(), "ranger");
 			final String id = (String)session.save(event);
 			System.err.println("id = " + id);
 			tx.commit();

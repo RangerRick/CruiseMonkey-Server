@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+
 import com.raccoonfink.cruisemonkey.UserException;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.User;
@@ -20,10 +23,35 @@ public class MockUserDao implements UserDao {
 	public List<User> findAll() {
 		return new ArrayList<User>(m_users.values());
 	}
+	
+	@Override
+	public List<User> findAll(final Session session) {
+		return findAll();
+	}
+
+	@Override
+	public List<User> find(final Criteria criteria) {
+		throw new UnsupportedOperationException("not implemented");
+	}
 
 	@Override
 	public User get(final String username) {
 		return m_users.get(username);
+	}
+
+	@Override
+	public User get(final String username, final Session session) {
+		return get(username);
+	}
+
+	@Override
+	public void delete(final User user) {
+		m_users.remove(user.getUsername());
+	}
+	
+	@Override
+	public void delete(final User user, final Session session) {
+		delete(user);
 	}
 
 	@Override
@@ -35,4 +63,8 @@ public class MockUserDao implements UserDao {
 		}
 	}
 
+	@Override
+	public void save(final User user, final Session session) throws UserException {
+		save(user);
+	}
 }
