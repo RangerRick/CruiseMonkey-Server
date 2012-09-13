@@ -10,9 +10,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
-import com.raccoonfink.cruisemonkey.dao.Dao;
-
-public abstract class AbstractHibernateDao<T,K extends Serializable> implements Dao<T,K> {
+public abstract class AbstractHibernateDao<T,K extends Serializable> implements HibernateDao<T,K> {
 	private final SessionFactory m_sessionFactory;
 
 	@SuppressWarnings("deprecation")
@@ -24,6 +22,7 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		return m_sessionFactory;
 	}
 	
+	@Override
 	public Session createSession() throws HibernateException {
 		return m_sessionFactory.getCurrentSession();
 	}

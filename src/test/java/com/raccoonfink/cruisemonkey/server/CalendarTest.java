@@ -11,15 +11,17 @@ import org.junit.Test;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao;
-import com.raccoonfink.cruisemonkey.dao.hibernate.OfficialCalendarVisitor;
 import com.raccoonfink.cruisemonkey.model.Event;
 
 public class CalendarTest {
 	private EventDao m_eventDao;
+	private OfficialCalendarVisitor m_visitor;
 	
 	@Before
 	public void setUp() {
 		m_eventDao = new HibernateEventDao();
+		m_visitor = new OfficialCalendarVisitor();
+		m_visitor.setEventDao(m_eventDao);
 	}
 
 	@Test
@@ -27,7 +29,7 @@ public class CalendarTest {
         // final URL url = new URL("https://www.google.com/calendar/ical/nh76o8dgn9d86b7n3p3uofg1q0%40group.calendar.google.com/public/basic.ics");
         final CalendarManager manager = new CalendarManager();
         manager.setUrl(new File("src/test/resources/before.ics").toURI().toURL());
-        manager.setVisitor(new OfficialCalendarVisitor());
+		manager.setVisitor(m_visitor);
         manager.updateNow();
         
         final List<Event> events = m_eventDao.findAll();
@@ -39,7 +41,7 @@ public class CalendarTest {
     public void testOfficialCalendarVisitorUpdate() throws Exception {
         // final URL url = new URL("https://www.google.com/calendar/ical/nh76o8dgn9d86b7n3p3uofg1q0%40group.calendar.google.com/public/basic.ics");
 		final CalendarManager manager = new CalendarManager();
-        manager.setVisitor(new OfficialCalendarVisitor());
+        manager.setVisitor(m_visitor);
         manager.setUrl(new File("src/test/resources/before.ics").toURI().toURL());
         manager.updateNow();
         
@@ -63,7 +65,7 @@ public class CalendarTest {
         // final URL url = new URL("https://www.google.com/calendar/ical/nh76o8dgn9d86b7n3p3uofg1q0%40group.calendar.google.com/public/basic.ics");
 
 		final CalendarManager manager = new CalendarManager();
-        manager.setVisitor(new OfficialCalendarVisitor());
+		manager.setVisitor(m_visitor);
         manager.setUrl(new File("src/test/resources/jccc2-before.ics").toURI().toURL());
         manager.updateNow();
         

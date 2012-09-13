@@ -1,4 +1,4 @@
-package com.raccoonfink.cruisemonkey.dao.hibernate;
+package com.raccoonfink.cruisemonkey.server;
 
 import java.util.Date;
 import java.util.List;
@@ -23,6 +23,8 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import com.raccoonfink.cruisemonkey.dao.CalendarVisitor;
+import com.raccoonfink.cruisemonkey.dao.EventDao;
+import com.raccoonfink.cruisemonkey.dao.hibernate.HibernateDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 
 public class OfficialCalendarVisitor implements CalendarVisitor {
@@ -31,7 +33,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
     private static Pattern m_escaped = Pattern.compile("\\\\(.)", Pattern.MULTILINE | Pattern.DOTALL);
     private static Pattern m_eol     = Pattern.compile("[\\r\\n\\s]*(.*?)[\\r\\n\\s]", Pattern.MULTILINE | Pattern.DOTALL);
 
-    private final HibernateEventDao m_eventDao;
+    private EventDao m_eventDao;
     private Session m_session         = null;
     private Transaction m_transaction = null;
 	@SuppressWarnings("unused")
@@ -39,13 +41,23 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 	private long m_lastUpdated;
 
     public OfficialCalendarVisitor() {
-    	m_eventDao = new HibernateEventDao();
+    }
+
+    public EventDao getEventDao() {
+    	return m_eventDao;
+    }
+    
+    public void setEventDao(final EventDao eventDao) {
+    	m_eventDao = eventDao;
     }
 
 	@Override
+    @SuppressWarnings("unchecked")
 	public void begin() {
-        m_session = m_eventDao.createSession();
-        m_transaction = m_session.beginTransaction();
+    	if (m_eventDao instanceof HibernateDao<?,?>) {
+            m_session = ((HibernateDao<Event,String>)m_eventDao).createSession();
+            m_transaction = m_session.beginTransaction();
+    	}
         m_lastUpdated = System.currentTimeMillis();
 	}
 
@@ -68,18 +80,19 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
     
     @Override
     public void end() {
-    	final Criteria criteria = m_session.createCriteria(Event.class)
-    			.add(Restrictions.lt("lastModifiedDate", new Date(m_lastUpdated)));
-    	final List<Event> events = m_eventDao.find(criteria);
-
-        for (final Event event : events) {
-        	if (IMPORT_USERNAME.equals(event.getCreatedBy())) {
-        		m_eventDao.delete(event, m_session);
-        	}
-        }
-    	// System.out.println("");
-        m_transaction.commit();
-        
+    	if (m_session != null && m_transaction != null) {
+	    	final Criteria criteria = m_session.createCriteria(Event.class)
+	    			.add(Restrictions.lt("lastModifiedDate", new Date(m_lastUpdated)));
+	    	final List<Event> events = m_eventDao.find(criteria);
+	
+	        for (final Event event : events) {
+	        	if (IMPORT_USERNAME.equals(event.getCreatedBy())) {
+	        		m_eventDao.delete(event, m_session);
+	        	}
+	        }
+	    	// System.out.println("");
+	        m_transaction.commit();
+    	}
     }
 
     private VTimeZone getTimeZone(final Component component) {

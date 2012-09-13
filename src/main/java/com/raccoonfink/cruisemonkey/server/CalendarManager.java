@@ -14,16 +14,16 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.CalendarVisitor;
 
 public class CalendarManager implements InitializingBean {
-	@Autowired
-	private URL m_url;
+	private static final int MINUTES = 5;
 
+	private URL m_url;
 	private CalendarVisitor m_visitor;
+
 	private ScheduledExecutorService m_executor = Executors.newSingleThreadScheduledExecutor();
 
 	public CalendarManager() {
@@ -50,7 +50,9 @@ public class CalendarManager implements InitializingBean {
 		Assert.notNull(m_url);
 		Assert.notNull(m_visitor);
 
-		m_executor.schedule(getRunnable(), 5, TimeUnit.MINUTES);
+		System.err.println("Scheduling calendar update every " + MINUTES + " minutes.");
+		getRunnable().run();
+		m_executor.schedule(getRunnable(), MINUTES, TimeUnit.MINUTES);
 	}
 
 	private Runnable getRunnable() {
@@ -58,6 +60,7 @@ public class CalendarManager implements InitializingBean {
 			@Override
 			public void run() {
 		        final URL url = getUrl();
+				System.err.println("Updating calendar information from " + url);
 				try {
 					final Calendar calendar = getCalendar(url);
 					CalendarManager.visitCalendar(calendar, getVisitor());
