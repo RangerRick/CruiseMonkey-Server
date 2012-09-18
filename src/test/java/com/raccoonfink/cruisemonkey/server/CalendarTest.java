@@ -8,20 +8,39 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
-import com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations={
+		"classpath:/META-INF/spring/dao-context.xml",
+		"classpath:/META-INF/spring/server-context.xml"
+})
+@Transactional
 public class CalendarTest {
+	@Autowired
 	private EventDao m_eventDao;
+	
+	@Autowired
 	private OfficialCalendarVisitor m_visitor;
 	
 	@Before
 	public void setUp() {
-		m_eventDao = new HibernateEventDao();
+		/*
+		final HibernateEventDao hibernateEventDao = new HibernateEventDao();
+		m_eventDao = hibernateEventDao;
+		@SuppressWarnings("deprecation")
+		final SessionFactory sf = new Configuration().configure().buildSessionFactory();
+		hibernateEventDao.setSessionFactory(sf);
 		m_visitor = new OfficialCalendarVisitor();
 		m_visitor.setEventDao(m_eventDao);
+		*/
 	}
 
 	@Test

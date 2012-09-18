@@ -8,18 +8,21 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractHibernateDao<T,K extends Serializable> implements HibernateDao<T,K> {
-	private final SessionFactory m_sessionFactory;
+	@Autowired
+	private SessionFactory m_sessionFactory;
 
-	@SuppressWarnings("deprecation")
 	public AbstractHibernateDao() {
-		m_sessionFactory = new Configuration().configure().buildSessionFactory();
 	}
 	
-	protected SessionFactory getSessionFactory() {
+	public SessionFactory getSessionFactory() {
 		return m_sessionFactory;
+	}
+	
+	public void setSessionFactory(final SessionFactory sessionFactory) {
+		m_sessionFactory = sessionFactory;
 	}
 	
 	@Override

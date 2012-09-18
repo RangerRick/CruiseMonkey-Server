@@ -35,4 +35,9 @@ public class MockEventRestServiceImpl implements EventRestService, InitializingB
 		return Lists.newArrayList(m_eventDao.findInRange(start, end));
 	}
 
+	@Override
+	public void putEvent(final Event event) {
+		m_eventDao.save(event);
+	}
+
 }

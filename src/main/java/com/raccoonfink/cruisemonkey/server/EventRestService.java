@@ -9,4 +9,5 @@ public interface EventRestService {
 	public Event getEvent(final String id);
 	public List<Event> getEvents();
 	public List<Event> getEventsInRange(final Date start, final Date end);
+	public void putEvent(final Event event);
 }

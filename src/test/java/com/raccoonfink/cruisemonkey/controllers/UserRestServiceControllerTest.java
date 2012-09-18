@@ -1,4 +1,4 @@
-package com.raccoonfink.cruisemonkey.server;
+package com.raccoonfink.cruisemonkey.controllers;
 
 import static org.junit.Assert.*;
 
@@ -9,9 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.raccoonfink.cruisemonkey.controllers.UserRestServiceController;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.dao.mock.MockUserDao;
 import com.raccoonfink.cruisemonkey.model.User;
+import com.raccoonfink.cruisemonkey.server.MockUserRestServiceImpl;
+import com.raccoonfink.cruisemonkey.server.UserRestService;
 
 public class UserRestServiceControllerTest {
 	private UserRestServiceController m_controller;
