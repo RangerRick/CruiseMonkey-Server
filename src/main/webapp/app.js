@@ -1,3 +1,5 @@
+console.log("app.js loading");
+
 ko.bindingHandlers.dateString = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
 		var value = valueAccessor(),
@@ -57,8 +59,5 @@ function EventsViewModel() {
 }
 
 var eventsModel = new EventsViewModel();
-ko.applyBindings(eventsModel);
 
-var interval = setInterval(function() {
-	eventsModel.updateDataFromJSON();
-}, 30000);
+console.log("app.js loaded");
