@@ -41,11 +41,14 @@ function EventsViewModel() {
 	        	});
 	        	if (item) {
 //	        		console.log("reusing " + ko.toJSON(item));
-	        		item.summary(event.summary + " (BLAH)");
-	        		item.description(event.description);
-	        		item.start(new Date(event.startDate));
-	        		item.end(new Date(event.endDate));
-	        		item.createdBy(event.createdBy);
+	        		var startDate = new Date(event.startDate);
+	        		var endDate   = new Date(event.endDate);
+
+	        		if (item.summary()         != event.summary)       { item.summary(event.summary); }
+	        		if (item.description()     != event.description)   { item.description(event.description); }
+	        		if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
+	        		if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
+	        		if (item.createdBy         != event.createdBy)     { item.createdBy(event.createdBy); }
 	        		return item;
 	        	} else {
 		        	return new Event(event);

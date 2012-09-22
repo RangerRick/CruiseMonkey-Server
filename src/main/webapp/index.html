@@ -7,13 +7,13 @@
 
     <!-- <link href="jquery/jquery.mobile.structure-1.2.0-rc.1.min.css" rel="stylesheet" /> -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="styles.css" type="text/css" />
     <style>
       body {
-        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        padding-top: 40px; /* 40px to make the container go all the way to the bottom of the topbar */
       }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" type="text/css" />
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -30,10 +30,13 @@
     <script src="mustache/mustache.js"></script>
     <script src="knockout/knockout-2.1.0.js"></script>
     <script src="knockout/knockout.mapping-latest.js"></script>
+    <script src="hammer/hammer.js"></script>
+    <script src="hammer/jquery.hammer.js"></script>
+    <script src="navbar.js"></script>
     <script src="app.js"></script>
     <script src="init.js"></script>
     <script>
-      // Until we set up phonegap, trigger manually
+      // FIXME: Until we set up phonegap, trigger manually
       onDeviceReady(null);
     </script>
   </body>

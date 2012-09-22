@@ -52,7 +52,7 @@ public class CalendarManager implements InitializingBean {
 
 		System.err.println("Scheduling calendar update every " + MINUTES + " minutes.");
 		getRunnable().run();
-		m_executor.schedule(getRunnable(), MINUTES, TimeUnit.MINUTES);
+		// m_executor.schedule(getRunnable(), MINUTES, TimeUnit.MINUTES);
 	}
 
 	private Runnable getRunnable() {

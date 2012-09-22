@@ -58,13 +58,31 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
-	public List<Event> findInRange(final Date start, final Date end) {
+	public List<Event> findByUser(final String userName) {
+		final List<Event> events = new ArrayList<Event>();
+		
+		for (final Event event : m_events) {
+			if (userName != null && !event.getCreatedBy().equalsIgnoreCase(userName)) {
+				continue;
+			}
+			events.add(event);
+		}
+		
+		return sortedEventList(events);
+	}
+
+	@Override
+	public List<Event> findInRange(final Date start, final Date end, final String userName) {
 		final long startTime = start.getTime();
 		final long endTime   = end.getTime();
 
 		final List<Event> events = new ArrayList<Event>();
 
 		for (final Event event : m_events) {
+			if (userName != null && !event.getCreatedBy().equalsIgnoreCase(userName)) {
+				continue;
+			}
+
 			final long eventStartTime = event.getStartDate().getTime();
 			final long eventEndTime   = event.getEndDate().getTime();
 			if (eventStartTime < startTime && eventEndTime >= startTime) {

@@ -26,13 +26,13 @@ public class MockEventRestServiceImpl implements EventRestService, InitializingB
 	}
 
 	@Override
-	public List<Event> getEvents() {
-		return Lists.newArrayList(m_eventDao.findAll());
+	public List<Event> getEvents(final String userName) {
+		return Lists.newArrayList(m_eventDao.findByUser(userName));
 	}
 
 	@Override
-	public List<Event> getEventsInRange(final Date start, final Date end) {
-		return Lists.newArrayList(m_eventDao.findInRange(start, end));
+	public List<Event> getEventsInRange(final Date start, final Date end, final String userName) {
+		return Lists.newArrayList(m_eventDao.findInRange(start, end, userName));
 	}
 
 	@Override

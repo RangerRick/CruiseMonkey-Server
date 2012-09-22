@@ -15,21 +15,44 @@ import com.raccoonfink.cruisemonkey.model.Event;
 public class HibernateEventDao extends AbstractHibernateDao<Event,String> implements EventDao {
 
 	@Override
-	public List<Event> findInRange(final Date start, final Date end) {
+	public List<Event> findByUser(final String userName) {
 		final Session session = createSession();
 		final Transaction tx = session.beginTransaction();
 		
 		try {
-			return findInRange(start, end, session);
+			return findByUser(userName, session);
+		} finally {
+			tx.commit();
+		}
+	}
+	
+	public List<Event> findByUser(final String userName, final Session session) {
+		Criteria criteria = session.createCriteria(Event.class);
+		if (userName != null) {
+			criteria = criteria.add(Restrictions.eq("createdBy", userName).ignoreCase());
+		}
+		return resultWithDefaultSort(criteria);
+	}
+
+	@Override
+	public List<Event> findInRange(final Date start, final Date end, final String userName) {
+		final Session session = createSession();
+		final Transaction tx = session.beginTransaction();
+		
+		try {
+			return findInRange(start, end, userName, session);
 		} finally {
 			tx.commit();
 		}
 	}
 
-	public List<Event> findInRange(final Date start, final Date end, final Session session) {
-		final Criteria criteria = session.createCriteria(Event.class)
+	public List<Event> findInRange(final Date start, final Date end, final String userName, final Session session) {
+		Criteria criteria = session.createCriteria(Event.class)
 				.add(Restrictions.ge("startDate", start))
 				.add(Restrictions.le("endDate", end));
+		if (userName != null) {
+			criteria = criteria.add(Restrictions.eq("createdBy", userName).ignoreCase());
+		}
 		return resultWithDefaultSort(criteria);
 	}
 

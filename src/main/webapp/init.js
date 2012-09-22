@@ -31,11 +31,8 @@ var header, container;
 
 function setupDefaultView() {
     console.log("setting up default view");
-    header = $("body").find("#header");
-    container = $("body").find("#content");
-
-    header.html(templates.header);
-    container.html( Mustache.to_html(templates.events, { event_header: "Official Events" }));
+    
+    showOfficialEventsView();
 
     // initialize model data
     ko.applyBindings(eventsModel);
@@ -43,6 +40,15 @@ function setupDefaultView() {
     var interval = setInterval(function() {
     	eventsModel.updateDataFromJSON();
     }, 30000);
+}
+
+function showOfficialEventsView() {
+    header = $("body").find("#header");
+    container = $("body").find("#content");
+
+    header.html(templates.header);
+    container.html( Mustache.to_html(templates.events, { event_header: "Official Events" }));
+    container.find('ul.event-list').css('visibility', 'visible');
 }
 
 function onTemplateLoaded(template, key) {

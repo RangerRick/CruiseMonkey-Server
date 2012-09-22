@@ -26,11 +26,11 @@ public class EventRestServiceController {
 
 	@RequestMapping(method=RequestMethod.GET)
 	@Transactional(readOnly=true)
-	public Events getUsers(@RequestParam(value="start", required=false) final Date start, @RequestParam(value="end", required=false) final Date end) {
+	public Events getEvents(@RequestParam(value="start", required=false) final Date start, @RequestParam(value="end", required=false) final Date end, @RequestParam(value="user", required=false) final String userName) {
 		if (start != null && end != null) {
-			return new Events(m_eventRestService.getEventsInRange(start, end));
+			return new Events(m_eventRestService.getEventsInRange(start, end, userName));
 		} else {
-			return new Events(m_eventRestService.getEvents());
+			return new Events(m_eventRestService.getEvents(userName));
 		}
 	}
 
