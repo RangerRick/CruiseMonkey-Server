@@ -117,15 +117,17 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 		// final Date lastModifiedDate = new Date(lastModified.getDate().getTime());
 		final Date lastModifiedDate = new Date(m_lastUpdated);
 
+		String summaryString = summary.getValue().trim();
+		final String locationString = location.getValue().trim();
+
 		final Event existingEvent = m_eventDao.get(id, m_session);
 
-		System.err.println("found existing event: " + existingEvent);
 		if (existingEvent == null) {
 			final Event event = new Event();
 			event.setId(id);
-			event.setSummary(summary.getValue());
-			event.setDescription(description.getValue());
-			event.setLocation(location.getValue());
+			event.setSummary(summaryString);
+			event.setDescription(description.getValue().trim());
+			event.setLocation(locationString);
 			event.setIsPublic(true);
 			event.setStartDate(startDate);
 			event.setEndDate(endDate);
@@ -135,9 +137,10 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 			event.setLastModifiedDate(lastModifiedDate);
 			return event;
 		} else {
-			existingEvent.setSummary(summary.getValue());
-			existingEvent.setDescription(description.getValue());
-			existingEvent.setLocation(location.getValue());
+			System.err.println("found existing event: " + existingEvent);
+			existingEvent.setSummary(summaryString);
+			existingEvent.setDescription(description.getValue().trim());
+			existingEvent.setLocation(locationString);
 			existingEvent.setStartDate(startDate);
 			existingEvent.setEndDate(endDate);
 			existingEvent.setCreatedDate(createdDate);

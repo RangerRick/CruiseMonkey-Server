@@ -10,14 +10,41 @@ ko.bindingHandlers.dateString = {
 	}
 }
 
+function removeLastMatch(string, match) {
+	var n = string.lastIndexOf(match);
+	if (n >= 0 && (n + match.length) == string.length) {
+		// console.log("removeLastMatch: " + string + " matches " + match);
+		return string.substring(0, n);
+	} else {
+		// console.log("removeLastMatch: " + string + " does not match " + match);
+		return string;
+	}
+}
+
 function Event(data) {
 	var self = this;
-	self.id = data.id;
-	self.summary = ko.observable(data.summary);
+
+	data.summary = removeLastMatch(data.summary, ' - ' + data.location);
+
+	self.id          = data.id;
+	self.summary     = ko.observable(data.summary);
 	self.description = ko.observable(data.description);
-	self.start = ko.observable(new Date(data.startDate));
-	self.end = ko.observable(new Date(data.endDate));
-	self.createdBy = ko.observable(data.createdBy);
+	self.start       = ko.observable(new Date(data.startDate));
+	self.end         = ko.observable(new Date(data.endDate));
+	self.location    = ko.observable(data.location);
+	self.createdBy   = ko.observable(data.createdBy);
+	self.timespan    = ko.computed(function() {
+		var start = start === null? null : formatTime(self.start(), false);
+		var end   = end   === null? null : formatTime(self.end(), false);
+		var retVal = "";
+		if (start != null) {
+			retVal += start;
+			if (end != null) {
+				retVal += "-" + end;
+			}
+		}
+		return retVal;
+	}, self);
 }
 
 var entryIdMatch = function(entry, id) {
