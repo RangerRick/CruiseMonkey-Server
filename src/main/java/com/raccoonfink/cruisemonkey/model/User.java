@@ -8,6 +8,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,17 +22,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @XmlRootElement(name="user")
+@XmlAccessorType(XmlAccessType.NONE)
 public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = 3424942325904141059L;
+	private static final long serialVersionUID = -5588394243858729656L;
 
-	@XmlAttribute(name="username")
 	private String m_username;
-
-	@XmlElement(name="name")
 	private String m_name;
-
-	// @XmlElement(name="password")
-	@XmlTransient
 	private String m_password;
 
 	public User() {
@@ -45,6 +42,7 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 
 	@Id
 	@Column(name="username", length=64, unique=true)
+	@XmlAttribute(name="username")
 	public String getUsername() {
 		return m_username;
 	}
@@ -54,6 +52,7 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	}
 
 	@Column(name="name", length=256)
+	@XmlElement(name="name")
 	public String getName() {
 		return m_name;
 	}
@@ -62,29 +61,43 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		m_name = name;
 	}
 
-	@Column(name="password", length=32)
+	@Transient
+	@XmlElement(name="password")
 	public String getPassword() {
-		return m_password;
+		return m_password == null? null : "********";
 	}
 	
 	public void setPassword(final String password) {
 		m_password = password;
 	}
 
+	@Column(name="password", length=32)
+	@XmlTransient
+	public String getPlaintextPassword() {
+		return m_password;
+	}
+
+	public void setPlaintextPassword(final String password) {
+		m_password = password;
+	}
+
 	@Override
 	@Transient
+	@XmlTransient
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 	}
 
 	@Override
 	@Transient
+	@XmlTransient
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
 	@Override
 	@Transient
+	@XmlTransient
 	public boolean isAccountNonLocked() {
 		return true;
 	}
@@ -97,6 +110,7 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 
 	@Override
 	@Transient
+	@XmlTransient
 	public boolean isEnabled() {
 		return true;
 	}
