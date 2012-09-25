@@ -3,9 +3,9 @@ package com.raccoonfink.cruisemonkey.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@XStreamAlias("users")
+@XmlRootElement(name="users")
 public class Users extends ArrayList<User> {
 	private static final long serialVersionUID = -7572598560006224755L;
 

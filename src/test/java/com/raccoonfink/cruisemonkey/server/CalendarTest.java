@@ -90,7 +90,7 @@ public class CalendarTest {
         
         final List<Event> beforeEvents = m_eventDao.findAll();
         assertEquals(2, beforeEvents.size());
-        assertEquals("DRAMA CLUB with Bill Corbett & Peter Sagal", beforeEvents.get(0).getSummary());
+        assertEquals("DRAMA CLUB with Bill Corbett & Peter Sagal - Culinary Arts Center", beforeEvents.get(0).getSummary());
         assertEquals("JCCC2 \"Official\" Group Photo", beforeEvents.get(1).getSummary());
 
 		manager.setUrl(new File("src/test/resources/jccc2-after.ics").toURI().toURL());

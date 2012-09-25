@@ -54,11 +54,12 @@ var entryIdMatch = function(entry, id) {
 function EventsViewModel() {
 	var self = this;
 	self.events = ko.observableArray();
+	self.group  = ko.observable("official");
 	self.filter = ko.observable("");
 
 	self.updateDataFromJSON = function() {
-	    $.getJSON("http://sin.local:8088/events.json", function(allData) {
-	        var mappedTasks = $.map(allData.eventList, function(event) {
+	    $.getJSON("http://localhost:8088/events", function(allData) {
+	        var mappedTasks = $.map(allData.event, function(event) {
 	        	var item = ko.utils.arrayFirst(self.events(), function(entry) {
 	        		if (entry.id == event.id) {
 	        			// console.log("found match: " + ko.toJSON(entry));
@@ -68,7 +69,7 @@ function EventsViewModel() {
 	        		}
 	        	});
 	        	if (item) {
-//	        		console.log("reusing " + ko.toJSON(item));
+	        		// console.log("reusing " + ko.toJSON(item));
 	        		var startDate = new Date(event.startDate);
 	        		var endDate   = new Date(event.endDate);
 
@@ -76,7 +77,7 @@ function EventsViewModel() {
 	        		if (item.description()     != event.description)   { item.description(event.description); }
 	        		if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
 	        		if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
-	        		if (item.createdBy         != event.createdBy)     { item.createdBy(event.createdBy); }
+	        		if (item.createdBy()       != event.createdBy)     { item.createdBy(event.createdBy); }
 	        		return item;
 	        	} else {
 		        	return new Event(event);

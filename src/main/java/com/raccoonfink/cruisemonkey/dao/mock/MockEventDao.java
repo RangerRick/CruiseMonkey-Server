@@ -14,9 +14,9 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 
-import com.google.common.collect.Lists;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
+import com.raccoonfink.cruisemonkey.model.User;
 
 public class MockEventDao implements EventDao {
 	private Set<Event> m_events = new TreeSet<Event>();
@@ -24,7 +24,8 @@ public class MockEventDao implements EventDao {
 	public MockEventDao() {
 		final Date now = new Date();
 		final Date hourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-		m_events.add(new Event(UUID.randomUUID().toString(), "test", "test description", hourAgo, now, "ranger"));
+		final User owner = new User("ranger", "test", "Benjamin Reed");
+		m_events.add(new Event(UUID.randomUUID().toString(), "test", "test description", hourAgo, now, owner));
 	}
 
 	@Override
@@ -121,7 +122,7 @@ public class MockEventDao implements EventDao {
 	}
 
 	private List<Event> sortedEventList(final Collection<Event> events) {
-		final List<Event> newList = Lists.newArrayList(events);
+		final List<Event> newList = new ArrayList<Event>(events);
 		Collections.sort(newList, new Comparator<Event>() {
 			@Override
 			public int compare(final Event left, final Event right) {

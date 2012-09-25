@@ -50,6 +50,7 @@
 
     <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateUserDao" />
     <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao" />
+	<bean id="userInitializer" class="com.raccoonfink.cruisemonkey.server.UserInitializer" />
 
     <tx:annotation-driven proxy-target-class="true" />
 </beans>

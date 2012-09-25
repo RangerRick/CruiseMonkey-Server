@@ -10,13 +10,13 @@ import org.springframework.util.Assert;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.User;
 
-public class MockUserRestServiceImpl implements UserRestService, InitializingBean {
+public class UserServiceImpl implements UserService, InitializingBean {
 	@Autowired
 	private UserDao m_userDao;
 
-	public MockUserRestServiceImpl() {}
+	public UserServiceImpl() {}
 	
-	public MockUserRestServiceImpl(final UserDao userDao) {
+	public UserServiceImpl(final UserDao userDao) {
 		m_userDao = userDao;
 	}
 
@@ -37,6 +37,11 @@ public class MockUserRestServiceImpl implements UserRestService, InitializingBea
 			users.add(getScrubbedUser(user));
 		}
 		return users;
+	}
+
+	@Override
+	public void putUser(final User user) {
+		m_userDao.save(user);
 	}
 
 	private User getScrubbedUser(final User realUser) {

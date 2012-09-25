@@ -3,9 +3,9 @@ package com.raccoonfink.cruisemonkey.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@XStreamAlias("events")
+@XmlRootElement(name="events")
 public class Events extends ArrayList<Event> {
 	private static final long serialVersionUID = 4144250605158398689L;
 

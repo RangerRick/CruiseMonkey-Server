@@ -6,67 +6,71 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@XStreamAlias("event")
+@XmlRootElement(name="event")
 public class Event extends AbstractRecord implements Serializable {
+	private static final long serialVersionUID = 8869459149371750476L;
+
 	@Override
 	public String toString() {
 		return "Event [id=" + m_id + ", summary=" + m_summary
 				+ ", description=" + m_description
 				+ ", location=" + m_location + ", startDate="
 				+ m_startDate + ", endDate=" + m_endDate + ", isPublic="
-				+ m_isPublic + "]";
+				+ m_isPublic + ", owner=" + (m_owner == null? null : m_owner.getUsername()) + "]";
 	}
-	private static final long serialVersionUID = 1L;
 
-	@XStreamAlias("id")
-	@XStreamAsAttribute
+	@XmlID
+	@XmlAttribute(name="id")
 	private String m_id;
 
-	@XStreamAlias("summary")
+	@XmlElement(name="summary")
 	private String m_summary;
 
-	@XStreamAlias("description")
+	@XmlElement(name="description")
 	private String m_description;
 
-	@XStreamAlias("location")
+	@XmlElement(name="location")
 	private String m_location;
 
-	@XStreamAlias("start")
+	@XmlElement(name="start")
 	private Date m_startDate;
 
-	@XStreamAlias("end")
+	@XmlElement(name="end")
 	private Date m_endDate;
 
-	@XStreamAlias("public")
-	@XStreamAsAttribute
+	@XmlAttribute(name="public")
 	private Boolean m_isPublic = false;
+
+	@XmlElement(name="owner")
+	private User m_owner;
 
 	public Event() {
 		super();
 		m_id = UUID.randomUUID().toString();
 	}
 
-	public Event(final String id, String summary, final String description, final Date start, final Date end, final String createdBy) {
-		super(createdBy);
+	public Event(final String id, String summary, final String description, final Date start, final Date end, final User owner) {
+		super(owner.getUsername());
 		m_id          = id;
 		m_summary     = summary;
 		m_description = description;
 		m_startDate   = start;
 		m_endDate     = end;
+		m_owner       = owner;
 	}
 
 	@Id
 	@Column(name="id")
-	/*
-	@GeneratedValue(generator="system-uuid")
-	@GenericGenerator(name="system-uuid", strategy="uuid")
-	*/
 	public String getId() { return m_id; }
 	public void setId(final String id) { m_id = id; }
 
@@ -94,4 +98,8 @@ public class Event extends AbstractRecord implements Serializable {
 	public Boolean getIsPublic() { return m_isPublic; }
 	public void setIsPublic(final Boolean isPublic) { m_isPublic = isPublic; }
 
+	@OneToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="owner")
+	public User getOwner() { return m_owner; }
+	public void setOwner(final User owner) { m_owner = owner; }
 }

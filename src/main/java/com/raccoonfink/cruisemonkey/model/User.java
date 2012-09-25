@@ -8,29 +8,33 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 @Entity
-@XStreamAlias("user")
+@XmlRootElement(name="user")
 public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3424942325904141059L;
 
-	@XStreamAlias("username")
+	@XmlAttribute(name="username")
 	private String m_username;
 
-	@XStreamAlias("name")
+	@XmlElement(name="name")
 	private String m_name;
 
-	@XStreamAlias("password")
+	// @XmlElement(name="password")
+	@XmlTransient
 	private String m_password;
 
 	public User() {
+		super();
 	}
 
 	public User(final String username, final String password, final String name) {

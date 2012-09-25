@@ -21,18 +21,24 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.CalendarVisitor;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
+import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.dao.hibernate.HibernateDao;
 import com.raccoonfink.cruisemonkey.model.Event;
+import com.raccoonfink.cruisemonkey.model.User;
 
-public class OfficialCalendarVisitor implements CalendarVisitor {
-    private static final String IMPORT_USERNAME = "_google";
+public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBean {
 	private static Pattern m_cr      = Pattern.compile("\\\\n", Pattern.MULTILINE | Pattern.DOTALL);
     private static Pattern m_escaped = Pattern.compile("\\\\(.)", Pattern.MULTILINE | Pattern.DOTALL);
     private static Pattern m_eol     = Pattern.compile("[\\r\\n\\s]*(.*?)[\\r\\n\\s]", Pattern.MULTILINE | Pattern.DOTALL);
 
+    private User m_importUser;
+
+    private UserDao m_userDao;
     private EventDao m_eventDao;
     private Session m_session         = null;
     private Transaction m_transaction = null;
@@ -43,12 +49,27 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
     public OfficialCalendarVisitor() {
     }
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(m_userDao);
+		Assert.notNull(m_eventDao);
+		m_importUser = m_userDao.get("admin");
+	}
+
     public EventDao getEventDao() {
     	return m_eventDao;
     }
     
     public void setEventDao(final EventDao eventDao) {
     	m_eventDao = eventDao;
+    }
+
+    public UserDao getUserDao() {
+    	return m_userDao;
+    }
+    
+    public void setUserDao(final UserDao userDao) {
+    	m_userDao = userDao;
     }
 
 	@Override
@@ -86,12 +107,13 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 	    	final List<Event> events = m_eventDao.find(criteria);
 	
 	        for (final Event event : events) {
-	        	if (IMPORT_USERNAME.equals(event.getCreatedBy())) {
+	        	if (m_importUser.getUsername().equals(event.getCreatedBy())) {
 	        		m_eventDao.delete(event, m_session);
 	        	}
 	        }
 	    	// System.out.println("");
 	        m_transaction.commit();
+	        System.out.println("added " + m_eventDao.findAll().size() + " events");
     	}
     }
 
@@ -121,6 +143,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 		final String locationString = location.getValue().trim();
 
 		final Event existingEvent = m_eventDao.get(id, m_session);
+		final String username = m_importUser.getUsername();
 
 		if (existingEvent == null) {
 			final Event event = new Event();
@@ -131,10 +154,11 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 			event.setIsPublic(true);
 			event.setStartDate(startDate);
 			event.setEndDate(endDate);
-			event.setCreatedBy(IMPORT_USERNAME);
+			event.setCreatedBy(username);
 			event.setCreatedDate(createdDate);
-			event.setLastModifiedBy(IMPORT_USERNAME);
+			event.setLastModifiedBy(username);
 			event.setLastModifiedDate(lastModifiedDate);
+			event.setOwner(m_importUser);
 			return event;
 		} else {
 			System.err.println("found existing event: " + existingEvent);
@@ -144,8 +168,9 @@ public class OfficialCalendarVisitor implements CalendarVisitor {
 			existingEvent.setStartDate(startDate);
 			existingEvent.setEndDate(endDate);
 			existingEvent.setCreatedDate(createdDate);
-			existingEvent.setLastModifiedBy(IMPORT_USERNAME);
+			existingEvent.setLastModifiedBy(username);
 			existingEvent.setLastModifiedDate(lastModifiedDate);
+			existingEvent.setOwner(m_importUser);
 			return existingEvent;
 		}
 	}

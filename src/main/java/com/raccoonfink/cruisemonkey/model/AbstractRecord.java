@@ -4,22 +4,22 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @MappedSuperclass
-@XStreamAlias("record")
+@XmlRootElement(name="record")
 public abstract class AbstractRecord implements Record {
-	@XStreamAlias("created-by")
+	@XmlElement(name="created-by")
 	private String m_createdBy;
 
-	@XStreamAlias("created-date")
+	@XmlElement(name="created-date")
 	private Date m_createdDate;
 
-	@XStreamAlias("last-modified-by")
+	@XmlElement(name="last-modified-by")
 	private String m_lastModifiedBy;
 
-	@XStreamAlias("last-modified-date")
+	@XmlElement(name="last-modified-date")
 	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {
