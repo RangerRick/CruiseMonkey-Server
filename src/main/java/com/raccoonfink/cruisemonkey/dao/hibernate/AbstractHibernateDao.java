@@ -103,7 +103,8 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 
 	@Override
 	public void save(final T obj, final Session session) {
-		session.save(obj);
+		System.err.println("saving: " + obj);
+		session.saveOrUpdate(obj);
 	}
 
 }

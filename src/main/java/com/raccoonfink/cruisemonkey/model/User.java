@@ -6,12 +6,15 @@ import java.util.Collections;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -27,7 +30,9 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	private static final long serialVersionUID = -5588394243858729656L;
 
 	private String m_username;
+
 	private String m_name;
+
 	private String m_password;
 
 	public User() {
@@ -40,9 +45,11 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		m_name     = name;
 	}
 
+	@Override
 	@Id
 	@Column(name="username", length=64, unique=true)
-	@XmlAttribute(name="username")
+	@XmlID
+	@XmlAttribute(name="username", required=true)
 	public String getUsername() {
 		return m_username;
 	}
@@ -61,23 +68,24 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		m_name = name;
 	}
 
-	@Transient
-	@XmlElement(name="password")
+	@Override
+	@Column(name="password", length=32)
+	@XmlTransient
 	public String getPassword() {
-		return m_password == null? null : "********";
+		return m_password;
 	}
 	
 	public void setPassword(final String password) {
 		m_password = password;
 	}
 
-	@Column(name="password", length=32)
-	@XmlTransient
-	public String getPlaintextPassword() {
-		return m_password;
+	@Transient
+	@XmlElement(name="password")
+	public String getVisiblePassword() {
+		return ((m_password == null || m_password.isEmpty())? null:"********");
 	}
 
-	public void setPlaintextPassword(final String password) {
+	public void setVisiblePassword(final String password) {
 		m_password = password;
 	}
 
@@ -121,5 +129,10 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 			.append(this.m_username, that.m_username)
 			.append(this.m_name,     that.m_name)
 			.toComparison();
+	}
+
+	@Override
+	public String toString() {
+		return "User [username=" + m_username + ", name=" + m_name + "]";
 	}
 }
