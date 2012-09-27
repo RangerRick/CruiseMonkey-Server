@@ -86,12 +86,6 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	public void visitEvent(final Component component) {
         final Event event = getEvent(component);
         m_eventDao.save(event, m_session);
-        
-        /*
-		System.out.println("'" + unescape(event.getDescription()) + "'");
-		System.out.println("  start: '" + event.getStartDate() + "'");
-		System.out.println("  end:   '" + event.getEndDate() + "'");
-		*/
 	}
 
     @Override
@@ -141,6 +135,12 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 
 		String summaryString = summary.getValue().trim();
 		final String locationString = location.getValue().trim();
+		final String removeThis = " - " + locationString;
+		if (summaryString.endsWith(removeThis)) {
+			// System.err.println("old summaryString: '" + summaryString + "'");
+			summaryString = summaryString.substring(0, summaryString.length() - removeThis.length());
+			// System.err.println("new summaryString: '" + summaryString + "'");
+		}
 
 		final Event existingEvent = m_eventDao.get(id, m_session);
 		final String username = m_importUser.getUsername();

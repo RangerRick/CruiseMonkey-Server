@@ -10,13 +10,19 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.raccoonfink.cruisemonkey.util.UsernameAdapter;
 
 @Entity
 @XmlRootElement(name="event")
+@XmlAccessorType(XmlAccessType.NONE)
 public class Event extends AbstractRecord implements Serializable {
 	private static final long serialVersionUID = 8869459149371750476L;
 
@@ -52,6 +58,7 @@ public class Event extends AbstractRecord implements Serializable {
 	private Boolean m_isPublic = false;
 
 	@XmlElement(name="owner")
+	@XmlJavaTypeAdapter(UsernameAdapter.class)
 	private User m_owner;
 
 	public Event() {

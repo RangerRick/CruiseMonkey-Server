@@ -4,11 +4,14 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @MappedSuperclass
 @XmlRootElement(name="record")
+@XmlAccessorType(XmlAccessType.NONE)
 public abstract class AbstractRecord implements Record {
 	@XmlElement(name="created-by")
 	private String m_createdBy;
@@ -23,7 +26,7 @@ public abstract class AbstractRecord implements Record {
 	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {
-	        final long time = System.currentTimeMillis();
+		final long time = System.currentTimeMillis();
 		m_createdDate = new Date(time);
 		m_lastModifiedDate = new Date(time);
 	}

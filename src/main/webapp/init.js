@@ -41,7 +41,7 @@ function setupDefaultView() {
 
     var interval = setInterval(function() {
     	eventsModel.updateDataFromJSON();
-    }, 30000);
+    }, 5000);
 
     // Hide address bar on mobile devices
     /*

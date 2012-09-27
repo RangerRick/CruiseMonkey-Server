@@ -31,4 +31,6 @@
 	  <property name="url" value="https://www.google.com/calendar/ical/nh76o8dgn9d86b7n3p3uofg1q0%40group.calendar.google.com/public/basic.ics" />
 	</bean>
 
+	<bean id="springApplicationContext" class="com.raccoonfink.cruisemonkey.util.SpringApplicationContext"/>
+
 </beans>
