@@ -6,8 +6,6 @@ import java.util.Collections;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -19,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
+import org.eclipse.persistence.oxm.annotations.XmlReadOnly;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,12 +26,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @XmlRootElement(name="user")
 @XmlAccessorType(XmlAccessType.NONE)
 public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = -5588394243858729656L;
+	private static final long serialVersionUID = -3545473669883020357L;
 
 	private String m_username;
-
 	private String m_name;
-
 	private String m_password;
 
 	public User() {
@@ -46,10 +43,10 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	}
 
 	@Override
-	@Id
-	@Column(name="username", length=64, unique=true)
 	@XmlID
 	@XmlAttribute(name="username", required=true)
+	@Id
+	@Column(name="username", length=64, unique=true)
 	public String getUsername() {
 		return m_username;
 	}
@@ -58,8 +55,8 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		m_username = username;
 	}
 
-	@Column(name="name", length=256)
 	@XmlElement(name="name")
+	@Column(name="name", length=256)
 	public String getName() {
 		return m_name;
 	}
@@ -69,23 +66,14 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	}
 
 	@Override
+	@XmlElement(name="password")
+	@XmlReadOnly
 	@Column(name="password", length=32)
-	@XmlTransient
 	public String getPassword() {
 		return m_password;
 	}
-	
+
 	public void setPassword(final String password) {
-		m_password = password;
-	}
-
-	@Transient
-	@XmlElement(name="password")
-	public String getVisiblePassword() {
-		return ((m_password == null || m_password.isEmpty())? null:"********");
-	}
-
-	public void setVisiblePassword(final String password) {
 		m_password = password;
 	}
 
@@ -133,6 +121,6 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 
 	@Override
 	public String toString() {
-		return "User [username=" + m_username + ", name=" + m_name + "]";
+		return "User [username=" + m_username + ", name=" + m_name + ", password=" + m_password + "]";
 	}
 }

@@ -19,6 +19,8 @@ public class UserInitializer implements InitializingBean {
 		if (user == null) {
 			user = new User("admin", "admin", "Administrator");
 			m_userDao.save(user);
+		} else {
+			System.err.println("already have a user: " + user);
 		}
 	}
 

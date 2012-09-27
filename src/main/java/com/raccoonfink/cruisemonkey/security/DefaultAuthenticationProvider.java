@@ -23,7 +23,7 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
 
 	@Override
 	protected void additionalAuthenticationChecks(final UserDetails userDetails, final UsernamePasswordAuthenticationToken token) throws AuthenticationException {
-        if (!userDetails.getPassword().equals(token.getCredentials().toString())) {
+        if (userDetails.getPassword() == null || !userDetails.getPassword().equals(token.getCredentials().toString())) {
             throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 	}
