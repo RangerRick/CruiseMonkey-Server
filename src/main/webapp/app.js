@@ -1,5 +1,7 @@
 console.log("app.js loading");
-/*
+
+var eventsModel;
+
 ko.bindingHandlers.dateString = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
 		var value = valueAccessor(),
@@ -9,15 +11,12 @@ ko.bindingHandlers.dateString = {
 		$(element).text(valueUnwrapped.toString(pattern));
 	}
 }
-*/
 
 function removeLastMatch(string, match) {
 	var n = string.lastIndexOf(match);
 	if (n >= 0 && (n + match.length) == string.length) {
-		// console.log("removeLastMatch: " + string + " matches " + match);
 		return string.substring(0, n);
 	} else {
-		// console.log("removeLastMatch: " + string + " does not match " + match);
 		return string;
 	}
 }
@@ -74,7 +73,7 @@ function EventsViewModel() {
 					}
 				});
 				if (item) {
-					console.log("reusing " + ko.toJSON(item));
+					// console.log("reusing " + ko.toJSON(item));
 					var startDate = new Date(event.start);
 					var endDate	= new Date(event.end);
 					var createdBy = event["created-by"];
@@ -96,7 +95,7 @@ function EventsViewModel() {
 	self.updateDataFromJSON();
 }
 
-var eventsModel = new EventsViewModel();
+eventsModel = new EventsViewModel();
 
 eventsModel.filteredEvents = ko.dependentObservable(function() {
 	var filter = this.filter().toLowerCase();
@@ -105,6 +104,15 @@ eventsModel.filteredEvents = ko.dependentObservable(function() {
 		return this.events();
 	} else {
 		return ko.utils.arrayFilter(this.events(), function(event) {
+			if (this.group() == "official") {
+				if (event.createdBy() != "admin") {
+					return false;
+				}
+			} else {
+				if (event.createdBy() == "admin") {
+					return false;
+				}
+			}
 			if (event.summary().toLowerCase().search(filter) != -1) {
 				return true;
 			} else if (event.description().toLowerCase().search(filter) != -1) {

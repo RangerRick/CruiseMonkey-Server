@@ -27,14 +27,53 @@ function onDeviceReady( event ) {
     }
 }
 
-var header, container;
+var _header, _container;
+
+function getHeader() {
+	if (!_header) {
+		_header = $("body").find("#header");
+	}
+	return _header;
+}
+
+function getContainer() {
+	if (!_container) {
+		_container = $("body").find("#content");
+	}
+	return _container;
+}
+
+function setupHeader() {
+    header = getHeader();
+    header.html(templates.header);
+    
+    $('nav').find('a').each(function(index, element) {
+    	var hash = undefined;
+    	if (element.href !== undefined) {
+    		hash = element.href.split('#')[1];
+    	}
+    	if (hash !== undefined && hash != "") {
+    		// $(element).off('click');
+    		$(element).on('click.fndtn touchstart.fndtn', function(e) {
+            	e.preventDefault();
+            	console.log("navigation event: " + hash);
+            	if (hash == 'official-events') {
+            		showOfficialEventsView();
+            	} else if (hash == 'my-events') {
+            		showMyEventsView();
+            	}
+    		});
+    	}
+    });
+
+    $(document).foundationTopBar();
+}
 
 function setupDefaultView() {
     console.log("setting up default view");
 
+    setupHeader();
     showOfficialEventsView();
-
-    $(document).foundationTopBar();
 
     // initialize model data
     ko.applyBindings(eventsModel);
@@ -57,13 +96,55 @@ function setupDefaultView() {
 
 }
 
-function showOfficialEventsView() {
-    header = $("body").find("#header");
-    container = $("body").find("#content");
+var current_page = undefined;
+var pages = {
+};
 
-    header.html(templates.header);
-    container.html( Mustache.to_html(templates.events, { event_header: "Official Events" }));
-    container.find('ul.event-list').css('visibility', 'visible');
+function replaceCurrentPage(page) {
+    if (current_page) {
+		$(current_page).css('visibility', 'hidden');
+	}
+
+    var content = getContainer()[0];
+    content.innerHTML = '';
+    content.appendChild(page);
+    current_page = page;
+}
+
+function createOfficialEventsView() {
+    if (!pages.official_events) {
+    	var div = document.createElement('div');
+    	div.setAttribute('id', 'official-events');
+    	var html = Mustache.to_html(templates.events, { eventType: "official" });
+    	$(div).html(html);
+    	pages.official_events = div;
+    }
+}
+
+function showOfficialEventsView() {
+	createOfficialEventsView();
+	replaceCurrentPage(pages.official_events);
+    
+    var content = getContainer();
+    content.find('ul.event-list').css('visibility', 'visible');
+}
+
+function createMyEventsView() {
+    if (!pages.my_events) {
+    	var div = document.createElement('div');
+    	div.setAttribute('id', 'my-events');
+    	var html = Mustache.to_html(templates.events, { eventType: "my" });
+    	$(div).html(html);
+    	pages.my_events = div;
+    }
+}
+
+function showMyEventsView() {
+	createMyEventsView();
+	replaceCurrentPage(pages.my_events);
+    
+    var content = getContainer();
+    content.find('ul.event-list').css('visibility', 'visible');
 }
 
 function onTemplateLoaded(template, key) {
@@ -75,6 +156,10 @@ function onTemplateLoaded(template, key) {
 
 	if ( templates.loaded == templates.requested ) {
 		console.log("all requested templates have been loaded");
+		
+		createOfficialEventsView();
+		createMyEventsView();
+
         setupDefaultView();
     }
 }
