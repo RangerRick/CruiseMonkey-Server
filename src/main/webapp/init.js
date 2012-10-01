@@ -1,5 +1,7 @@
 console.log("init.js loading");
 
+var pages = {};
+
 var templates = {
 	header: "views/header.html",
 	events: "views/events.html",
@@ -75,9 +77,6 @@ function setupDefaultView() {
     setupHeader();
     showOfficialEventsView();
 
-    // initialize model data
-    ko.applyBindings(eventsModel);
-
     var interval = setInterval(function() {
     	eventsModel.updateDataFromJSON();
     }, 5000);
@@ -96,55 +95,49 @@ function setupDefaultView() {
 
 }
 
-var current_page = undefined;
-var pages = {
-};
-
-function replaceCurrentPage(page) {
-    if (current_page) {
-		$(current_page).css('visibility', 'hidden');
-	}
-
-    var content = getContainer()[0];
-    content.innerHTML = '';
-    content.appendChild(page);
-    current_page = page;
+function replaceCurrentPage(pageId) {
+	getContainer().children().css('display', 'none');
+	$('#' + pageId).css('display', 'block');
+	return getContainer()[0];
 }
 
 function createOfficialEventsView() {
-    if (!pages.official_events) {
+    if (!pages.official) {
     	var div = document.createElement('div');
     	div.setAttribute('id', 'official-events');
+    	$(div).css('display', 'none');
     	var html = Mustache.to_html(templates.events, { eventType: "official" });
     	$(div).html(html);
-    	pages.official_events = div;
+    	pages.official = div;
+    	var appended = getContainer()[0].appendChild(div);
+        ko.applyBindings(officialEventsModel, appended);
     }
 }
 
 function showOfficialEventsView() {
 	createOfficialEventsView();
-	replaceCurrentPage(pages.official_events);
-    
-    var content = getContainer();
-    content.find('ul.event-list').css('visibility', 'visible');
+	var content = replaceCurrentPage('official-events');
+    $(content).find('ul.event-list').css('display', 'block');
 }
 
 function createMyEventsView() {
-    if (!pages.my_events) {
+    if (!pages.my) {
     	var div = document.createElement('div');
     	div.setAttribute('id', 'my-events');
+    	$(div).css('display', 'none');
     	var html = Mustache.to_html(templates.events, { eventType: "my" });
+    	// console.log("html = " + html);
     	$(div).html(html);
-    	pages.my_events = div;
+    	pages.my = div;
+    	var appended = getContainer()[0].appendChild(div);
+        ko.applyBindings(myEventsModel, appended);
     }
 }
 
 function showMyEventsView() {
 	createMyEventsView();
-	replaceCurrentPage(pages.my_events);
-    
-    var content = getContainer();
-    content.find('ul.event-list').css('visibility', 'visible');
+	var content = replaceCurrentPage('my-events');
+    $(content).find('ul.event-list').css('display', 'block');
 }
 
 function onTemplateLoaded(template, key) {

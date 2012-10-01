@@ -9,7 +9,11 @@ input[type="search"] {
 }
 	/* margin: 3px 0 3px 0; */
 
-#search_events {
+#official-search {
+	margin-bottom: 5px;
+}
+
+#my-search {
 	margin-bottom: 5px;
 }
 

@@ -33,6 +33,7 @@ function Event(data) {
 	self.end          = ko.observable(new Date(data.end));
 	self.location     = ko.observable(data.location);
 	self.createdBy    = ko.observable(data["created-by"]);
+	self.owner        = ko.observable(data.owner);
 	self.timespan     = ko.computed(function() {
 		var start = start === null? null : formatTime(self.start(), false);
 		var end	= end	=== null? null : formatTime(self.end(), false);
@@ -54,8 +55,6 @@ var entryIdMatch = function(entry, id) {
 function EventsViewModel() {
 	var self = this;
 	self.events = ko.observableArray();
-	self.group  = ko.observable("official");
-	self.filter = ko.observable("");
 
 	self.updateDataFromJSON = function() {
 		$.getJSON("rest/events", function(allData) {
@@ -83,6 +82,7 @@ function EventsViewModel() {
 					if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
 					if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
 					if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
+					if (item.owner()           != event.owner)         { item.owner(event.owner); }
 					return item;
 				} else {
 					return new Event(event);
@@ -97,22 +97,30 @@ function EventsViewModel() {
 
 eventsModel = new EventsViewModel();
 
-eventsModel.filteredEvents = ko.dependentObservable(function() {
-	var filter = this.filter().toLowerCase();
-	
+function OfficialEventsModel() {
+	var self   = this;
+
+	self.filter = ko.observable("");
+	self.events = eventsModel.events;
+}
+var officialEventsModel = new OfficialEventsModel();
+
+officialEventsModel.filteredEvents = ko.dependentObservable(function() {
+	var self = this;
+
+	var filter = self.filter().toLowerCase();
+
+	var matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+		if (event.owner() != 'admin') {
+			return false;
+		}
+		return true;
+	});
+
 	if (!filter) {
-		return this.events();
+		return matchesGroup;
 	} else {
-		return ko.utils.arrayFilter(this.events(), function(event) {
-			if (this.group() == "official") {
-				if (event.createdBy() != "admin") {
-					return false;
-				}
-			} else {
-				if (event.createdBy() == "admin") {
-					return false;
-				}
-			}
+		return ko.utils.arrayFilter(matchesGroup, function(event) {
 			if (event.summary().toLowerCase().search(filter) != -1) {
 				return true;
 			} else if (event.description().toLowerCase().search(filter) != -1) {
@@ -122,6 +130,42 @@ eventsModel.filteredEvents = ko.dependentObservable(function() {
 			}
 		});
 	}
-}, eventsModel);
+}, officialEventsModel);
+
+function MyEventsModel() {
+	var self   = this;
+
+	self.filter = ko.observable("");
+	self.events = eventsModel.events;
+}
+var myEventsModel = new MyEventsModel();
+
+myEventsModel.filteredEvents = ko.dependentObservable(function() {
+	var self = this;
+
+	var filter = self.filter().toLowerCase();
+
+	var matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+		if (event.owner() == 'admin') {
+			return false;
+		}
+		return true;
+	});
+
+	console.log("matchesGroup = " + ko.toJSON(matchesGroup));
+	if (!filter) {
+		return matchesGroup;
+	} else {
+		return ko.utils.arrayFilter(matchesGroup, function(event) {
+			if (event.summary().toLowerCase().search(filter) != -1) {
+				return true;
+			} else if (event.description().toLowerCase().search(filter) != -1) {
+				return true;
+			} else {
+				return false;
+			}
+		});
+	}
+}, myEventsModel);
 
 console.log("app.js loaded");
