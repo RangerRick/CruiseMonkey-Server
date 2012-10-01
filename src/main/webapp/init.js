@@ -82,7 +82,6 @@ function setupDefaultView() {
     }, 5000);
 
     // Hide address bar on mobile devices
-    /*
     var Modernizr = window.Modernizr;
     if (Modernizr.touch) {
         $(window).load(function () {
@@ -91,13 +90,17 @@ function setupDefaultView() {
             }, 0);
         });
     }
-    */
 
 }
 
 function replaceCurrentPage(pageId) {
 	getContainer().children().css('display', 'none');
-	$('#' + pageId).css('display', 'block');
+	var page = $('#' + pageId);
+	page.css('display', 'block');
+    if (!Modernizr.touch) {
+    	// on non-mobile devices, focus the search input
+    	page.find('input[type=search]')[0].focus();
+    }
 	return getContainer()[0];
 }
 
