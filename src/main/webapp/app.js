@@ -105,6 +105,20 @@ function OfficialEventsModel() {
 }
 var officialEventsModel = new OfficialEventsModel();
 
+officialEventsModel.filter.subscribe(function() {
+	if (scrollTimeout === null) {
+		scrollTimeout = setTimeout(function() {
+			scrollTimeout = null;
+			var found = findTopVisibleElement();
+			if (found) {
+				console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).find('span.id').text() + ')');
+			} else {
+				console.log("no elements visible!");
+			}
+		}, scrollEndDelay);
+	}
+}, officialEventsModel);
+
 officialEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var self = this;
 
@@ -140,6 +154,20 @@ function MyEventsModel() {
 }
 var myEventsModel = new MyEventsModel();
 
+myEventsModel.filter.subscribe(function() {
+	if (scrollTimeout === null) {
+		scrollTimeout = setTimeout(function() {
+			scrollTimeout = null;
+			var found = findTopVisibleElement();
+			if (found) {
+				console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).find('span.id').text() + ')');
+			} else {
+				console.log("no elements visible!");
+			}
+		}, scrollEndDelay);
+	}
+}, myEventsModel);
+
 myEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var self = this;
 
@@ -152,7 +180,6 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 		return true;
 	});
 
-	console.log("matchesGroup = " + ko.toJSON(matchesGroup));
 	if (!filter) {
 		return matchesGroup;
 	} else {

@@ -9,6 +9,60 @@ var templates = {
 	requested: 0,
 };
 
+function elementInViewport(el) {
+	var top = el.offsetTop;
+	// var left = el.offsetLeft;
+	// var width = el.offsetWidth;
+	var height = el.offsetHeight;
+
+	while (el.offsetParent) {
+		el = el.offsetParent;
+		top += el.offsetTop;
+		// left += el.offsetLeft;
+	}
+
+	return (top >= window.pageYOffset
+		// && left >= window.pageXOffset
+		&& (top + height) <= (window.pageYOffset + window.innerHeight)
+		// && (left + width) <= (window.pageXOffset + window.innerWidth)
+	);
+}
+
+var scrollTimeout = null;
+var scrollEndDelay = 500; // ms
+
+function findTopVisibleElement() {
+	var found = null;
+	$('.calendar-event').each(function(index, element) {
+		if (elementInViewport(element)) {
+			found = element;
+			return false;
+		}
+	});
+
+	return found;
+}
+
+function scrollEndHandler() {
+	console.log("scrolling finished");
+	scrollTimeout = null;
+	var found = findTopVisibleElement();
+	if (found) {
+		console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).find('span.id').text() + ')');
+	} else {
+		console.log("no elements visible!");
+	}
+}
+
+$(window).scroll(function() {
+	if (scrollTimeout === null) {
+		console.log("scrolling started");
+	} else {
+		clearTimeout(scrollTimeout);
+	}
+	scrollTimeout = setTimeout( scrollEndHandler, scrollEndDelay );
+});
+
 function onDeviceReady( event ) {
 	console.log("Device is ready.  Initializing.");
 	
@@ -45,6 +99,31 @@ function getContainer() {
 	return _container;
 }
 
+function getScroll() {
+	var scroll;
+	
+	// Netscape compliant
+	if (typeof(window.pageYOffset) === 'number') {
+		scroll = window.pageYOffset;
+	}
+	// DOM compliant
+	else if (document.body && document.body.scrollTop) {
+		scroll = document.body.scrollTop;
+	}
+	// IE6 standards compliant mode
+	else if (document.documentElement && document.documentElement.scrollTop) {
+		scroll = document.documentElement.scrollTop;
+	}
+	// needed for IE6 (when vertical scroll bar is on the top)
+	else {
+		scroll = 0;
+	}
+}
+
+function scrollTo(x, y) {
+	window.scrollTo(x, y);
+}
+
 function setupHeader() {
     header = getHeader();
     header.html(templates.header);
@@ -57,7 +136,7 @@ function setupHeader() {
     	if (hash !== undefined && hash != "") {
     		// $(element).off('click');
     		$(element).on('click.fndtn touchstart.fndtn', function(e) {
-            	e.preventDefault();
+    			// e.preventDefault();
             	console.log("navigation event: " + hash);
             	if (hash == 'official-events') {
             		showOfficialEventsView();
@@ -82,6 +161,7 @@ function setupDefaultView() {
     }, 5000);
 
     // Hide address bar on mobile devices
+    /*
     var Modernizr = window.Modernizr;
     if (Modernizr.touch) {
         $(window).load(function () {
@@ -90,6 +170,7 @@ function setupDefaultView() {
             }, 0);
         });
     }
+    */
 
 }
 
