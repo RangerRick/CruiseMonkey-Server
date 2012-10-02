@@ -1,6 +1,8 @@
 console.log("init.js loading");
 
 var pages = {};
+var current_page = 'official-events';
+var page_scroll_element = [];
 
 var templates = {
 	header: "views/header.html",
@@ -28,6 +30,38 @@ function elementInViewport(el) {
 	);
 }
 
+function _getPageStoreCache() {
+	// console.log("store currently contains: " + ko.toJSON(amplify.store()));
+	var page_store_cache = amplify.store('page_store_cache');
+	if (!page_store_cache) {
+		page_store_cache = {};
+	}
+	return page_store_cache;
+}
+
+function _setPageStoreCache(cache) {
+	console.log("set cache: " + ko.toJSON(cache));
+	amplify.store('page_store_cache', cache);
+}
+
+function updatePageTopElement(page, id) {
+	console.log("storing " + id + " as the top element for page " + page);
+	var page_store_cache = _getPageStoreCache();
+	page_store_cache[page] = id;
+	_setPageStoreCache(page_store_cache);
+	return id;
+}
+
+function getPageTopElement(page) {
+	var page_store_cache = _getPageStoreCache();
+	var retVal = null;
+	if (page_store_cache) {
+		retVal = page_store_cache[page];
+	}
+	console.log("getPageTopElement(" + page + ") = " + retVal);
+	return retVal;
+}
+
 var scrollTimeout = null;
 var scrollEndDelay = 500; // ms
 
@@ -35,6 +69,14 @@ function findTopVisibleElement() {
 	var found = null;
 	$('.calendar-event').each(function(index, element) {
 		if (elementInViewport(element)) {
+			var id = $(element).attr('id');
+			if (id) {
+				var summary = $(found).find('div.summary').text();
+				console.log("first visible element: " + summary + ' (' + id + ')');
+				if (current_page) {
+					updatePageTopElement(current_page, id);
+				}
+			}
 			found = element;
 			return false;
 		}
@@ -48,7 +90,7 @@ function scrollEndHandler() {
 	scrollTimeout = null;
 	var found = findTopVisibleElement();
 	if (found) {
-		console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).find('span.id').text() + ')');
+		console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).attr('id') + ')');
 	} else {
 		console.log("no elements visible!");
 	}
@@ -138,11 +180,7 @@ function setupHeader() {
     		$(element).on('click.fndtn touchstart.fndtn', function(e) {
     			// e.preventDefault();
             	console.log("navigation event: " + hash);
-            	if (hash == 'official-events') {
-            		showOfficialEventsView();
-            	} else if (hash == 'my-events') {
-            		showMyEventsView();
-            	}
+            	navigateTo(hash);
     		});
     	}
     });
@@ -150,11 +188,56 @@ function setupHeader() {
     $(document).foundationTopBar();
 }
 
+function navigateTo(pageId) {
+	if (pageId == 'official-events') {
+		showOfficialEventsView();
+	} else if (pageId == 'my-events') {
+		showMyEventsView();
+	} else {
+		console.log('unknown page ID: ' + pageId);
+		return false;
+	}
+
+	var topElement = getPageTopElement(pageId);
+	if (topElement) {
+		var matched = null;
+		$('#content').find('.scrollable').each(function(index, element) {
+			var id = $(element).attr('id');
+			if (id == topElement) {
+				matched = element;
+				console.log("matched " + id);
+				return false;
+			} else {
+				console.log("id " + id + " did not match " + topElement);
+			}
+			return true;
+		});
+
+		if (matched) {
+			console.log("scrolling to " + topElement);
+			matched.scrollIntoView(true);
+			window.scrollBy(0, -45);
+		} else {
+			console.log("didn't find an element to scroll to for " + topElement);
+		}
+	} else {
+		console.log("no top element found for " + pageId);
+	}
+
+	return true;
+}
+
 function setupDefaultView() {
     console.log("setting up default view");
 
+    var current_page = amplify.store('current_page');
+    if (!current_page) {
+    	current_page = 'official-events';
+    	amplify.store('current_page', current_page);
+    }
+
     setupHeader();
-    showOfficialEventsView();
+    navigateTo(current_page);
 
     var interval = setInterval(function() {
     	eventsModel.updateDataFromJSON();
@@ -182,6 +265,7 @@ function replaceCurrentPage(pageId) {
     	// on non-mobile devices, focus the search input
     	page.find('input[type=search]')[0].focus();
     }
+    amplify.store('current_page', pageId);
 	return getContainer()[0];
 }
 

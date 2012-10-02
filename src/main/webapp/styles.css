@@ -1,5 +1,5 @@
 body {
-	padding-top: 45px;
+	/* padding-top: 45px; */
 }
 
 input[type="search"] {
@@ -22,6 +22,7 @@ input[type="search"] {
 }
 
 #content {
+	margin-top: 45px;
 	padding: 5px;
 }
 

@@ -2,6 +2,7 @@ console.log("app.js loading");
 
 var eventsModel;
 
+/** filter dates in Knockout data-bind **/
 ko.bindingHandlers.dateString = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
 		var value = valueAccessor(),
@@ -12,19 +13,9 @@ ko.bindingHandlers.dateString = {
 	}
 }
 
-function removeLastMatch(string, match) {
-	var n = string.lastIndexOf(match);
-	if (n >= 0 && (n + match.length) == string.length) {
-		return string.substring(0, n);
-	} else {
-		return string;
-	}
-}
-
+/** represents a calendar event **/
 function Event(data) {
 	var self = this;
-
-	// data.summary = removeLastMatch(data.summary, ' - ' + data.location);
 
 	self.id           = ko.observable(data["@id"]);
 	self.summary      = ko.observable(data.summary);
@@ -48,54 +39,95 @@ function Event(data) {
 	}, self);
 }
 
-var entryIdMatch = function(entry, id) {
-	return entry.id === id;
+/** used for filter/searching, match an event based on a filter **/
+var matchEventText = function(event, filter) {
+	if (event.summary().toLowerCase().search(filter) != -1) {
+		return true;
+	} else if (event.description().toLowerCase().search(filter) != -1) {
+		return true;
+	} else {
+		return false;
+	}
 }
+
+/** Wait to make sure no other changes have happened,
+  * then perform the mildly expensive check to see what
+  * the latest visible element is.
+  **/
+var onFilterChange = function() {
+	/*
+	if (scrollTimeout === null) {
+		scrollTimeout = setTimeout(function() {
+			scrollTimeout = null;
+			var found = findTopVisibleElement();
+			if (found) {
+				console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).attr('id') + ')');
+			} else {
+				console.log("no elements visible!");
+			}
+		}, scrollEndDelay);
+	}
+	*/
+};
 
 function EventsViewModel() {
 	var self = this;
 	self.events = ko.observableArray();
 
-	self.updateDataFromJSON = function() {
-		$.getJSON("rest/events", function(allData) {
-			var mappedTasks = $.map(allData.event, function(event) {
-				var item = ko.utils.arrayFirst(self.events(), function(entry) {
-					if (entry) {
-						// console.log("entry = " + ko.toJSON(entry));
-						if (entry.id() == event["@id"]) {
-							return true;
-						} else {
-							return false;
-						}
+	self.updateData = function(allData) {
+		var mappedTasks = $.map(allData.event, function(event) {
+			var item = ko.utils.arrayFirst(self.events(), function(entry) {
+				if (entry) {
+					// console.log("entry = " + ko.toJSON(entry));
+					if (entry.id() == event["@id"]) {
+						return true;
 					} else {
-						console.log("no entry");
+						return false;
 					}
-				});
-				if (item) {
-					// console.log("reusing " + ko.toJSON(item));
-					var startDate = new Date(event.start);
-					var endDate	= new Date(event.end);
-					var createdBy = event["created-by"];
-
-					if (item.summary()         != event.summary)       { item.summary(event.summary); }
-					if (item.description()     != event.description)   { item.description(event.description); }
-					if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
-					if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
-					if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
-					if (item.owner()           != event.owner)         { item.owner(event.owner); }
-					return item;
 				} else {
-					return new Event(event);
+					console.log("no entry");
 				}
 			});
-			self.events(mappedTasks);
-		});	 
+			if (item) {
+				// console.log("reusing " + ko.toJSON(item));
+				var startDate = new Date(event.start);
+				var endDate	= new Date(event.end);
+				var createdBy = event["created-by"];
+
+				if (item.summary()         != event.summary)       { item.summary(event.summary); }
+				if (item.description()     != event.description)   { item.description(event.description); }
+				if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
+				if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
+				if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
+				if (item.owner()           != event.owner)         { item.owner(event.owner); }
+				return item;
+			} else {
+				return new Event(event);
+			}
+		});
+		self.events(mappedTasks);
+		console.log("saving ReST events");
+		amplify.store("events", allData);
+	}
+	
+	self.updateDataFromJSON = function() {
+		$.getJSON("rest/events", self.updateData);
 	};
 
 	self.updateDataFromJSON();
 }
 
 eventsModel = new EventsViewModel();
+
+if (typeof(Storage) !== "undefined") {
+	var restEvents = amplify.store("events");
+	if (restEvents) {
+		console.log("loading stored ReST events");
+		eventsModel.updateData(restEvents);
+	} else {
+		console.log("no stored ReST events");
+	}
+}
 
 function OfficialEventsModel() {
 	var self   = this;
@@ -104,21 +136,7 @@ function OfficialEventsModel() {
 	self.events = eventsModel.events;
 }
 var officialEventsModel = new OfficialEventsModel();
-
-officialEventsModel.filter.subscribe(function() {
-	if (scrollTimeout === null) {
-		scrollTimeout = setTimeout(function() {
-			scrollTimeout = null;
-			var found = findTopVisibleElement();
-			if (found) {
-				console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).find('span.id').text() + ')');
-			} else {
-				console.log("no elements visible!");
-			}
-		}, scrollEndDelay);
-	}
-}, officialEventsModel);
-
+officialEventsModel.filter.subscribe(onFilterChange, officialEventsModel);
 officialEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var self = this;
 
@@ -135,13 +153,7 @@ officialEventsModel.filteredEvents = ko.dependentObservable(function() {
 		return matchesGroup;
 	} else {
 		return ko.utils.arrayFilter(matchesGroup, function(event) {
-			if (event.summary().toLowerCase().search(filter) != -1) {
-				return true;
-			} else if (event.description().toLowerCase().search(filter) != -1) {
-				return true;
-			} else {
-				return false;
-			}
+			return matchEventText(event, filter);
 		});
 	}
 }, officialEventsModel);
@@ -153,21 +165,7 @@ function MyEventsModel() {
 	self.events = eventsModel.events;
 }
 var myEventsModel = new MyEventsModel();
-
-myEventsModel.filter.subscribe(function() {
-	if (scrollTimeout === null) {
-		scrollTimeout = setTimeout(function() {
-			scrollTimeout = null;
-			var found = findTopVisibleElement();
-			if (found) {
-				console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).find('span.id').text() + ')');
-			} else {
-				console.log("no elements visible!");
-			}
-		}, scrollEndDelay);
-	}
-}, myEventsModel);
-
+myEventsModel.filter.subscribe(onFilterChange, myEventsModel);
 myEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var self = this;
 
@@ -184,13 +182,7 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 		return matchesGroup;
 	} else {
 		return ko.utils.arrayFilter(matchesGroup, function(event) {
-			if (event.summary().toLowerCase().search(filter) != -1) {
-				return true;
-			} else if (event.description().toLowerCase().search(filter) != -1) {
-				return true;
-			} else {
-				return false;
-			}
+			return matchEventText(event, filter);
 		});
 	}
 }, myEventsModel);
