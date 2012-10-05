@@ -3,6 +3,7 @@ console.log("init.js loading");
 var pages = {};
 var current_page = 'official-events';
 var page_scroll_element = [];
+var offline = true;
 
 var templates = {
 	header: "views/header.html",
@@ -11,6 +12,20 @@ var templates = {
 	loaded: 0,
 	requested: 0,
 };
+
+function setOffline() {
+	if (offline == false) {
+		console.log("setOffline: we were online but have gone offline");
+	}
+	console.log("offline = " + offline);
+}
+
+function setOnline() {
+	if (offline == true) {
+		console.log("setOnline: we were offline but have gone online");
+	}
+	console.log("offline = " + offline);
+}
 
 function elementInViewport(el) {
 	var top = el.offsetTop;
@@ -251,16 +266,23 @@ function checkIfAuthorized(success, failure) {
 		password: password,
 		success: function(data) {
 			if (data == 'ok') {
+				setOnline();
 				console.log('test returned OK');
 				success();
 				return;
 			} else {
+				setOnline();
 				console.log('success function called, but data was not OK!');
 				failure();
 				return;
 			}
 		}
 	}).error(function(data) {
+		if (data && data.readyState == 0) {
+			setOffline();
+		} else {
+			setOnline();
+		}
 		console.log("An error occurred: " + ko.toJSON(data));
 		failure();
 	});
