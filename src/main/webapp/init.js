@@ -256,7 +256,7 @@ function checkIfAuthorized(success, failure) {
 	}
 
 	$.ajax({
-		url: statusNetOptions.statusNetRoot + '/help/test.json',
+		url: serverModel.statusnet() + '/api/help/test.json',
 		dataType: 'json',
 		type: 'POST',
 		beforeSend: function(xhr) {

@@ -190,21 +190,32 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 function ServerModel() {
 	var self = this;
 	
-	self.server   = ko.observable(amplify.store('server'));
-	self.username = ko.observable(amplify.store('username'));
-	self.password = ko.observable(amplify.store('password'));
+	self.cruisemonkey = ko.observable(amplify.store('cruisemonkey_url'));
+	self.statusnet    = ko.observable(amplify.store('statusnet_url'));
+	self.username     = ko.observable(amplify.store('username'));
+	self.password     = ko.observable(amplify.store('password'));
 	
 	self.reset = function() {
-		self.server(amplify.store('server'));
+		self.cruisemonkey(amplify.store('cruisemonkey_url'));
+		self.statusnet(amplify.store('statusnet_url'));
 		self.username(amplify.store('username'));
 		self.password(amplify.store('password'));
 	};
 	
 	self.persist = function() {
-		amplify.store('server', self.server());
-		amplify.store('username', self.username());
-		amplify.store('password', self.password());
+		amplify.store('cruisemonkey_url', self.cruisemonkey());
+		amplify.store('statusnet_url',    self.statusnet());
+		amplify.store('username',         self.username());
+		amplify.store('password',         self.password());
 	};
+	
+	if (!self.cruisemonkey()) {
+		self.cruisemonkey("http://localhost:8080");
+	}
+	if (!self.statusnet()) {
+		// self.statusnet("http://192.168.211.118/statusnet");
+		self.statusnet("https://identi.ca");
+	}
 }
 
 var serverModel = new ServerModel();
