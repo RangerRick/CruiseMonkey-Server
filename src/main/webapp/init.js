@@ -394,19 +394,19 @@ function createLoginView() {
     	$(div).css('display', 'none');
     	var html = Mustache.to_html(templates.login);
     	$(div).html(html);
-		$(div).find('#login_cancel').on('click.fndtn touchstart.fndtn', function(e) {
+		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
 			console.log("cancel clicked");
+			serverModel.reset();
 		});
 		$(div).find('#login_save').on('click.fndtn touchstart.fndtn', function(e) {
 			console.log("save clicked");
-			amplify.store('username', loginModel.username());
-			amplify.store('password', loginModel.password());
+			serverModel.persist();
 			setupDefaultView();
 		});
 
     	pages.login = div;
     	var appended = getContainer()[0].appendChild(div);
-    	ko.applyBindings(loginModel, appended);
+    	ko.applyBindings(serverModel, appended);
 	}
 }
 

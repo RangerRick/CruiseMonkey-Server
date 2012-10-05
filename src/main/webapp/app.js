@@ -187,13 +187,26 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 	}
 }, myEventsModel);
 
-function LoginModel() {
+function ServerModel() {
 	var self = this;
 	
+	self.server   = ko.observable(amplify.store('server'));
 	self.username = ko.observable(amplify.store('username'));
 	self.password = ko.observable(amplify.store('password'));
+	
+	self.reset = function() {
+		self.server(amplify.store('server'));
+		self.username(amplify.store('username'));
+		self.password(amplify.store('password'));
+	};
+	
+	self.persist = function() {
+		amplify.store('server', self.server());
+		amplify.store('username', self.username());
+		amplify.store('password', self.password());
+	};
 }
 
-var loginModel = new LoginModel();
+var serverModel = new ServerModel();
 
 console.log("app.js loaded");
