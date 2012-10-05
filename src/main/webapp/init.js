@@ -7,6 +7,7 @@ var page_scroll_element = [];
 var templates = {
 	header: "views/header.html",
 	events: "views/events.html",
+	login: "views/login.html",
 	loaded: 0,
 	requested: 0,
 };
@@ -189,10 +190,13 @@ function setupHeader() {
 }
 
 function navigateTo(pageId) {
+	console.log('navigating to ' + pageId);
 	if (pageId == 'official-events') {
 		showOfficialEventsView();
 	} else if (pageId == 'my-events') {
 		showMyEventsView();
+	} else if (pageId == 'login') {
+		showLoginView();
 	} else {
 		console.log('unknown page ID: ' + pageId);
 		return false;
@@ -227,21 +231,70 @@ function navigateTo(pageId) {
 	return true;
 }
 
+function checkIfAuthorized(success, failure) {
+	var username = amplify.store('username');
+	var password = amplify.store('password');
+	
+	if (!username || !password) {
+		failure();
+		return;
+	}
+
+	$.ajax({
+		url: statusNetOptions.statusNetRoot + '/help/test.json',
+		dataType: 'json',
+		type: 'POST',
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ':' + password));
+		},
+		username: username,
+		password: password,
+		success: function(data) {
+			if (data == 'ok') {
+				console.log('test returned OK');
+				success();
+				return;
+			} else {
+				console.log('success function called, but data was not OK!');
+				failure();
+				return;
+			}
+		}
+	}).error(function(data) {
+		console.log("An error occurred: " + ko.toJSON(data));
+		failure();
+	});
+}
+
 function setupDefaultView() {
     console.log("setting up default view");
 
     var current_page = amplify.store('current_page');
-    if (!current_page) {
+    if (!current_page || current_page == 'login') {
     	current_page = 'official-events';
     	amplify.store('current_page', current_page);
     }
 
     setupHeader();
-    navigateTo(current_page);
 
+    checkIfAuthorized(
+    	// success
+    	function() {
+    		console.log("checkIfAuthorized: success");
+    	    navigateTo(current_page);
+    	},
+    	// failure
+    	function() {
+    		console.log("checkIfAuthorized: failure");
+    		navigateTo('login');
+    	}
+    )
+
+    /*
     var interval = setInterval(function() {
     	eventsModel.updateDataFromJSON();
     }, 5000);
+    */
 
     // Hide address bar on mobile devices
     /*
@@ -263,9 +316,14 @@ function replaceCurrentPage(pageId) {
 	page.css('display', 'block');
     if (!Modernizr.touch) {
     	// on non-mobile devices, focus the search input
-    	page.find('input[type=search]')[0].focus();
+    	var search = page.find('input[type=search]');
+    	if (search && search[0]) {
+    		search[0].focus();
+    	}
     }
-    amplify.store('current_page', pageId);
+    if (pageId != 'login') {
+        amplify.store('current_page', pageId);
+    }
 	return getContainer()[0];
 }
 
@@ -294,7 +352,6 @@ function createMyEventsView() {
     	div.setAttribute('id', 'my-events');
     	$(div).css('display', 'none');
     	var html = Mustache.to_html(templates.events, { eventType: "my" });
-    	// console.log("html = " + html);
     	$(div).html(html);
     	pages.my = div;
     	var appended = getContainer()[0].appendChild(div);
@@ -306,6 +363,34 @@ function showMyEventsView() {
 	createMyEventsView();
 	var content = replaceCurrentPage('my-events');
     $(content).find('ul.event-list').css('display', 'block');
+}
+
+function createLoginView() {
+	if (!pages.login) {
+    	var div = document.createElement('div');
+    	div.setAttribute('id', 'login');
+    	$(div).css('display', 'none');
+    	var html = Mustache.to_html(templates.login);
+    	$(div).html(html);
+		$(div).find('#login_cancel').on('click.fndtn touchstart.fndtn', function(e) {
+			console.log("cancel clicked");
+		});
+		$(div).find('#login_save').on('click.fndtn touchstart.fndtn', function(e) {
+			console.log("save clicked");
+			amplify.store('username', loginModel.username());
+			amplify.store('password', loginModel.password());
+			setupDefaultView();
+		});
+
+    	pages.login = div;
+    	var appended = getContainer()[0].appendChild(div);
+    	ko.applyBindings(loginModel, appended);
+	}
+}
+
+function showLoginView() {
+	createLoginView();
+	var content = replaceCurrentPage('login');
 }
 
 function onTemplateLoaded(template, key) {
@@ -320,6 +405,7 @@ function onTemplateLoaded(template, key) {
 		
 		createOfficialEventsView();
 		createMyEventsView();
+		createLoginView();
 
         setupDefaultView();
     }

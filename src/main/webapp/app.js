@@ -106,7 +106,7 @@ function EventsViewModel() {
 			}
 		});
 		self.events(mappedTasks);
-		console.log("saving ReST events");
+		// console.log("saving ReST events");
 		amplify.store("events", allData);
 	}
 	
@@ -186,5 +186,14 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 		});
 	}
 }, myEventsModel);
+
+function LoginModel() {
+	var self = this;
+	
+	self.username = ko.observable(amplify.store('username'));
+	self.password = ko.observable(amplify.store('password'));
+}
+
+var loginModel = new LoginModel();
 
 console.log("app.js loaded");
