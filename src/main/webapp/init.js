@@ -3,7 +3,7 @@ console.log("init.js loading");
 var pages = {};
 var current_page = 'official-events';
 var page_scroll_element = [];
-var offline = true;
+var online = false;
 
 var templates = {
 	header: "views/header.html",
@@ -13,18 +13,30 @@ var templates = {
 	requested: 0,
 };
 
-function setOffline() {
-	if (offline == false) {
+var setOffline = function() {
+	if (online == true) {
 		console.log("setOffline: we were online but have gone offline");
 	}
-	console.log("offline = " + offline);
+	online = false;
+	navModel.signedIn(false);
+	console.log("online = " + online);
 }
 
-function setOnline() {
-	if (offline == true) {
+var setOnline = function() {
+	if (online == false) {
 		console.log("setOnline: we were offline but have gone online");
 	}
-	console.log("offline = " + offline);
+	online = true;
+	navModel.signedIn(true);
+	console.log("online = " + online);
+}
+
+var isOnline = function() {
+	return online;
+}
+
+var isSignedIn = function() {
+	return online && loginModel.username() && loginModel.username().length > 0;
 }
 
 function elementInViewport(el) {
@@ -186,7 +198,9 @@ function setupHeader() {
     header = getHeader();
     header.html(templates.header);
     
-    $('nav').find('a').each(function(index, element) {
+    var nav = $(header).find('nav')[0];
+
+    $(nav).find('a').each(function(index, element) {
     	var hash = undefined;
     	if (element.href !== undefined) {
     		hash = element.href.split('#')[1];
@@ -202,6 +216,8 @@ function setupHeader() {
     });
 
     $(document).foundationTopBar();
+
+    ko.applyBindings(navModel, nav);
 }
 
 function navigateTo(pageId) {

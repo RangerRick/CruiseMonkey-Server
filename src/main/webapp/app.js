@@ -70,6 +70,39 @@ var onFilterChange = function() {
 	*/
 };
 
+function ServerModel() {
+	var self = this;
+
+	self.cruisemonkey = ko.observable(amplify.store('cruisemonkey_url'));
+	self.statusnet    = ko.observable(amplify.store('statusnet_url'));
+	self.username     = ko.observable(amplify.store('username'));
+	self.password     = ko.observable(amplify.store('password'));
+	
+	self.reset = function() {
+		self.cruisemonkey(amplify.store('cruisemonkey_url'));
+		self.statusnet(amplify.store('statusnet_url'));
+		self.username(amplify.store('username'));
+		self.password(amplify.store('password'));
+	};
+	
+	self.persist = function() {
+		amplify.store('cruisemonkey_url', self.cruisemonkey());
+		amplify.store('statusnet_url',    self.statusnet());
+		amplify.store('username',         self.username());
+		amplify.store('password',         self.password());
+	};
+	
+	if (!self.cruisemonkey()) {
+		self.cruisemonkey("http://localhost:8088");
+	}
+	if (!self.statusnet()) {
+		// self.statusnet("http://192.168.211.118/statusnet");
+		self.statusnet("https://identi.ca");
+	}
+}
+
+var serverModel = new ServerModel();
+
 function EventsViewModel() {
 	var self = this;
 	self.events = ko.observableArray();
@@ -111,7 +144,7 @@ function EventsViewModel() {
 	}
 	
 	self.updateDataFromJSON = function() {
-		$.getJSON("rest/events", self.updateData);
+		$.getJSON(serverModel.cruisemonkey() + '/rest/events', self.updateData);
 	};
 
 	self.updateDataFromJSON();
@@ -187,37 +220,12 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 	}
 }, myEventsModel);
 
-function ServerModel() {
+var navModel = {
+		signedIn: ko.observable(false)
+};
+navModel.notSignedIn = ko.dependentObservable(function() {
 	var self = this;
-	
-	self.cruisemonkey = ko.observable(amplify.store('cruisemonkey_url'));
-	self.statusnet    = ko.observable(amplify.store('statusnet_url'));
-	self.username     = ko.observable(amplify.store('username'));
-	self.password     = ko.observable(amplify.store('password'));
-	
-	self.reset = function() {
-		self.cruisemonkey(amplify.store('cruisemonkey_url'));
-		self.statusnet(amplify.store('statusnet_url'));
-		self.username(amplify.store('username'));
-		self.password(amplify.store('password'));
-	};
-	
-	self.persist = function() {
-		amplify.store('cruisemonkey_url', self.cruisemonkey());
-		amplify.store('statusnet_url',    self.statusnet());
-		amplify.store('username',         self.username());
-		amplify.store('password',         self.password());
-	};
-	
-	if (!self.cruisemonkey()) {
-		self.cruisemonkey("http://localhost:8080");
-	}
-	if (!self.statusnet()) {
-		// self.statusnet("http://192.168.211.118/statusnet");
-		self.statusnet("https://identi.ca");
-	}
-}
-
-var serverModel = new ServerModel();
+	return ! self.signedIn();
+}, navModel);
 
 console.log("app.js loaded");

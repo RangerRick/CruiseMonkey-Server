@@ -10,8 +10,8 @@
         <li><a href="#my-events">My Events</a></li>
       </ul>
       <ul class="right">
-      	<li><a href="#">Sign In</a></li>
-      	<li><a href="#">Sign Out</a></li>
+      	<li data-bind="visible: notSignedIn"><a href="#">Sign In</a></li>
+      	<li data-bind="visible: signedIn"><a href="#">Sign Out</a></li>
       </ul>
     </section>
   </nav>
