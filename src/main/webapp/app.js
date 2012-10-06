@@ -97,7 +97,8 @@ function ServerModel() {
 	}
 	if (!self.statusnet()) {
 		// self.statusnet("http://192.168.211.118/statusnet");
-		self.statusnet("https://identi.ca");
+		// self.statusnet("https://identi.ca");
+		self.statusnet('http://localhost/statusnet');
 	}
 }
 

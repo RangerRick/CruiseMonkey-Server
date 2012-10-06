@@ -217,6 +217,20 @@ function setupHeader() {
 
     $(document).foundationTopBar();
 
+    $(nav).find('.signin').each(function(index, element) {
+    	$(element).on('click.fndtn touchstart.fndtn', function(e) {
+    		setOffline();
+    		navigateTo('login');
+    	});
+    });
+    $(nav).find('.signout').each(function(index, element) {
+    	$(element).on('click.fndtn touchstart.fndtn', function(e) {
+    		setOffline();
+    		serverModel.username(null);
+    		serverModel.password(null);
+    		navigateTo('login');
+    	});
+    });
     ko.applyBindings(navModel, nav);
 }
 
@@ -304,16 +318,18 @@ function checkIfAuthorized(success, failure) {
 	});
 }
 
-function setupDefaultView() {
-    console.log("setting up default view");
-
+var getCurrentPage = function() {
     var current_page = amplify.store('current_page');
+    console.log('setupDefaultView: current_page = ' + current_page);
     if (!current_page || current_page == 'login') {
     	current_page = 'official-events';
     	amplify.store('current_page', current_page);
     }
+    return current_page;
+}
 
-    setupHeader();
+var showLoginOrCurrent = function() {
+	var current_page = getCurrentPage();
 
     checkIfAuthorized(
     	// success
@@ -326,7 +342,11 @@ function setupDefaultView() {
     		console.log("checkIfAuthorized: failure");
     		navigateTo('login');
     	}
-    )
+    );
+}
+
+function setupDefaultView() {
+    setupHeader();
 
     /*
     var interval = setInterval(function() {
@@ -346,6 +366,7 @@ function setupDefaultView() {
     }
     */
 
+    showLoginOrCurrent();
 }
 
 function replaceCurrentPage(pageId) {
