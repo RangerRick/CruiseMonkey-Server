@@ -19,38 +19,27 @@
 
     <context:annotation-config />
 
-	<!-- 
-	<jdbc:embedded-database id="dataSource" type="HSQL" />
-	-->
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-		<property name="url" value="jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true" />
-		<property name="username" value="sa" />
-		<property name="password" value="" />
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+		p:driverClassName="org.hsqldb.jdbcDriver"
+		p:url="jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true"
+		p:username="sa"
+		p:password="" />
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.raccoonfink.cruisemonkey.model" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.connection.pool_size">1</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.current_session_context_class">thread</prop>
+			</props>
+		</property>
 	</bean>
-
-	<util:properties id="hibernateProperties">
-		<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-		<prop key="hibernate.connection.url">jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true</prop>
-		<!-- 
-		<prop key="hibernate.connection.username">sa</prop>
-		<prop key="hibernate.connection.password"></prop>
-		-->
-		<prop key="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</prop>
-		<prop key="hibernate.format_sql">true</prop>
-		<prop key="hibernate.show_sql">false</prop>
-		<prop key="hibernate.hbm2ddl.auto">update</prop>
-		<prop key="hibernate.connection.pool_size">1</prop>
-		<prop key="hibernate.connection.autocommit">false</prop>
-		<prop key="hibernate.current_session_context_class">thread</prop>
-	</util:properties>
-
-	<bean id="sessionFactory"
-		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
-		p:dataSource-ref="dataSource"
-		p:packagesToScan="com.raccoonfink.cruisemonkey.model"
-		p:hibernateProperties-ref="hibernateProperties"
-	/>
 
 	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory"/>

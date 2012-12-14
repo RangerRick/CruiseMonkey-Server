@@ -17,7 +17,8 @@
 	<security:global-method-security secured-annotations="enabled" />
 
 	<security:http auto-config="true">
-		<security:intercept-url method="POST" pattern="/**" access="ROLE_USER" />
+		<security:intercept-url pattern="/auth/**" access="ROLE_ANONYMOUS" />
+		<security:intercept-url pattern="/**" access="ROLE_USER" />
 		<security:http-basic />
 	</security:http>
 

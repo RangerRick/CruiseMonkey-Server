@@ -1,9 +1,31 @@
 console.log("init.js loading");
 
 var pages = {};
-var current_page = 'official-events';
 var page_scroll_element = [];
 var online = false;
+
+var scrollManager = new ScrollManager();
+scrollManager.delay = 100;
+
+scrollManager.onScrollStart = function(enabled) {
+	if (enabled) {
+		console.log('scrolling started while enabled');
+	} else {
+		console.log('scrolling started while disabled');
+	}
+};
+scrollManager.onScrollStop = function(enabled) {
+	if (enabled) {
+		var found = findTopVisibleElement();
+		if (found) {
+			console.log("visible element: " + getSummary(found) + ' (' + $(found).attr('id') + ')');
+		} else {
+			console.log("no elements visible!");
+		}
+	} else {
+		console.log('scrolling stopped while disabled');
+	}
+};
 
 var templates = {
 	header: "views/header.html",
@@ -14,6 +36,7 @@ var templates = {
 };
 
 var setOffline = function() {
+	console.log('setOffline()');
 	if (online == true) {
 		console.log("setOffline: we were online but have gone offline");
 	}
@@ -23,6 +46,7 @@ var setOffline = function() {
 }
 
 var setOnline = function() {
+	console.log('setOnline()');
 	if (online == false) {
 		console.log("setOnline: we were offline but have gone online");
 	}
@@ -73,7 +97,7 @@ function _setPageStoreCache(cache) {
 }
 
 function updatePageTopElement(page, id) {
-	console.log("storing " + id + " as the top element for page " + page);
+	console.log('updatePageTopElement(' + page + ', ' + id + ')');
 	var page_store_cache = _getPageStoreCache();
 	page_store_cache[page] = id;
 	_setPageStoreCache(page_store_cache);
@@ -81,57 +105,42 @@ function updatePageTopElement(page, id) {
 }
 
 function getPageTopElement(page) {
+	console.log('getPageTopElement(' + page + ')');
 	var page_store_cache = _getPageStoreCache();
 	var retVal = null;
 	if (page_store_cache) {
 		retVal = page_store_cache[page];
 	}
-	console.log("getPageTopElement(" + page + ") = " + retVal);
+	console.log("getPageTopElement: returning " + retVal);
 	return retVal;
 }
 
-var scrollTimeout = null;
-var scrollEndDelay = 500; // ms
+function getSummary(element) {
+	return $(element).find('div.summary').text();
+}
 
 function findTopVisibleElement() {
+	console.log('findTopVisibleElement()');
 	var found = null;
-	$('.calendar-event').each(function(index, element) {
+	var current_page = getCurrentPage();
+	$('#' + current_page).find('.calendar-event').each(function(index, element) {
 		if (elementInViewport(element)) {
 			var id = $(element).attr('id');
 			if (id) {
-				var summary = $(found).find('div.summary').text();
-				console.log("first visible element: " + summary + ' (' + id + ')');
+				var summary = getSummary(element);
 				if (current_page) {
+					console.log("first visible element on " + current_page + ": " + summary + ' (' + id + ')');
 					updatePageTopElement(current_page, id);
 				}
 			}
 			found = element;
 			return false;
 		}
+		return true;
 	});
 
 	return found;
 }
-
-function scrollEndHandler() {
-	console.log("scrolling finished");
-	scrollTimeout = null;
-	var found = findTopVisibleElement();
-	if (found) {
-		console.log("visible element: " + $(found).find('div.summary').text() + ' (' + $(found).attr('id') + ')');
-	} else {
-		console.log("no elements visible!");
-	}
-}
-
-$(window).scroll(function() {
-	if (scrollTimeout === null) {
-		console.log("scrolling started");
-	} else {
-		clearTimeout(scrollTimeout);
-	}
-	scrollTimeout = setTimeout( scrollEndHandler, scrollEndDelay );
-});
 
 function onDeviceReady( event ) {
 	console.log("Device is ready.  Initializing.");
@@ -190,11 +199,8 @@ function getScroll() {
 	}
 }
 
-function scrollTo(x, y) {
-	window.scrollTo(x, y);
-}
-
 function setupHeader() {
+	console.log('setupHeader()');
     header = getHeader();
     header.html(templates.header);
     
@@ -235,7 +241,10 @@ function setupHeader() {
 }
 
 function navigateTo(pageId) {
-	console.log('navigating to ' + pageId);
+	console.log('----------------------------------------------------------------------------------');
+	console.log('navigateTo(' + pageId + ')');
+	scrollManager.disable();
+
 	if (pageId == 'official-events') {
 		showOfficialEventsView();
 	} else if (pageId == 'my-events') {
@@ -249,23 +258,39 @@ function navigateTo(pageId) {
 
 	var topElement = getPageTopElement(pageId);
 	if (topElement) {
+		var page = $('#' + pageId);
+
 		var matched = null;
-		$('#content').find('.scrollable').each(function(index, element) {
+		var matched_index = -1;
+		page.find('.scrollable').each(function(index, element) {
 			var id = $(element).attr('id');
 			if (id == topElement) {
-				matched = element;
+				matched = id;
+				matched_index = index;
 				console.log("matched " + id);
 				return false;
 			} else {
-				console.log("id " + id + " did not match " + topElement);
+				console.log(id + ' did not match ' + topElement);
 			}
 			return true;
 		});
 
 		if (matched) {
-			console.log("scrolling to " + topElement);
-			matched.scrollIntoView(true);
-			window.scrollBy(0, -45);
+			console.log("matched_index = " + matched_index);
+			if (matched_index == 0) {
+				console.log('scrolling to the top of the page');
+				scrollTo(0,-45);
+				// $('body').scrollTo(0, 0, {margin:false, offset: {left:0, top:-45}});
+			} else {
+				console.log("scrolling to " + topElement + ' (' + matched + ')');
+				$('body').scrollTo('#' + topElement, 0, {margin:false, offset: {left:0, top:-45}});
+				// $('body').scrollTo('#' + topElement, 0);
+			}
+			/*
+			setTimeout(function() {
+				window.scrollBy(0, -45);
+			}, 50);
+			*/
 		} else {
 			console.log("didn't find an element to scroll to for " + topElement);
 		}
@@ -273,10 +298,14 @@ function navigateTo(pageId) {
 		console.log("no top element found for " + pageId);
 	}
 
+	setTimeout(function() {
+		scrollManager.enable();
+	}, 100);
 	return true;
 }
 
 function checkIfAuthorized(success, failure) {
+	console.log('checkIfAuthorized()');
 	var username = amplify.store('username');
 	var password = amplify.store('password');
 	
@@ -346,6 +375,7 @@ var showLoginOrCurrent = function() {
 }
 
 function setupDefaultView() {
+	console.log('setupDefaultView()');
     setupHeader();
 
     /*
@@ -370,6 +400,7 @@ function setupDefaultView() {
 }
 
 function replaceCurrentPage(pageId) {
+	console.log('replaceCurrentPage(' + pageId + ')');
 	getContainer().children().css('display', 'none');
 	var page = $('#' + pageId);
 	page.css('display', 'block');
@@ -387,6 +418,7 @@ function replaceCurrentPage(pageId) {
 }
 
 function createOfficialEventsView() {
+	console.log('createOfficialEventsView()');
     if (!pages.official) {
     	var div = document.createElement('div');
     	div.setAttribute('id', 'official-events');
@@ -400,12 +432,14 @@ function createOfficialEventsView() {
 }
 
 function showOfficialEventsView() {
+	console.log('showOfficialEventsView()');
 	createOfficialEventsView();
 	var content = replaceCurrentPage('official-events');
     $(content).find('ul.event-list').css('display', 'block');
 }
 
 function createMyEventsView() {
+	console.log('createMyEventsView()');
     if (!pages.my) {
     	var div = document.createElement('div');
     	div.setAttribute('id', 'my-events');
@@ -419,12 +453,14 @@ function createMyEventsView() {
 }
 
 function showMyEventsView() {
+	console.log('showMyEventsView()');
 	createMyEventsView();
 	var content = replaceCurrentPage('my-events');
     $(content).find('ul.event-list').css('display', 'block');
 }
 
 function createLoginView() {
+	console.log('createLoginView()');
 	if (!pages.login) {
     	var div = document.createElement('div');
     	div.setAttribute('id', 'login');
@@ -448,12 +484,13 @@ function createLoginView() {
 }
 
 function showLoginView() {
+	console.log('showLoginView()');
 	createLoginView();
 	var content = replaceCurrentPage('login');
 }
 
 function onTemplateLoaded(template, key) {
-	console.log("template '" + key + "' loaded");
+	console.log('onTemplateLoaded(<template>, ' + key + ')');
 
 //    console.log( key + ": " + template);
     templates[ key ] = template;

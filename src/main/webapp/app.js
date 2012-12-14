@@ -17,7 +17,7 @@ ko.bindingHandlers.dateString = {
 function Event(data) {
 	var self = this;
 
-	self.id           = ko.observable(data["@id"]);
+	self.id           = ko.observable(data["@id"].replace(/[\W\@]+/g, ''));
 	self.summary      = ko.observable(data.summary);
 	self.description  = ko.observable(data.description);
 	self.start        = ko.observable(new Date(data.start));
@@ -113,6 +113,7 @@ function EventsViewModel() {
 			var item = ko.utils.arrayFirst(self.events(), function(entry) {
 				if (entry) {
 					// console.log("entry = " + ko.toJSON(entry));
+					event["@id"] = event["@id"].replace(/[\W\@]+/g, '');
 					if (entry.id() == event["@id"]) {
 						return true;
 					} else {
