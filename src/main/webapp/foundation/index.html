@@ -35,7 +35,7 @@
   <div class="row">
     <div class="twelve columns">
       <h2>Welcome to Foundation</h2>
-      <p>This is version <strong>3.1.1</strong> generated on September 20, 2012.</p>
+      <p>This is version <strong>3.2.2</strong> generated on November 10, 2012.</p>
       <hr />
     </div>
   </div>
@@ -134,9 +134,9 @@
     <div class="twelve columns">
       <h3>Orbit</h3>
       <div id="featured">
-        <img src="http://placehold.it/1200x250&text=Slide_1" alt="slide image">
-        <img src="http://placehold.it/1200x250&text=Slide_2" alt="slide image">
-        <img src="http://placehold.it/1200x250&text=Slide_3" alt="slide image">
+        <img src="holder.js/1200x250/text:Slide_1" alt="slide image">
+        <img src="holder.js/1200x250/text:Slide_2" alt="slide image">
+        <img src="holder.js/1200x250/text:Slide_3" alt="slide image">
       </div>
     </div>
   </div>
@@ -190,6 +190,12 @@
   
   <script src="javascripts/jquery.foundation.topbar.js"></script>
   
+  <script src="javascripts/jquery.foundation.joyride.js"></script>
+  
+  <script src="javascripts/jquery.foundation.clearing.js"></script>
+  
+  <script src="javascripts/jquery.foundation.magellan.js"></script>
+  
   -->
   
   <!-- Included JS Files (Compressed) -->
@@ -198,5 +204,13 @@
   
   <!-- Initialize JS Plugins -->
   <script src="javascripts/app.js"></script>
+
+  
+    <script>
+    $(window).load(function(){
+      $("#featured").orbit();
+    });
+    </script> 
+  
 </body>
 </html>
