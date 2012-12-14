@@ -6,14 +6,19 @@ import org.junit.Test;
 
 public class StatusNetServiceTest {
 
+	private static final String HOST = "identi.ca";
+	private static final int PORT = 80;
+	private static final String PATH = "";
+	private static final String USERNAME = "RangerRick";
+
 	@Test
 	public void testHttpAuth() throws Exception {
-		new StatusNetService("192.168.211.118", 80, "/statusnet", "RangerRick", "M0nkey").authorize();
+		new StatusNetService(HOST, PORT, PATH, USERNAME, "M0nkey").authorize();
 	}
 
 	@Test(expected=AuthorizationFailureException.class)
 	public void testHttpAuthFailure() throws Exception {
-		new StatusNetService("192.168.211.118", 80, "/statusnet", "RangerRick", "aoeuaoeu").authorize();
+		new StatusNetService(HOST, 80, PATH, USERNAME, "aoeuaoeu").authorize();
 	}
 
 }
