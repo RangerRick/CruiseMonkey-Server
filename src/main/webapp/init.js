@@ -276,21 +276,16 @@ function navigateTo(pageId) {
 		});
 
 		if (matched) {
-			console.log("matched_index = " + matched_index);
-			if (matched_index == 0) {
-				console.log('scrolling to the top of the page');
-				scrollTo(0,-45);
-				// $('body').scrollTo(0, 0, {margin:false, offset: {left:0, top:-45}});
-			} else {
-				console.log("scrolling to " + topElement + ' (' + matched + ')');
-				$('body').scrollTo('#' + topElement, 0, {margin:false, offset: {left:0, top:-45}});
-				// $('body').scrollTo('#' + topElement, 0);
-			}
-			/*
 			setTimeout(function() {
-				window.scrollBy(0, -45);
-			}, 50);
-			*/
+				console.log("matched_index = " + matched_index);
+				if (matched_index == 0) {
+					console.log('scrolling to the top of the page');
+					scrollTo(0,0);
+				} else {
+					console.log("scrolling to " + topElement + ' (' + matched + ')');
+					$('body').scrollTo('#' + topElement, 0, {margin:false, offset: {left:0, top:-45}});
+				}
+			}, 0);
 		} else {
 			console.log("didn't find an element to scroll to for " + topElement);
 		}
@@ -300,7 +295,7 @@ function navigateTo(pageId) {
 
 	setTimeout(function() {
 		scrollManager.enable();
-	}, 100);
+	}, 0);
 	return true;
 }
 
