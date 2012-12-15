@@ -7,14 +7,16 @@
 </head>
 <body>
 	<div id="qunit"></div>
-	<div id="scroll-manager-fixture"></div>
+	<div id="qunit-fixture"></div>
 	<script src="jquery/jquery-1.8.1.js"></script>
 	<script src="http://code.jquery.com/qunit/qunit-1.10.0.js"></script>
+  <script src="amplifyjs/amplify.min.js"></script>
 	<script src="scroll_manager.js"></script>
+	<script src="page_tracker.js"></script>
 	<script>
 		module("ScrollManager tests", {
 			setup: function() {
-				var fixture = $('#scroll-manager-fixture');
+				var fixture = $('#qunit-fixture');
 				$(fixture).append('<ol>');
 				for (var i = 1; i <= 1000; i++) {
 					$(fixture).append('<li id="' + i + '">ID #' + i + '</li>');
@@ -22,7 +24,7 @@
 				$(fixture).append('</ol>');
 			},
 			teardown: function() {
-				var fixture = $('#scroll-manager-fixture');
+				var fixture = $('#qunit-fixture');
 				$(fixture).empty();
 			}
 		});
@@ -39,7 +41,7 @@
 				if (enabled) { stopped++; }
 			};
 			scrollManager.delay = 10;
-			
+
 			$('#500').scroll();
 			setTimeout(function() {
 				equal(started, 1, 'ScrollManager should have started scrolling once.');
@@ -47,7 +49,7 @@
 				start();
 			}, 50);
 		});
-		
+
 		/* callbacks should not be called while disabled */
 		asyncTest('scrollManager.disabled', 4, function() {
 			var scrollManager = new ScrollManager();
@@ -71,7 +73,7 @@
 			};
 			scrollManager.delay = 10;
 			scrollManager.disable();
-			
+
 			$('#500').scroll();
 			setTimeout(function() {
 				equal(started, 0, 'ScrollManager should not have started scrolling.');
@@ -80,6 +82,27 @@
 				equal(stopped_while_disabled, 1, 'ScrollManager should have completed disabled scrolling.');
 				start();
 			}, 50);
+		});
+
+		module("PageTracker tests", {
+			setup: function() {
+			},
+			teardown: function() {
+				var fixture = $('#qunit-fixture');
+				$(fixture).empty();
+			}
+		});
+
+		test('pageTracker.basic', 3, function() {
+			raises(function() {
+				var pageTracker = new PageTracker(null);
+			}, TypeError, "Expecting a type error when passing an invalid amplify object.");
+
+			var pageTracker = new PageTracker(amplify);
+			pageTracker.setScrolledId('bar', 'baz');
+			equal('baz', pageTracker.getScrolledId('bar'));
+
+			equal(null, pageTracker.getScrolledId('foo'));
 		});
 	</script>
 </body>

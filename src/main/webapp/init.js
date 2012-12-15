@@ -82,52 +82,15 @@ function elementInViewport(el) {
 	);
 }
 
-function PageTracker(amplify) {
-	m_amplify = amplify;
-
-	var me = this;
-
-	f_getPageCache = function() {
-		var page_store_cache = m_amplify.store('page_store_cache');
-		if (!page_store_cache) {
-			page_store_cache = {};
-		}
-		return page_store_cache;
-	};
-	
-	me.cache = function(new_page_store_cache) {
-		console.log('PageTracker::cache()');
-		if (new_page_store_cache) {
-			m_amplify.store('page_store_cache', new_page_store_cache);
-		} else {
-			return f_getPageCache();
-		}
-	};
-	
-	me.setPage = function(page, id) {
-		var page_store_cache = f_getPageCache();
-		page_store_cache[page] = id;
-		me.cache(page_store_cache);
-	};
-}
-
 var pageTracker = new PageTracker(amplify);
 
 function updatePageTopElement(page, id) {
-	console.log('updatePageTopElement(' + page + ', ' + id + ')');
-	pageTracker.setPage(page, id);
+	pageTracker.setScrolledId(page, id);
 	return id;
 }
 
 function getPageTopElement(page) {
-	console.log('getPageTopElement(' + page + ')');
-	var page_store_cache = pageTracker.cache();
-	var retVal = null;
-	if (page_store_cache) {
-		retVal = page_store_cache[page];
-	}
-	console.log("getPageTopElement: returning " + retVal);
-	return retVal;
+	return pageTracker.getScrolledId(page);
 }
 
 function getSummary(element) {
