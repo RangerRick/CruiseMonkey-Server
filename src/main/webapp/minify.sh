@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm 3rdparty.js cruisemonkey.js
+rm 3rdparty.js cruisemonkey.js cruisemonkey.css
 
 for FILE in \
 	jquery/jquery-1.8.1.min.js \
@@ -33,4 +33,13 @@ for FILE in \
 	echo "=== $FILE ==="
 	java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$FILE" >> cruisemonkey.js
 	echo "" >> cruisemonkey.js
+done
+
+for FILE in \
+	foundation/stylesheets/foundation.css \
+	styles.css \
+; do
+	echo "=== $FILE ==="
+	java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$FILE" >> cruisemonkey.css
+	echo "" >> cruisemonkey.css
 done
