@@ -1,28 +1,3 @@
-function ScrollState(page, entry) {
-	var m_page  = null;
-	var m_entry = null;
-
-	var me = this;
-
-	if (page) {
-		m_page = page;
-	}
-	if (entry) {
-		m_entry = entry;
-	}
-	
-	me.page = function() {
-		return m_page;
-	};
-	me.entry = function() {
-		return m_entry;
-	};
-	me.set = function(page, entry) {
-		m_page  = page;
-		m_entry = entry;
-	};
-}
-
 function Scroll(enabled, timeout) {
 	this.enabled = enabled;
 	this.timeout = timeout;

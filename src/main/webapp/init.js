@@ -82,31 +82,46 @@ function elementInViewport(el) {
 	);
 }
 
-function _getPageStoreCache() {
-	// console.log("store currently contains: " + ko.toJSON(amplify.store()));
-	var page_store_cache = amplify.store('page_store_cache');
-	if (!page_store_cache) {
-		page_store_cache = {};
-	}
-	return page_store_cache;
+function PageTracker(amplify) {
+	m_amplify = amplify;
+
+	var me = this;
+
+	f_getPageCache = function() {
+		var page_store_cache = m_amplify.store('page_store_cache');
+		if (!page_store_cache) {
+			page_store_cache = {};
+		}
+		return page_store_cache;
+	};
+	
+	me.cache = function(new_page_store_cache) {
+		console.log('PageTracker::cache()');
+		if (new_page_store_cache) {
+			m_amplify.store('page_store_cache', new_page_store_cache);
+		} else {
+			return f_getPageCache();
+		}
+	};
+	
+	me.setPage = function(page, id) {
+		var page_store_cache = f_getPageCache();
+		page_store_cache[page] = id;
+		me.cache(page_store_cache);
+	};
 }
 
-function _setPageStoreCache(cache) {
-	console.log("set cache: " + ko.toJSON(cache));
-	amplify.store('page_store_cache', cache);
-}
+var pageTracker = new PageTracker(amplify);
 
 function updatePageTopElement(page, id) {
 	console.log('updatePageTopElement(' + page + ', ' + id + ')');
-	var page_store_cache = _getPageStoreCache();
-	page_store_cache[page] = id;
-	_setPageStoreCache(page_store_cache);
+	pageTracker.setPage(page, id);
 	return id;
 }
 
 function getPageTopElement(page) {
 	console.log('getPageTopElement(' + page + ')');
-	var page_store_cache = _getPageStoreCache();
+	var page_store_cache = pageTracker.cache();
 	var retVal = null;
 	if (page_store_cache) {
 		retVal = page_store_cache[page];
@@ -270,7 +285,7 @@ function navigateTo(pageId) {
 				console.log("matched " + id);
 				return false;
 			} else {
-				console.log(id + ' did not match ' + topElement);
+				// console.log(id + ' did not match ' + topElement);
 			}
 			return true;
 		});
@@ -280,22 +295,42 @@ function navigateTo(pageId) {
 				console.log("matched_index = " + matched_index);
 				if (matched_index == 0) {
 					console.log('scrolling to the top of the page');
-					scrollTo(0,0);
+					$('body').scrollTo(0, 0, {
+						onAfter: function() {
+							scrollManager.enable();
+						}
+					});
 				} else {
 					console.log("scrolling to " + topElement + ' (' + matched + ')');
-					$('body').scrollTo('#' + topElement, 0, {margin:false, offset: {left:0, top:-45}});
+					$('body').scrollTo('#' + topElement, 0,
+						{
+							margin:false,
+							offset: {left:0, top:-45},
+							onAfter: function() {
+								setTimeout(function() {
+									console.log('topElement enable');
+									scrollManager.enable();
+								}, 50);
+							}
+						}
+					);
 				}
 			}, 0);
 		} else {
 			console.log("didn't find an element to scroll to for " + topElement);
+			setTimeout(function() {
+				console.log('missing element enable');
+				scrollManager.enable();
+			}, 0);
 		}
 	} else {
 		console.log("no top element found for " + pageId);
+		setTimeout(function() {
+			console.log('no top element enable');
+			scrollManager.enable();
+		}, 0);
 	}
 
-	setTimeout(function() {
-		scrollManager.enable();
-	}, 0);
 	return true;
 }
 
@@ -415,13 +450,16 @@ function replaceCurrentPage(pageId) {
 function createOfficialEventsView() {
 	console.log('createOfficialEventsView()');
     if (!pages.official) {
+    	var html = Mustache.to_html(templates.events, { eventType: "official" });
+
     	var div = document.createElement('div');
     	div.setAttribute('id', 'official-events');
     	$(div).css('display', 'none');
-    	var html = Mustache.to_html(templates.events, { eventType: "official" });
     	$(div).html(html);
-    	pages.official = div;
     	var appended = getContainer()[0].appendChild(div);
+
+    	pages.official = div;
+
         ko.applyBindings(officialEventsModel, appended);
     }
 }
@@ -436,13 +474,16 @@ function showOfficialEventsView() {
 function createMyEventsView() {
 	console.log('createMyEventsView()');
     if (!pages.my) {
+    	var html = Mustache.to_html(templates.events, { eventType: "my" });
+
     	var div = document.createElement('div');
     	div.setAttribute('id', 'my-events');
     	$(div).css('display', 'none');
-    	var html = Mustache.to_html(templates.events, { eventType: "my" });
     	$(div).html(html);
-    	pages.my = div;
     	var appended = getContainer()[0].appendChild(div);
+
+    	pages.my = div;
+
         ko.applyBindings(myEventsModel, appended);
     }
 }
@@ -457,10 +498,11 @@ function showMyEventsView() {
 function createLoginView() {
 	console.log('createLoginView()');
 	if (!pages.login) {
+    	var html = Mustache.to_html(templates.login);
+
     	var div = document.createElement('div');
     	div.setAttribute('id', 'login');
     	$(div).css('display', 'none');
-    	var html = Mustache.to_html(templates.login);
     	$(div).html(html);
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
 			console.log("cancel clicked");
@@ -471,9 +513,10 @@ function createLoginView() {
 			serverModel.persist();
 			setupDefaultView();
 		});
+    	var appended = getContainer()[0].appendChild(div);
 
     	pages.login = div;
-    	var appended = getContainer()[0].appendChild(div);
+
     	ko.applyBindings(serverModel, appended);
 	}
 }
