@@ -27,18 +27,18 @@ scrollManager.onScrollStop = function(enabled) {
 	}
 };
 
-var pageTracker   = new PageTracker(amplify, '.scrollable');
-var pageNavigator = new PageNavigator(amplify, pageTracker, 'official-events', '.calendar-event');
+var pageTracker = new PageTracker(amplify, '.scrollable'),
+pageNavigator   = new PageNavigator(amplify, pageTracker, 'official-events', '.calendar-event'),
 
-var templates = {
+templates = {
 	header: "views/header.html",
 	events: "views/events.html",
 	login: "views/login.html",
 	loaded: 0,
 	requested: 0,
-};
+},
 
-var setOffline = function() {
+setOffline = function() {
 	console.log('setOffline()');
 	if (online == true) {
 		console.log("setOffline: we were online but have gone offline");
@@ -46,9 +46,9 @@ var setOffline = function() {
 	online = false;
 	navModel.signedIn(false);
 	console.log("online = " + online);
-}
+},
 
-var setOnline = function() {
+setOnline = function() {
 	console.log('setOnline()');
 	if (online == false) {
 		console.log("setOnline: we were offline but have gone online");
@@ -56,15 +56,15 @@ var setOnline = function() {
 	online = true;
 	navModel.signedIn(true);
 	console.log("online = " + online);
-}
+},
 
-var isOnline = function() {
+isOnline = function() {
 	return online;
-}
+},
 
-var isSignedIn = function() {
+isSignedIn = function() {
 	return online && loginModel.username() && loginModel.username().length > 0;
-}
+};
 
 function onDeviceReady( event ) {
 	console.log("Device is ready.  Initializing.");

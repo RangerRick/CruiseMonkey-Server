@@ -3,9 +3,9 @@ function PageElement(element, elementId, index) {
 		throw new TypeError("You must pass an element, element ID, and match index!");
 	}
 
-	var m_element   = element;
-	var m_elementId = elementId;
-	var m_index     = index;
+	var m_element   = element,
+	 	m_elementId = elementId,
+	 	m_index     = index;
 	
 	this.getElement = function() {
 		return m_element;
@@ -26,13 +26,12 @@ function PageTracker(amplify, elementCriteria) {
 		throw new TypeError("You must pass an Amplify storage class and an element match criteria!");
 	}
 
-	var m_amplify = amplify;
-	var m_elementCriteria = elementCriteria;
-
-	var me = this;
+	var m_amplify = amplify,
+		m_elementCriteria = elementCriteria,
+		self = this;
 
 	/** public methods **/
-	me.getScrolledId = function(page) {
+	self.getScrolledId = function(page) {
 		console.log('PageTracker::getScrolledId(' + page + ')');
 		if (!page) {
 			throw new TypeError("You must specify a page!");
@@ -40,7 +39,7 @@ function PageTracker(amplify, elementCriteria) {
 		return f_getPageCache()[page];
 	};
 	
-	me.setScrolledId = function(page, id) {
+	self.setScrolledId = function(page, id) {
 		console.log('PageTracker::setScrolledId(' + page + ', ' + id + ')');
 		if (!page) {
 			throw new TypeError("You must specify a page!");
@@ -51,7 +50,7 @@ function PageTracker(amplify, elementCriteria) {
 		return id;
 	};
 	
-	me.getTopElement = function(pageId) {
+	self.getTopElement = function(pageId) {
 		var matched = f_getElementForPageId(pageId);
 		if (matched) {
 			return matched;
@@ -59,9 +58,9 @@ function PageTracker(amplify, elementCriteria) {
 		return null;
 	};
 
-	me.isElementInViewport = function(el) {
-		var m_top    = el.offsetTop;
-		var m_height = el.offsetHeight;
+	self.isElementInViewport = function(el) {
+		var m_top    = el.offsetTop,
+		 	m_height = el.offsetHeight;
 
 		while (el.offsetParent) {
 			el = el.offsetParent;
@@ -78,19 +77,18 @@ function PageTracker(amplify, elementCriteria) {
 			page_store_cache = {};
 		}
 		return page_store_cache;
-	};
-	
-	var f_setPageCache = function(new_page_store_cache) {
+	},
+	f_setPageCache = function(new_page_store_cache) {
 		m_amplify.store('page_store_cache', new_page_store_cache);
-	};
-	
-	var f_getElementForPageId = function(pageId) {
-		var topElement = me.getScrolledId(pageId);
-		var page = $('#' + pageId);
+	},
+	f_getElementForPageId = function(pageId) {
+		var topElement = self.getScrolledId(pageId),
+			page = $('#' + pageId),
+			matched = null,
+			id = null;
 
-		var matched = null;
 		page.find(m_elementCriteria).each(function(index, element) {
-			var id = $(element).attr('id');
+			id = $(element).attr('id');
 			if (id == topElement) {
 				matched = new PageElement(element, id, index);
 				console.log('PageTracker::getElementForPageId(' + pageId + '): matched ' + matched.toString());

@@ -4,22 +4,21 @@ function Scroll(enabled, timeout) {
 }
 
 function ScrollManager() {
-	var m_currentScroll  = null;
-	var m_enabled        = true;
+	var m_currentScroll  = null,
+		m_enabled        = true,
+		self             = this;
 
-	var me = this;
-	
 	/* User-configurable options */
-	me.delay = 500; // ms
-	me.onScrollStart = function(enabled) {};
-	me.onScrollStop  = function(enabled) {};
+	self.delay = 500; // ms
+	self.onScrollStart = function(enabled) {};
+	self.onScrollStop  = function(enabled) {};
 
 	/* Public methods */
-	me.disable = function() {
+	self.disable = function() {
 		console.log("ScrollManager::disable()");
 		m_enabled = false;
 	};
-	me.enable = function() {
+	self.enable = function() {
 		console.log("ScrollManager::enable()");
 		m_enabled = true;
 	};
@@ -30,14 +29,14 @@ function ScrollManager() {
 
 		if (m_currentScroll === null) {
 			console.log('ScrollManager::onScrollStart(): scrolling started (enabled = ' + enabled + ')');
-			me.onScrollStart(enabled);
-			m_currentScroll = new Scroll(enabled, setTimeout(f_onScrollStop, me.delay));
+			self.onScrollStart(enabled);
+			m_currentScroll = new Scroll(enabled, setTimeout(f_onScrollStop, self.delay));
 		} else {
 			clearTimeout(m_currentScroll.timeout);
-			m_currentScroll.timeout = setTimeout(f_onScrollStop, me.delay);
+			m_currentScroll.timeout = setTimeout(f_onScrollStop, self.delay);
 		}
-	};
-	var f_onScrollStop = function(callback) {
+	},
+	f_onScrollStop = function(callback) {
 		var enabled = m_currentScroll.enabled;
 
 		console.log('ScrollManager::onScrollStop() (enabled = ' + enabled + ')');
@@ -45,7 +44,7 @@ function ScrollManager() {
 		m_currentScroll.timeout = null;
 		m_currentScroll = null;
 
-		me.onScrollStop(enabled);
+		self.onScrollStop(enabled);
 	};
 	
 	/* Attach the scrolling callback */

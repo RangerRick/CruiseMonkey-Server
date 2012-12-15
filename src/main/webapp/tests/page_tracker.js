@@ -12,7 +12,7 @@ test('testGettersAndSetters', 3, function() {
 		var pageTracker = new PageTracker(null);
 	}, TypeError, "Expecting a type error when passing an invalid amplify object.");
 
-	var pageTracker = new PageTracker(amplify);
+	var pageTracker = new PageTracker(amplify, '.scrollable');
 	pageTracker.setScrolledId('bar', 'baz');
 	equal('baz', pageTracker.getScrolledId('bar'));
 

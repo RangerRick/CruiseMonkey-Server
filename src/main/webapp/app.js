@@ -202,11 +202,10 @@ function MyEventsModel() {
 var myEventsModel = new MyEventsModel();
 myEventsModel.filter.subscribe(onFilterChange, myEventsModel);
 myEventsModel.filteredEvents = ko.dependentObservable(function() {
-	var self = this;
+	var self = this,
+		filter = self.filter().toLowerCase(),
 
-	var filter = self.filter().toLowerCase();
-
-	var matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+	matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
 		if (event.owner() == 'admin') {
 			return false;
 		}

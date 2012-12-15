@@ -3,14 +3,13 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
 	}
 
-	var m_amplify         = amplify;
-	var m_pageTracker     = pageTracker;
-	var m_defaultPage     = defaultPage;
-	var m_elementCriteria = elementCriteria;
+	var m_amplify         = amplify,
+	 	m_pageTracker     = pageTracker,
+	 	m_defaultPage     = defaultPage,
+	 	m_elementCriteria = elementCriteria,
+	 	self = this;
 
-	var me = this;
-
-	me.getCurrentPage = function() {
+	self.getCurrentPage = function() {
 	    var current_page = m_amplify.store('current_page');
 	    console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
 	    if (!current_page || current_page == 'login') {
@@ -20,13 +19,16 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 	    return current_page;
 	};
 
-	me.findTopVisibleElement = function() {
+	self.findTopVisibleElement = function() {
 		console.log('PageNavigator::findTopVisibleElement()');
-		var found = null;
-		var current_page = me.getCurrentPage();
+
+		var found = null,
+		 	current_page = self.getCurrentPage(),
+			id = null;
+
 		$('#' + current_page).find(m_elementCriteria).each(function(index, element) {
 			if (m_pageTracker.isElementInViewport(element)) {
-				var id = $(element).attr('id');
+				id = $(element).attr('id');
 				if (id) {
 					var summary = CMUtils.getSummary(element);
 					console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + summary + ' (' + id + ')');
