@@ -29,7 +29,7 @@ function ScrollManager() {
 		var enabled = m_enabled;
 
 		if (m_currentScroll === null) {
-			console.log('ScrollManager::onScrollStart(): scrolling started (enabled=' + enabled + ')');
+			console.log('ScrollManager::onScrollStart(): scrolling started (enabled = ' + enabled + ')');
 			me.onScrollStart(enabled);
 			m_currentScroll = new Scroll(enabled, setTimeout(f_onScrollStop, me.delay));
 		} else {
@@ -40,7 +40,7 @@ function ScrollManager() {
 	var f_onScrollStop = function(callback) {
 		var enabled = m_currentScroll.enabled;
 
-		console.log('ScrollManager::onScrollStop() (enabled=' + enabled + ')');
+		console.log('ScrollManager::onScrollStop() (enabled = ' + enabled + ')');
 		clearTimeout(m_currentScroll.timeout);
 		m_currentScroll.timeout = null;
 		m_currentScroll = null;

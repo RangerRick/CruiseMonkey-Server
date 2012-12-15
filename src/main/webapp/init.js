@@ -16,9 +16,9 @@ scrollManager.onScrollStart = function(enabled) {
 };
 scrollManager.onScrollStop = function(enabled) {
 	if (enabled) {
-		var found = findTopVisibleElement();
+		var found = pageNavigator.findTopVisibleElement();
 		if (found) {
-			console.log("visible element: " + getSummary(found) + ' (' + $(found).attr('id') + ')');
+			console.log("visible element: " + CMUtils.getSummary(found) + ' (' + $(found).attr('id') + ')');
 		} else {
 			console.log("no elements visible!");
 		}
@@ -26,6 +26,9 @@ scrollManager.onScrollStop = function(enabled) {
 		console.log('scrolling stopped while disabled');
 	}
 };
+
+var pageTracker   = new PageTracker(amplify, '.scrollable');
+var pageNavigator = new PageNavigator(amplify, pageTracker, 'official-events', '.calendar-event');
 
 var templates = {
 	header: "views/header.html",
@@ -61,54 +64,6 @@ var isOnline = function() {
 
 var isSignedIn = function() {
 	return online && loginModel.username() && loginModel.username().length > 0;
-}
-
-function elementInViewport(el) {
-	var top = el.offsetTop;
-	// var left = el.offsetLeft;
-	// var width = el.offsetWidth;
-	var height = el.offsetHeight;
-
-	while (el.offsetParent) {
-		el = el.offsetParent;
-		top += el.offsetTop;
-		// left += el.offsetLeft;
-	}
-
-	return (top >= window.pageYOffset
-		// && left >= window.pageXOffset
-		&& (top + height) <= (window.pageYOffset + window.innerHeight)
-		// && (left + width) <= (window.pageXOffset + window.innerWidth)
-	);
-}
-
-var pageTracker = new PageTracker(amplify);
-
-function getSummary(element) {
-	return $(element).find('div.summary').text();
-}
-
-function findTopVisibleElement() {
-	console.log('findTopVisibleElement()');
-	var found = null;
-	var current_page = getCurrentPage();
-	$('#' + current_page).find('.calendar-event').each(function(index, element) {
-		if (elementInViewport(element)) {
-			var id = $(element).attr('id');
-			if (id) {
-				var summary = getSummary(element);
-				if (current_page) {
-					console.log("first visible element on " + current_page + ": " + summary + ' (' + id + ')');
-					pageTracker.setScrolledId(current_page, id);
-				}
-			}
-			found = element;
-			return false;
-		}
-		return true;
-	});
-
-	return found;
 }
 
 function onDeviceReady( event ) {
@@ -301,18 +256,8 @@ function checkIfAuthorized(success, failure) {
 	});
 }
 
-var getCurrentPage = function() {
-    var current_page = amplify.store('current_page');
-    console.log('setupDefaultView: current_page = ' + current_page);
-    if (!current_page || current_page == 'login') {
-    	current_page = 'official-events';
-    	amplify.store('current_page', current_page);
-    }
-    return current_page;
-}
-
 var showLoginOrCurrent = function() {
-	var current_page = getCurrentPage();
+	var current_page = pageNavigator.getCurrentPage();
 
     checkIfAuthorized(
     	// success

@@ -1,4 +1,8 @@
 function PageElement(element, elementId, index) {
+	if (!element || !elementId || index === undefined) {
+		throw new TypeError("You must pass an element, element ID, and match index!");
+	}
+
 	var m_element   = element;
 	var m_elementId = elementId;
 	var m_index     = index;
@@ -17,12 +21,13 @@ function PageElement(element, elementId, index) {
 	};
 }
 
-function PageTracker(amplify) {
-	if (!amplify) {
-		throw new TypeError("You must pass the Amplify storage class!");
+function PageTracker(amplify, elementCriteria) {
+	if (!amplify|| !elementCriteria) {
+		throw new TypeError("You must pass an Amplify storage class and an element match criteria!");
 	}
 
 	var m_amplify = amplify;
+	var m_elementCriteria = elementCriteria;
 
 	var me = this;
 
@@ -54,6 +59,18 @@ function PageTracker(amplify) {
 		return null;
 	};
 
+	me.isElementInViewport = function(el) {
+		var m_top    = el.offsetTop;
+		var m_height = el.offsetHeight;
+
+		while (el.offsetParent) {
+			el = el.offsetParent;
+			m_top += el.offsetTop;
+		}
+
+		return ( m_top >= window.pageYOffset && (m_top + m_height) <= (window.pageYOffset + window.innerHeight) );
+	};
+
 	/** internal methods **/
 	var f_getPageCache = function() {
 		var page_store_cache = m_amplify.store('page_store_cache');
@@ -72,7 +89,7 @@ function PageTracker(amplify) {
 		var page = $('#' + pageId);
 
 		var matched = null;
-		page.find('.scrollable').each(function(index, element) {
+		page.find(m_elementCriteria).each(function(index, element) {
 			var id = $(element).attr('id');
 			if (id == topElement) {
 				matched = new PageElement(element, id, index);
