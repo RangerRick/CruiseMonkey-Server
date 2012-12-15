@@ -30,6 +30,8 @@ CRUISEMONKEYCSS = \
 
 CRUISEMONKEYMINCSS = $(patsubst %.css,%.min.css,$(CRUISEMONKEYCSS))
 
+all: 3rdparty.js cruisemonkey.js cruisemonkey.css
+
 %.min.js: %.js
 	java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
 
