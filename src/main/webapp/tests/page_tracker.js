@@ -7,7 +7,7 @@ module("PageTracker", {
 	}
 });
 
-test('PageTracker.basic', 3, function() {
+test('testGettersAndSetters', 3, function() {
 	raises(function() {
 		var pageTracker = new PageTracker(null);
 	}, TypeError, "Expecting a type error when passing an invalid amplify object.");

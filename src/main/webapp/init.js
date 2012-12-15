@@ -84,15 +84,6 @@ function elementInViewport(el) {
 
 var pageTracker = new PageTracker(amplify);
 
-function updatePageTopElement(page, id) {
-	pageTracker.setScrolledId(page, id);
-	return id;
-}
-
-function getPageTopElement(page) {
-	return pageTracker.getScrolledId(page);
-}
-
 function getSummary(element) {
 	return $(element).find('div.summary').text();
 }
@@ -108,7 +99,7 @@ function findTopVisibleElement() {
 				var summary = getSummary(element);
 				if (current_page) {
 					console.log("first visible element on " + current_page + ": " + summary + ' (' + id + ')');
-					updatePageTopElement(current_page, id);
+					pageTracker.setScrolledId(current_page, id);
 				}
 			}
 			found = element;
@@ -234,63 +225,33 @@ function navigateTo(pageId) {
 		return false;
 	}
 
-	var topElement = getPageTopElement(pageId);
-	if (topElement) {
-		var page = $('#' + pageId);
+	var topElement = pageTracker.getTopElement(pageId);
 
-		var matched = null;
-		var matched_index = -1;
-		page.find('.scrollable').each(function(index, element) {
-			var id = $(element).attr('id');
-			if (id == topElement) {
-				matched = id;
-				matched_index = index;
-				console.log("matched " + id);
-				return false;
-			} else {
-				// console.log(id + ' did not match ' + topElement);
-			}
-			return true;
-		});
-
-		if (matched) {
-			setTimeout(function() {
-				console.log("matched_index = " + matched_index);
-				if (matched_index == 0) {
-					console.log('scrolling to the top of the page');
-					$('body').scrollTo(0, 0, {
-						onAfter: function() {
-							scrollManager.enable();
-						}
-					});
-				} else {
-					console.log("scrolling to " + topElement + ' (' + matched + ')');
-					$('body').scrollTo('#' + topElement, 0,
-						{
-							margin:false,
-							offset: {left:0, top:-45},
-							onAfter: function() {
-								setTimeout(function() {
-									console.log('topElement enable');
-									scrollManager.enable();
-								}, 50);
-							}
-						}
-					);
-				}
-			}, 0);
-		} else {
-			console.log("didn't find an element to scroll to for " + topElement);
-			setTimeout(function() {
-				console.log('missing element enable');
-				scrollManager.enable();
-			}, 0);
-		}
-	} else {
-		console.log("no top element found for " + pageId);
+	if (!topElement || topElement.getIndex() == 0) {
+		console.log('scrolling to the top of the page');
 		setTimeout(function() {
-			console.log('no top element enable');
-			scrollManager.enable();
+			$('body').scrollTo(0, 0, {
+				onAfter: function() {
+					setTimeout(function() {
+						scrollManager.enable();
+					}, 50);
+				}
+			});
+		}, 0);
+	} else {
+		console.log("scrolling to " + topElement.toString());
+		setTimeout(function() {
+			$('body').scrollTo('#' + topElement.getId(), 0,
+				{
+					margin:false,
+					offset: {left:0, top:-45},
+					onAfter: function() {
+						setTimeout(function() {
+							scrollManager.enable();
+						}, 50);
+					}
+				}
+			);
 		}, 0);
 	}
 

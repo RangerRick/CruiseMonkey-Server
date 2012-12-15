@@ -14,7 +14,7 @@ module("ScrollManager", {
 });
 
 /* callbacks are called while enabled */
-asyncTest('ScrollManager.enabled', 2, function() {
+asyncTest('testEnabled', 2, function() {
 	var scrollManager = new ScrollManager();
 	var started = 0;
 	var stopped = 0;
@@ -35,7 +35,7 @@ asyncTest('ScrollManager.enabled', 2, function() {
 });
 
 /* callbacks should not be called while disabled */
-asyncTest('ScrollManager.disabled', 4, function() {
+asyncTest('testDisabled', 4, function() {
 	var scrollManager = new ScrollManager();
 	var started = 0;
 	var stopped = 0;
