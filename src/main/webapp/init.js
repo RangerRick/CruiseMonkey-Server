@@ -279,14 +279,17 @@ function setupDefaultView() {
 
 function replaceCurrentPage(pageId) {
 	console.log('replaceCurrentPage(' + pageId + ')');
-	getContainer().children().css('display', 'none');
+
 	var page = $('#' + pageId);
+	var search = page.find('input[type=search]').first();
+
+	getContainer().children().css('display', 'none');
 	page.css('display', 'block');
+
     if (!Modernizr.touch) {
     	// on non-mobile devices, focus the search input
-    	var search = page.find('input[type=search]');
-    	if (search && search[0]) {
-    		search[0].focus();
+    	if (search) {
+    		search.focus();
     	}
     }
     if (pageId != 'login') {
