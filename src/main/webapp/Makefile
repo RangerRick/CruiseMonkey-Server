@@ -22,21 +22,23 @@ CRUISEMONKEYJS = \
 	init.js \
 	auth.js
 
-CRUISEMONKEYMINJS = $(patsubst %.js,%.min.js,$(CRUISEMONKEYJS))
+CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
 
 CRUISEMONKEYCSS = \
 	foundation/stylesheets/foundation.css \
 	styles.css
 
-CRUISEMONKEYMINCSS = $(patsubst %.css,%.min.css,$(CRUISEMONKEYCSS))
+CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
 all: 3rdparty.js cruisemonkey.js cruisemonkey.css
 
-%.min.js: %.js
-	java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
+temp/%.min.js: %.js
+	@install -d $(shell dirname $@)
+	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
 
-%.min.css: %.css
-	java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
+temp/%.min.css: %.css
+	@install -d $(shell dirname $@)
+	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
 
 3rdparty.js: $(3RDPARTYJS)
 	cat $(3RDPARTYJS) >> 3rdparty.js
