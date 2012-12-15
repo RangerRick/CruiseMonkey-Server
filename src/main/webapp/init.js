@@ -102,27 +102,6 @@ function getContainer() {
 	return _container;
 }
 
-function getScroll() {
-	var scroll;
-	
-	// Netscape compliant
-	if (typeof(window.pageYOffset) === 'number') {
-		scroll = window.pageYOffset;
-	}
-	// DOM compliant
-	else if (document.body && document.body.scrollTop) {
-		scroll = document.body.scrollTop;
-	}
-	// IE6 standards compliant mode
-	else if (document.documentElement && document.documentElement.scrollTop) {
-		scroll = document.documentElement.scrollTop;
-	}
-	// needed for IE6 (when vertical scroll bar is on the top)
-	else {
-		scroll = 0;
-	}
-}
-
 function setupHeader() {
 	console.log('setupHeader()');
     header = getHeader();
