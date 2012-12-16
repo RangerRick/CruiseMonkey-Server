@@ -17,6 +17,7 @@ CRUISEMONKEYJS = \
 	scroll_manager.js \
 	page_tracker.js \
 	page_navigator.js \
+	template_loader.js \
 	date.js \
 	app.js \
 	init.js \
@@ -30,22 +31,25 @@ CRUISEMONKEYCSS = \
 
 CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
-all: 3rdparty.js cruisemonkey.js cruisemonkey.css
+all: 3rdparty.js cruisemonkey.js cruisemonkey.css index.html.phonegap
 
-temp/%.min.js: %.js
+index.html.phonegap: index.html Makefile
+	@perl -p -e 's,<!--#PHONEGAP-->,<script src="phonegap.js"></script>,; s,\s+onDeviceReady.null.;,,;' index.html > index.html.phonegap
+
+temp/%.min.js: %.js Makefile
 	@install -d $(shell dirname $@)
 	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
 
-temp/%.min.css: %.css
+temp/%.min.css: %.css Makefile
 	@install -d $(shell dirname $@)
 	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
 
-3rdparty.js: $(3RDPARTYJS)
-	cat $(3RDPARTYJS) >> 3rdparty.js
+3rdparty.js: $(3RDPARTYJS) Makefile
+	cat $(3RDPARTYJS) > 3rdparty.js
 
-cruisemonkey.js: $(CRUISEMONKEYMINJS)
+cruisemonkey.js: $(CRUISEMONKEYMINJS) Makefile
 	cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
 
 
-cruisemonkey.css: $(CRUISEMONKEYMINCSS)
+cruisemonkey.css: $(CRUISEMONKEYMINCSS) Makefile
 	cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css

@@ -27,16 +27,25 @@ scrollManager.onScrollStop = function(enabled) {
 	}
 };
 
+var templates = ['views/header.html', 'views/events.html', 'views/login.html'];
+var templateLoader  = new TemplateLoader(templates);
+templateLoader.onLoad = function(url) {
+	switch(url) {
+		case 'views/events.html':
+			createOfficialEventsView();
+			createMyEventsView();
+			break;
+		case 'views/login.html':
+			createLoginView();
+			break;
+	}
+};
+templateLoader.onFinished = function() {
+    setupDefaultView();
+};
+
 var pageTracker = new PageTracker(amplify, '.scrollable'),
 pageNavigator   = new PageNavigator(amplify, pageTracker, 'official-events', '.calendar-event'),
-
-templates = {
-	header: "views/header.html",
-	events: "views/events.html",
-	login: "views/login.html",
-	loaded: 0,
-	requested: 0,
-},
 
 setOffline = function() {
 	console.log('setOffline()');
@@ -68,22 +77,8 @@ isSignedIn = function() {
 
 function onDeviceReady( event ) {
 	console.log("Device is ready.  Initializing.");
-	
-	// load Mustache templates
-    for (var key in templates) {
-        (function() {
-            var _key = key.toString();
-            if ( _key != "loaded" && _key != "requested" ){
-                templates.requested ++;
-         
-                 var templateLoaded = function( template ){
-                    onTemplateLoaded( template, _key );
-                 }
-                
-                $.get( templates[ _key ], templateLoaded );
-             }
-         })();
-    }
+
+	templateLoader.load();
 }
 
 var _header, _container;
@@ -105,7 +100,7 @@ function getContainer() {
 function setupHeader() {
 	console.log('setupHeader()');
     header = getHeader();
-    header.html(templates.header);
+    header.html(templateLoader.renderTemplate('views/header.html'));
     
     var nav = $(header).find('nav')[0];
 
@@ -300,8 +295,8 @@ function replaceCurrentPage(pageId) {
 
 function createOfficialEventsView() {
 	console.log('createOfficialEventsView()');
-    if (!pages.official) {
-    	var html = Mustache.to_html(templates.events, { eventType: "official" });
+	if (!pages.official) {
+		var html = templateLoader.renderTemplate('views/events.html', { eventType: "official" });
 
     	var div = document.createElement('div');
     	div.setAttribute('id', 'official-events');
@@ -324,8 +319,8 @@ function showOfficialEventsView() {
 
 function createMyEventsView() {
 	console.log('createMyEventsView()');
-    if (!pages.my) {
-    	var html = Mustache.to_html(templates.events, { eventType: "my" });
+	if (!pages.my) {
+		var html = templateLoader.renderTemplate('views/events.html', { eventType: "my" });
 
     	var div = document.createElement('div');
     	div.setAttribute('id', 'my-events');
@@ -349,7 +344,7 @@ function showMyEventsView() {
 function createLoginView() {
 	console.log('createLoginView()');
 	if (!pages.login) {
-    	var html = Mustache.to_html(templates.login);
+		var html = templateLoader.renderTemplate('views/login.html');
 
     	var div = document.createElement('div');
     	div.setAttribute('id', 'login');
@@ -376,24 +371,6 @@ function showLoginView() {
 	console.log('showLoginView()');
 	createLoginView();
 	var content = replaceCurrentPage('login');
-}
-
-function onTemplateLoaded(template, key) {
-	console.log('onTemplateLoaded(<template>, ' + key + ')');
-
-//    console.log( key + ": " + template);
-    templates[ key ] = template;
-    templates.loaded ++;
-
-	if ( templates.loaded == templates.requested ) {
-		console.log("all requested templates have been loaded");
-		
-		createOfficialEventsView();
-		createMyEventsView();
-		createLoginView();
-
-        setupDefaultView();
-    }
 }
 
 console.log("init.js loaded");
