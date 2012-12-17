@@ -102,6 +102,7 @@ function setupHeader() {
     			// e.preventDefault();
             	console.log("navigation event: " + hash);
             	navigateTo(hash);
+				if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
     		});
     	}
     });
@@ -112,6 +113,7 @@ function setupHeader() {
     	$(element).on('click.fndtn touchstart.fndtn', function(e) {
     		setOffline();
     		navigateTo('login');
+			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
     	});
     });
     $(nav).find('.signout').each(function(index, element) {
@@ -120,8 +122,10 @@ function setupHeader() {
     		serverModel.username(null);
     		serverModel.password(null);
     		navigateTo('login');
+			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
     	});
     });
+
     ko.applyBindings(navModel, nav);
 }
 
