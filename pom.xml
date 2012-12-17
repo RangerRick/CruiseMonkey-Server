@@ -59,6 +59,13 @@
 							<maxIdleTime>60000</maxIdleTime>
 						</connector>
 					</connectors>
+						<requestLog implementation="org.eclipse.jetty.server.NCSARequestLog">
+						<filename>target/yyyy_mm_dd.request.log</filename>
+						<retainDays>90</retainDays>
+						<append>true</append>
+						<extended>false</extended>
+						<logTimeZone>GMT</logTimeZone>
+					</requestLog>
 				</configuration>
 			</plugin>
 		</plugins>

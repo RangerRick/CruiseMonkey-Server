@@ -32,7 +32,7 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
 	protected UserDetails retrieveUser(final String username, final UsernamePasswordAuthenticationToken token) throws AuthenticationException {
         if (!StringUtils.hasLength(username)) {
             logger.info("Authentication attempted with empty username");
-            throw new BadCredentialsException(messages.getMessage("RadiusAuthenticationProvider.emptyUsername", "Username cannot be empty"));
+            throw new BadCredentialsException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.emptyUsername", "Username cannot be empty"));
         }
         final String password = (String) token.getCredentials();
         if (!StringUtils.hasLength(password)) {
