@@ -27,8 +27,9 @@ scrollManager.onScrollStop = function(enabled) {
 	}
 };
 
-var templates = ['views/header.html', 'views/events.html', 'views/login.html'];
-var templateLoader  = new TemplateLoader(templates);
+var templates = ['views/header.html', 'views/events.html', 'views/login.html'],
+ 	templateLoader  = new TemplateLoader(templates);
+
 templateLoader.onLoad = function(url) {
 	switch(url) {
 		case 'views/events.html':
@@ -83,23 +84,9 @@ function onDeviceReady( event ) {
 
 var _header, _container;
 
-function getHeader() {
-	if (!_header) {
-		_header = $("body").find("#header");
-	}
-	return _header;
-}
-
-function getContainer() {
-	if (!_container) {
-		_container = $("body").find("#content");
-	}
-	return _container;
-}
-
 function setupHeader() {
 	console.log('setupHeader()');
-    header = getHeader();
+    header = pageTracker.getHeader();
     header.html(templateLoader.renderTemplate('views/header.html'));
     
     var nav = $(header).find('nav')[0];
@@ -159,7 +146,7 @@ function navigateTo(pageId) {
 	if (!topElement || topElement.getIndex() == 0) {
 		console.log('scrolling to the top of the page');
 		setTimeout(function() {
-			$('body').scrollTo(0, 0, {
+			pageTracker.getElement('body').scrollTo(0, 0, {
 				onAfter: function() {
 					setTimeout(function() {
 						scrollManager.enable();
@@ -170,7 +157,7 @@ function navigateTo(pageId) {
 	} else {
 		console.log("scrolling to " + topElement.toString());
 		setTimeout(function() {
-			$('body').scrollTo('#' + topElement.getId(), 0,
+			pageTracker.getElement('body').scrollTo('#' + topElement.getId(), 0,
 				{
 					margin:false,
 					offset: {left:0, top:-45},
@@ -275,10 +262,10 @@ function setupDefaultView() {
 function replaceCurrentPage(pageId) {
 	console.log('replaceCurrentPage(' + pageId + ')');
 
-	var page = $('#' + pageId);
+	var page = pageTracker.getElement('#' + pageId);
 	var search = page.find('input[type=search]').first();
 
-	getContainer().children().css('display', 'none');
+	pageTracker.getContainer().children().css('display', 'none');
 	page.css('display', 'block');
 
     if (!Modernizr.touch) {
@@ -290,7 +277,7 @@ function replaceCurrentPage(pageId) {
     if (pageId != 'login') {
         amplify.store('current_page', pageId);
     }
-	return getContainer()[0];
+	return pageTracker.getContainer()[0];
 }
 
 function createOfficialEventsView() {
@@ -302,7 +289,7 @@ function createOfficialEventsView() {
     	div.setAttribute('id', 'official-events');
     	$(div).css('display', 'none');
     	$(div).html(html);
-    	var appended = getContainer()[0].appendChild(div);
+    	var appended = pageTracker.getContainer()[0].appendChild(div);
 
     	pages.official = div;
 
@@ -326,7 +313,7 @@ function createMyEventsView() {
     	div.setAttribute('id', 'my-events');
     	$(div).css('display', 'none');
     	$(div).html(html);
-    	var appended = getContainer()[0].appendChild(div);
+    	var appended = pageTracker.getContainer()[0].appendChild(div);
 
     	pages.my = div;
 
@@ -359,7 +346,7 @@ function createLoginView() {
 			serverModel.persist();
 			setupDefaultView();
 		});
-    	var appended = getContainer()[0].appendChild(div);
+    	var appended = pageTracker.getContainer()[0].appendChild(div);
 
     	pages.login = div;
 

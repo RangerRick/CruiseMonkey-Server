@@ -1,5 +1,7 @@
 module("PageTracker", {
 	setup: function() {
+		var fixture = $('#qunit-fixture');
+		fixture.append('<div id="foo" /><div id="bar"><span class="monkey">hi</span></div>');
 	},
 	teardown: function() {
 		var fixture = $('#qunit-fixture');
@@ -14,7 +16,13 @@ test('testGettersAndSetters', 3, function() {
 
 	var pageTracker = new PageTracker(amplify, '.scrollable');
 	pageTracker.setScrolledId('bar', 'baz');
-	equal('baz', pageTracker.getScrolledId('bar'));
+	equal(pageTracker.getScrolledId('bar'), 'baz');
 
-	equal(null, pageTracker.getScrolledId('foo'));
+	equal(pageTracker.getScrolledId('foo'), null);
+});
+
+test('testElementCache', 1, function() {
+	var pageTracker = new PageTracker('amplify', '.scrollable');
+	var element = pageTracker.getElement('#bar');
+	equal(pageTracker.getElement('#bar').html(), '<span class="monkey">hi</span>');
 });
