@@ -59,7 +59,7 @@ public class UserRestService implements InitializingBean {
 
 	@Transactional(readOnly=true)
 	@GET
-	@Produces({"application/xml", "application/json"})
+	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public List<User> getAllUsers() {
 		return m_userService.getUsers();
 	}
@@ -73,7 +73,7 @@ public class UserRestService implements InitializingBean {
 	}
 
 	@POST
-	@Consumes(MediaType.APPLICATION_XML)
+	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Response putUser(final User user) {
 		System.err.println("user posted: " + user);
 		m_userService.putUser(user);

@@ -185,7 +185,7 @@ officialEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var filter = self.filter().toLowerCase();
 
 	var matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-		if (event.owner() != 'admin') {
+		if (event.owner() != 'google') {
 			return false;
 		}
 		return true;
@@ -213,7 +213,7 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 		filter = self.filter().toLowerCase(),
 
 	matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-		if (event.owner() == 'admin') {
+		if (event.owner() == 'google') {
 			return false;
 		}
 		return true;

@@ -1,8 +1,5 @@
 package com.raccoonfink.cruisemonkey.security;
 
-import java.util.Map;
-
-import org.codehaus.jackson.map.util.LRUMap;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,8 +16,6 @@ import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.User;
 import com.raccoonfink.cruisemonkey.server.StatusNetService;
 import com.raccoonfink.cruisemonkey.server.StatusNetServiceFactory;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements InitializingBean {
 	@Autowired

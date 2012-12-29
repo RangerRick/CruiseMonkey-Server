@@ -53,25 +53,27 @@ public class EventRestService implements InitializingBean {
 
 	@Transactional(readOnly=true)
     @GET
-	@Produces({"application/xml", "application/json"})
+	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public List<Event> getEvents(@QueryParam("start") final Date start, @QueryParam("end") final Date end, @QueryParam("user") final String userName) {
+		final List<Event> events;
 		if (start != null && end != null) {
-			return m_eventService.getEventsInRange(start, end, userName);
+			events = m_eventService.getEventsInRange(start, end, userName);
 		} else {
-			return m_eventService.getEvents(userName);
+			events = m_eventService.getEvents(userName);
 		}
+		return events;
 	}
 
 	@Transactional(readOnly=true)
 	@GET
 	@Path("/{id}")
-	@Produces({"application/xml", "application/json"})
+	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Event getEvent(@PathParam("id") final String id) {
 		return m_eventService.getEvent(id);
 	}
 
 	@POST
-	@Consumes(MediaType.APPLICATION_XML)
+	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Response putEvent(final Event event) {
 		m_eventService.putEvent(event);
 		return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getEvent").build(event.getId())).build();

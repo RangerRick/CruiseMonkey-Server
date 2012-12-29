@@ -39,6 +39,7 @@ input[type="search"] {
 }
 
 .calendar-event {
+	position: relative;
 	border-bottom: 1px solid black;
 	/* height: 100px; */
 	width: 100%;
@@ -49,9 +50,9 @@ input[type="search"] {
 
 	background: #ccc; /* for non-css3 browsers */
 
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#cccccc'); /* for IE */
-	background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc)); /* for webkit browsers */
-	background: -moz-linear-gradient(top,  #eee,  #ccc); /* for firefox 3.6+ */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee'); /* for IE */
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #fff,  #eee); /* for firefox 3.6+ */
 }
 
 .summary {
@@ -64,6 +65,12 @@ input[type="search"] {
 }
 .time span {
 	font-family: monospace;
+}
+
+.favorite {
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 
 .location {

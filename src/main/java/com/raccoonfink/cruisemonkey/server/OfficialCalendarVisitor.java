@@ -53,7 +53,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_eventDao);
-		m_importUser = m_userDao.get("ranger");
+		m_importUser = m_userDao.get("google");
 	}
 
     public EventDao getEventDao() {
@@ -158,7 +158,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			event.setCreatedDate(createdDate);
 			event.setLastModifiedBy("google");
 			event.setLastModifiedDate(lastModifiedDate);
-			event.setOwner(null);
+			event.setOwner(m_importUser);
 			return event;
 		} else {
 			System.err.println("found existing event: " + existingEvent);
@@ -170,7 +170,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			existingEvent.setCreatedDate(createdDate);
 			existingEvent.setLastModifiedBy("google");
 			existingEvent.setLastModifiedDate(lastModifiedDate);
-			existingEvent.setOwner(null);
+			existingEvent.setOwner(m_importUser);
 			return existingEvent;
 		}
 	}

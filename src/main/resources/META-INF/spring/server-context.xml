@@ -20,7 +20,6 @@
 
     <bean id="userService" class="com.raccoonfink.cruisemonkey.server.UserServiceImpl" />
     <bean id="eventService" class="com.raccoonfink.cruisemonkey.server.EventServiceImpl" />
-    <bean id="authService"  class="com.raccoonfink.cruisemonkey.server.AuthServiceImpl" />
 
 	<bean id="calendarVisitor" class="com.raccoonfink.cruisemonkey.server.OfficialCalendarVisitor">
 		<property name="userDao" ref="userDao" />

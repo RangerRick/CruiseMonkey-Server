@@ -15,15 +15,13 @@ public class UserInitializer implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 
-		/*
-		User user = m_userDao.get("admin");
+		User user = m_userDao.get("google");
 		if (user == null) {
-			user = new User("admin", "admin", "Administrator");
+			user = new User("google", "google", "Google");
 			m_userDao.save(user);
 		} else {
 			System.err.println("already have a user: " + user);
 		}
-		*/
 	}
 
 }

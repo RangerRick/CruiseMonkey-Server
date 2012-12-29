@@ -185,8 +185,8 @@ function navigateTo(pageId) {
 
 function checkIfAuthorized(success, failure) {
 	console.log('checkIfAuthorized()');
-	var username = amplify.store('username');
-	var password = amplify.store('password');
+	var username = serverModel.username();
+	var password = serverModel.password();
 	
 	if (!username || !password) {
 		failure();
@@ -194,16 +194,14 @@ function checkIfAuthorized(success, failure) {
 	}
 
 	$.ajax({
-		url: serverModel.statusnet() + '/api/help/test.json',
+		url: serverModel.cruisemonkey() + '/rest/auth',
 		dataType: 'json',
-		type: 'POST',
-		beforeSend: function(xhr) {
-			xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ':' + password));
-		},
+		cache: false,
+		type: 'GET',
 		username: username,
 		password: password,
 		success: function(data) {
-			if (data == 'ok') {
+			if (data == true) {
 				setOnline();
 				console.log('test returned OK');
 				success();
@@ -353,7 +351,9 @@ function createLoginView() {
 			console.log("save clicked");
 			serverModel.persist();
 			showLoginOrCurrent();
-			eventsViewModel.updateDataFromJSON();
+			if (eventsViewModel) {
+				eventsViewModel.updateDataFromJSON();
+			}
 		});
     	var appended = pageTracker.getContainer()[0].appendChild(div);
 
