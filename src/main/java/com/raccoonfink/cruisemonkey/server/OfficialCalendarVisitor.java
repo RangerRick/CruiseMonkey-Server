@@ -53,7 +53,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_eventDao);
-		m_importUser = m_userDao.get("admin");
+		m_importUser = m_userDao.get("ranger");
 	}
 
     public EventDao getEventDao() {
@@ -101,7 +101,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	    	final List<Event> events = m_eventDao.find(criteria);
 	
 	        for (final Event event : events) {
-	        	if (m_importUser.getUsername().equals(event.getCreatedBy())) {
+	        	if ("google".equals(event.getCreatedBy())) {
 	        		m_eventDao.delete(event, m_session);
 	        	}
 	        }
@@ -143,7 +143,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 		}
 
 		final Event existingEvent = m_eventDao.get(id, m_session);
-		final String username = m_importUser.getUsername();
+		// final String username = m_importUser.getUsername();
 
 		if (existingEvent == null) {
 			final Event event = new Event();
@@ -154,11 +154,11 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			event.setIsPublic(true);
 			event.setStartDate(startDate);
 			event.setEndDate(endDate);
-			event.setCreatedBy(username);
+			event.setCreatedBy("google");
 			event.setCreatedDate(createdDate);
-			event.setLastModifiedBy(username);
+			event.setLastModifiedBy("google");
 			event.setLastModifiedDate(lastModifiedDate);
-			event.setOwner(m_importUser);
+			event.setOwner(null);
 			return event;
 		} else {
 			System.err.println("found existing event: " + existingEvent);
@@ -168,9 +168,9 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			existingEvent.setStartDate(startDate);
 			existingEvent.setEndDate(endDate);
 			existingEvent.setCreatedDate(createdDate);
-			existingEvent.setLastModifiedBy(username);
+			existingEvent.setLastModifiedBy("google");
 			existingEvent.setLastModifiedDate(lastModifiedDate);
-			existingEvent.setOwner(m_importUser);
+			existingEvent.setOwner(null);
 			return existingEvent;
 		}
 	}

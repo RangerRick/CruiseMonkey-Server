@@ -1,7 +1,12 @@
 package com.raccoonfink.cruisemonkey.server;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -21,6 +26,11 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+
+import com.raccoonfink.cruisemonkey.model.User;
 
 public class StatusNetService {
 	private final HttpHost m_httpHost;
@@ -28,6 +38,8 @@ public class StatusNetService {
 	private final UsernamePasswordCredentials m_credentials;
 	private final HttpClient m_httpClient;
 	private BasicHttpContext m_context;
+	private final JsonFactory m_jsonFactory = new JsonFactory();
+	private boolean m_authorized = false;
 
 	public StatusNetService(final String host, final int port, final String root, final String username, final String password) {
 		final HttpHost httpHost = new HttpHost(host, port, "http");
@@ -71,11 +83,16 @@ public class StatusNetService {
 		return m_credentials.getUserName();
 	}
 
-	public String getRoot() {
-		return m_root;
+	public String getPassword() {
+		return m_credentials.getPassword();
 	}
 
-	public void authorize() throws AuthorizationFailureException {
+	public String getRoot() {
+		return m_root == null? "" : m_root;
+	}
+
+	public StatusNetService authorize() throws AuthorizationFailureException {
+		System.err.println("StatusNetService::authorize(): username = " + getUsername());
 		final HttpPost post = new HttpPost(getRoot() + "/api/help/test.json");
 	
 		HttpResponse response;
@@ -86,7 +103,11 @@ public class StatusNetService {
 		}
 		final HttpEntity entity = response.getEntity();
 
-		if (response.getStatusLine().getStatusCode() == 200) return;
+		if (response.getStatusLine().getStatusCode() == 200) {
+			post.releaseConnection();
+			m_authorized = true;
+			return this;
+		}
 
 	    System.err.println("----------------------------------------");
 	    System.err.println("failed authentication:");
@@ -99,11 +120,79 @@ public class StatusNetService {
 		    	EntityUtils.consume(entity);
 			} catch (final IOException e) {
 				System.err.println("Failure while consuming the response entity.");
-				e.printStackTrace();
+				throw new AuthorizationFailureException("I/O exception while parsing response.", e);
+			} finally {
+				post.releaseConnection();
 			}
 	    }
 
 	    throw new AuthorizationFailureException("Unable to authenticate to Status.Net server.  Reason: " +response.getStatusLine());
+	}
+
+	public User getUser() throws UserRetrievalException {
+		System.err.println("StatusNetService::getUser(): username = " + getUsername());
+		if (!m_authorized) {
+			try {
+				this.authorize();
+			} catch (AuthorizationFailureException e) {
+				throw new UserRetrievalException("Unable to authorize user.", e);
+			}
+		}
+
+		final HttpPost post = new HttpPost(getRoot() + "/api/users/show/" + getUsername() + ".json");
+		
+		HttpResponse response;
+		try {
+			response = getResponse(post);
+		} catch (final Exception e) {
+			post.releaseConnection();
+			throw new UserRetrievalException("Failed to query the Status.Net API", e);
+		}
+		final HttpEntity entity = response.getEntity();
+
+		if (response.getStatusLine().getStatusCode() != 200) {
+			post.releaseConnection();
+			throw new UserRetrievalException("Unable to retrieve user " + getUsername());
+		}
+
+		PipedInputStream inputStream = null;
+		PipedOutputStream outputStream = null;
+		try {
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			entity.writeTo(out);
+			final ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+
+			final User user = new User();
+
+			final String userName = m_credentials.getUserName();
+			user.setUsername(userName);
+			user.setPassword(m_credentials.getPassword());
+			user.setCreatedBy(userName);
+			user.setLastModifiedBy(userName);
+
+			final JsonParser parser = m_jsonFactory.createJsonParser(in);
+
+			JsonToken current = parser.nextToken();
+			if (current != JsonToken.START_OBJECT) {
+				throw new UserRetrievalException("Unable to parse user data for " + getUsername() + ": no START_OBJECT found.");
+		    }
+
+			while (parser.nextToken() != JsonToken.END_OBJECT) {
+				final String fieldName = parser.getCurrentName();
+				current = parser.nextToken();
+				if ("name".equals(fieldName)) {
+					user.setName(parser.getText());
+				}
+			}
+
+			return user;
+		} catch (final Exception e) {
+			throw new UserRetrievalException("Unable to parse user data for " + getUsername(), e);
+		} finally {
+			post.releaseConnection();
+			IOUtils.closeQuietly(inputStream);
+			IOUtils.closeQuietly(outputStream);
+		}
 	}
 
 	protected HttpResponse getResponse(final HttpPost post) throws IOException, ClientProtocolException {
@@ -115,4 +204,5 @@ public class StatusNetService {
 			m_httpClient.getConnectionManager().shutdown();
 		}
 	}
+
 }

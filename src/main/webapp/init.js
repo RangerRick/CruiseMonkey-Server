@@ -1,8 +1,10 @@
 console.log("init.js loading");
 
-var pages = {};
-var page_scroll_element = [];
-var online = false;
+var pages = {},
+page_scroll_element = [],
+online = false,
+m_deviceReady = false,
+m_interval;
 
 var scrollManager = new ScrollManager();
 scrollManager.delay = 100;
@@ -30,18 +32,10 @@ scrollManager.onScrollStop = function(enabled) {
 var templates = ['views/header.html', 'views/events.html', 'views/login.html'],
  	templateLoader  = new TemplateLoader(templates);
 
-templateLoader.onLoad = function(url) {
-	switch(url) {
-		case 'views/events.html':
-			createOfficialEventsView();
-			createMyEventsView();
-			break;
-		case 'views/login.html':
-			createLoginView();
-			break;
-	}
-};
 templateLoader.onFinished = function() {
+	createLoginView();
+	createOfficialEventsView();
+	createMyEventsView();
     setupDefaultView();
 };
 
@@ -77,10 +71,21 @@ isSignedIn = function() {
 };
 
 function onDeviceReady( event ) {
+	if (m_deviceReady) return;
 	console.log("Device is ready.  Initializing.");
+	m_deviceReady = true;
 
 	templateLoader.load();
 }
+
+// if phonegap never initializes, fire manually
+/*
+setTimeout(function() {
+	if (!m_deviceReady) {
+		onDeviceReady(null);
+	}
+}, 5000);
+*/
 
 var _header, _container;
 
@@ -239,10 +244,11 @@ var showLoginOrCurrent = function() {
 }
 
 function setupDefaultView() {
+	
 	console.log('setupDefaultView()');
     setupHeader();
 
-    var interval = setInterval(function() {
+    m_interval = setInterval(function() {
     	eventsModel.updateDataFromJSON();
     }, 5000);
 
@@ -346,10 +352,12 @@ function createLoginView() {
 		$(div).find('#login_save').on('click.fndtn touchstart.fndtn', function(e) {
 			console.log("save clicked");
 			serverModel.persist();
-			setupDefaultView();
+			showLoginOrCurrent();
+			eventsViewModel.updateDataFromJSON();
 		});
     	var appended = pageTracker.getContainer()[0].appendChild(div);
 
+		console.log("done creating loginView");
     	pages.login = div;
 
     	ko.applyBindings(serverModel, appended);

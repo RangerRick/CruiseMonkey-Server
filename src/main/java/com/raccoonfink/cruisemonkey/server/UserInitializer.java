@@ -14,7 +14,8 @@ public class UserInitializer implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
-		
+
+		/*
 		User user = m_userDao.get("admin");
 		if (user == null) {
 			user = new User("admin", "admin", "Administrator");
@@ -22,6 +23,7 @@ public class UserInitializer implements InitializingBean {
 		} else {
 			System.err.println("already have a user: " + user);
 		}
+		*/
 	}
 
 }

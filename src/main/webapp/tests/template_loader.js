@@ -16,7 +16,7 @@ test('testConfiguration', 5, function() {
 	equal(templateLoader.urls().length, 4);
 });
 
-asyncTest('testFailedGet', 1, function() {
+asyncTest('testFailedGet', 2, function() {
 	var templateLoader = new TemplateLoader();
 	templateLoader.add('tests/aasdfasdfasdf.html');
 
@@ -27,6 +27,7 @@ asyncTest('testFailedGet', 1, function() {
 	templateLoader.onFinished = function() {
 		start();
 		equal(loadCount, 0);
+		equal(templateLoader.urls().length, 1);
 	};
 
 	templateLoader.load();
