@@ -12,6 +12,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,6 +35,8 @@ import com.sun.jersey.api.spring.Autowire;
 @Path("/cruisemonkey")
 @Autowire
 public class ApplicationRestService extends RestServiceBase implements InitializingBean {
+	final Logger m_logger = LoggerFactory.getLogger(ApplicationRestService.class);
+
 	@InjectParam("eventService")
 	@Autowired
 	EventService m_eventService;
@@ -70,7 +74,7 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public EventCollection getEventCollection(@QueryParam("start") final Date start, @QueryParam("end") final Date end) {
 		final String userName = getCurrentUser();
-		System.err.println("getEventCollection: userName = " + userName);
+		m_logger.debug("start = {}, end = {}, user = {}", start, end, userName);
 		final List<Event> events = new ArrayList<Event>();
 		if (start != null && end != null) {
 			events.addAll(m_eventService.getEventsInRange(start, end, userName));
@@ -79,7 +83,7 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 			events.addAll(m_eventService.getEvents(userName));
 			events.addAll(m_eventService.getEvents("google"));
 		}
-		System.err.println("getEventCollection: events = " + events);
+		m_logger.debug("{} events found", events == null? 0 : events.size());
 
 		final EventCollection collection = new EventCollection();
 		collection.setUser(m_userDao.get(userName));

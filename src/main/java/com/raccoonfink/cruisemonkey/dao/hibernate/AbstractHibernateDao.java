@@ -8,9 +8,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.raccoonfink.cruisemonkey.dao.HibernateDao;
+
 public abstract class AbstractHibernateDao<T,K extends Serializable> implements HibernateDao<T,K> {
+	final Logger m_logger = LoggerFactory.getLogger(AbstractHibernateDao.class);
+
 	@Autowired
 	private SessionFactory m_sessionFactory;
 
@@ -103,7 +109,7 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 
 	@Override
 	public void save(final T obj, final Session session) {
-		System.err.println("saving: " + obj);
+		m_logger.debug("saving: {}", obj);
 		session.saveOrUpdate(obj);
 	}
 

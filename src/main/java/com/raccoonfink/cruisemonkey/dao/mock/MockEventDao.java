@@ -29,6 +29,11 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
+	public Session createSession() {
+		return null;
+	}
+
+	@Override
 	public Event get(final String id) {
 		for (final Event event : m_events) {
 			if (event.getId() == id) {

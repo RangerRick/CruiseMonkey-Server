@@ -26,8 +26,8 @@ import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.CalendarVisitor;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
+import com.raccoonfink.cruisemonkey.dao.HibernateDao;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
-import com.raccoonfink.cruisemonkey.dao.hibernate.HibernateDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 import com.raccoonfink.cruisemonkey.model.User;
 

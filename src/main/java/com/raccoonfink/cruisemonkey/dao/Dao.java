@@ -7,6 +7,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 
 public interface Dao<T,K extends Serializable> {
+	public Session createSession();
+
 	public List<T> findAll();
 	public List<T> findAll(final Session session);
 

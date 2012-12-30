@@ -4,42 +4,38 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.raccoonfink.cruisemonkey.util.EventIdAdapter;
-import com.raccoonfink.cruisemonkey.util.UsernameAdapter;
 
 @Entity
-@XmlRootElement(name="event")
+@XmlRootElement(name="favorite")
 @XmlAccessorType(XmlAccessType.NONE)
+@Table(name="favorites", uniqueConstraints = {
+	@UniqueConstraint(columnNames={"user", "event"})
+})
 public class Favorite implements Serializable {
-	private static final long serialVersionUID = 4414263395007635534L;
+	private static final long serialVersionUID = 2L;
 
 	@XmlAttribute(name="id")
 	private Integer m_id;
 
 	@XmlAttribute(name="user")
-	@XmlJavaTypeAdapter(UsernameAdapter.class)
-	private User m_user;
+	private String m_user;
 
 	@XmlAttribute(name="event")
-	@XmlJavaTypeAdapter(EventIdAdapter.class)
-	private Event m_event;
+	private String m_event;
 
 	public Favorite() {
 		super();
 	}
 
-	public Favorite(final User user, final Event event) {
+	public Favorite(final String user, final String event) {
 		m_user = user;
 		m_event = event;
 	}
@@ -54,43 +50,45 @@ public class Favorite implements Serializable {
 		m_id = id;
 	}
 
-	@OneToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="userId")
-	public User getUser() { return m_user; }
-	public void setUser(final User user) { m_user = user; }
+	@Column(name="user")
+	public String getUser() { return m_user; }
+	public void setUser(final String user) { m_user = user; }
+
+	@Column(name="event")
+	public String getEvent() { return m_event; }
+	public void setEvent(final String event) { m_event = event; }
 	
-	@OneToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="eventId")
-	public Event getEvent() { return m_event; }
-	public void setEvent(final Event event) { m_event = event; }
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 59;
 		int result = 1;
-		result = prime * result + ((m_id == null) ? 0 : m_id.hashCode());
+		result = prime * result + ((m_event == null) ? 0 : m_event.hashCode());
+		result = prime * result + ((m_user == null) ? 0 : m_user.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Favorite)) {
-			return false;
-		}
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof Favorite)) return false;
 		final Favorite other = (Favorite) obj;
-		if (m_id == null) {
-			if (other.m_id != null) {
-				return false;
-			}
-		} else if (!m_id.equals(other.m_id)) {
+		if (m_event == null) {
+			if (other.m_event != null) return false;
+		} else if (!m_event.equals(other.m_event)) {
+			return false;
+		}
+		if (m_user == null) {
+			if (other.m_user != null) return false;
+		} else if (!m_user.equals(other.m_user)) {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Favorite [id=" + m_id + ", user=" + m_user + ", event=" + m_event + "]";
 	}
 }

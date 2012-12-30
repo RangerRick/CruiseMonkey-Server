@@ -20,6 +20,11 @@ public class MockUserDao implements UserDao {
 	}
 
 	@Override
+	public Session createSession() {
+		return null;
+	}
+
+	@Override
 	public List<User> findAll() {
 		return new ArrayList<User>(m_users.values());
 	}

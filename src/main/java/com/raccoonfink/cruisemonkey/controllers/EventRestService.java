@@ -15,11 +15,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.model.Event;
@@ -27,12 +28,13 @@ import com.raccoonfink.cruisemonkey.server.EventService;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
-@Transactional
 @Component
 @Scope("request")
 @Path("/events")
 @Autowire
 public class EventRestService implements InitializingBean {
+	final Logger m_logger = LoggerFactory.getLogger(EventRestService.class);
+
 	@InjectParam("eventService")
 	@Autowired
 	EventService m_eventService;
@@ -51,10 +53,10 @@ public class EventRestService implements InitializingBean {
 		Assert.notNull(m_eventService);
 	}
 
-	@Transactional(readOnly=true)
     @GET
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public List<Event> getEvents(@QueryParam("start") final Date start, @QueryParam("end") final Date end, @QueryParam("user") final String userName) {
+    	m_logger.debug("start = {}, end = {}, user = {}", start, end, userName);
 		final List<Event> events;
 		if (start != null && end != null) {
 			events = m_eventService.getEventsInRange(start, end, userName);
@@ -64,17 +66,18 @@ public class EventRestService implements InitializingBean {
 		return events;
 	}
 
-	@Transactional(readOnly=true)
 	@GET
 	@Path("/{id}")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Event getEvent(@PathParam("id") final String id) {
+		m_logger.debug("id = {}", id);
 		return m_eventService.getEvent(id);
 	}
 
 	@POST
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Response putEvent(final Event event) {
+		m_logger.debug("event = {}", event);
 		m_eventService.putEvent(event);
 		return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getEvent").build(event.getId())).build();
 	}

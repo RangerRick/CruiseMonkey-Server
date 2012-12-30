@@ -58,6 +58,7 @@ input[type="search"] {
 .summary {
 	font-size: larger;
 	font-weight: bolder;
+	margin-right: 18px;
 }
 
 .time {
@@ -69,6 +70,9 @@ input[type="search"] {
 
 .favorite {
 	position: absolute;
+	display: block;
+	float: right;
+	margin: 3px;
 	right: 0;
 	top: 0;
 }

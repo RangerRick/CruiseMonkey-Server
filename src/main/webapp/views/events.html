@@ -1,7 +1,7 @@
 <form id="{{eventType}}-search"><input type="search" results="5" placeholder="Search..." data-bind="value: filter, valueUpdate: 'afterkeydown'" /></form>
 <ul class="event-list unstyled" style="display:none">
 	<!-- ko foreach: { data: filteredEvents } -->
-	<li class="calendar-event {{eventType}} scrollable" data-bind="attr: { id: id }"> <!-- onclick="" ontouchstart="" -->
+	<li class="calendar-event {{eventType}} scrollable" data-bind="attr: { id: cleanId }"> <!-- onclick="" ontouchstart="" -->
 		<div class="summary"><span data-bind="text: summary"></span></div>
 		<div class="favorite"><input type="checkbox" data-bind="checked: favorite" /></div>
 		<div class="time">Time: <span data-bind="text: timespan"></span></div>

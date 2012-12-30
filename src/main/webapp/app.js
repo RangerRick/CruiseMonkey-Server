@@ -17,7 +17,8 @@ ko.bindingHandlers.dateString = {
 function Event(data) {
 	var self = this;
 
-	self.id           = ko.observable(data["@id"].replace(/[\W\@]+/g, ''));
+	self.id           = ko.observable(data["@id"]);
+	self.cleanId      = ko.observable(data["@id"].replace(/[\W\@]+/g, ''));
 	self.summary      = ko.observable(data.summary);
 	self.description  = ko.observable(data.description);
 	self.start        = ko.observable(new Date(data.start));
@@ -113,12 +114,11 @@ function EventsViewModel() {
 		var favorites = [];
 		if (allData.favorites && allData.favorites.favorite) {
 			favorites = $.map(allData.favorites.favorite, function(favorite) {
-				return favorite["@event"].replace(/[\W\@]+/g, '');
+				return favorite["@event"];
 			});
 		}
 		if (allData.events && allData.events.event) {
 			var mappedTasks = $.map(allData.events.event, function(event) {
-				event["@id"] = event["@id"].replace(/[\W\@]+/g, '');
 				var isFavorite = (favorites.indexOf(event["@id"]) != -1);
 				var item = ko.utils.arrayFirst(self.events(), function(entry) {
 					if (entry) {

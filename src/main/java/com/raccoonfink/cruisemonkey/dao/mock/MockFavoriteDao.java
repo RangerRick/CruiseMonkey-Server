@@ -21,9 +21,14 @@ public class MockFavoriteDao implements FavoriteDao {
 		m_eventDao = eventDao;
 
 		final Event event = m_eventDao.findAll().iterator().next();
-		final Favorite favorite = new Favorite(event.getOwner(), event);
+		final Favorite favorite = new Favorite(event.getOwner().getUsername(), event.getId());
 		favorite.setId(1);
 		m_favorites.add(favorite);
+	}
+
+	@Override
+	public Session createSession() {
+		return null;
 	}
 
 	@Override
@@ -80,21 +85,30 @@ public class MockFavoriteDao implements FavoriteDao {
 	public List<Favorite> findByUser(final String userName) {
 		final List<Favorite> favorites = new ArrayList<Favorite>();
 		for (final Favorite favorite : m_favorites) {
-			if (favorite.getUser().getUsername() == userName) {
+			if (favorite.getUser() == userName) {
 				favorites.add(favorite);
 			}
 		}
 		return favorites;
 	}
+	
+	@Override
+	public List<Favorite> findByUser(final String userName, final Session session) {
+		return findByUser(userName);
+	}
 
 	@Override
 	public Favorite findByUserAndEventId(final String userName, final String eventId) {
 		for (final Favorite favorite : m_favorites) {
-			if (favorite.getUser().getUsername() == userName && favorite.getEvent().getId() == eventId) {
+			if (favorite.getUser() == userName && favorite.getEvent() == eventId) {
 				return favorite;
 			}
 		}
 		return null;
 	}
 
+	@Override
+	public Favorite findByUserAndEventId(final String userName, final String eventId, final Session session) {
+		return findByUserAndEventId(userName, eventId);
+	}
 }

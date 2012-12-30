@@ -17,9 +17,7 @@ public class HibernateUserDao extends AbstractHibernateDao<User,String> implemen
 
 	@SuppressWarnings("unchecked")
 	protected List<User> resultWithDefaultSort(final Criteria criteria) {
-		final Criteria resultCriteria = criteria
-				.addOrder(Order.asc("username"));
-
+		final Criteria resultCriteria = criteria.addOrder(Order.asc("username"));
 		return (List<User>)resultCriteria.list();
 	}
 }

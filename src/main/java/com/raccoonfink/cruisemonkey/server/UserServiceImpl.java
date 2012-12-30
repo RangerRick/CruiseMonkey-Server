@@ -3,14 +3,20 @@ package com.raccoonfink.cruisemonkey.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.User;
 
+@Transactional(readOnly=true)
 public class UserServiceImpl implements UserService, InitializingBean {
+	final Logger m_logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
 	@Autowired
 	private UserDao m_userDao;
 
@@ -27,7 +33,9 @@ public class UserServiceImpl implements UserService, InitializingBean {
 
 	@Override
 	public User getUser(final String username) {
-		return getScrubbedUser(m_userDao.get(username));
+		final User user = getScrubbedUser(m_userDao.get(username));
+		m_logger.debug("username = {}, found user: {}", username, user);
+		return user;
 	}
 
 	@Override
@@ -36,11 +44,14 @@ public class UserServiceImpl implements UserService, InitializingBean {
 		for (final User user : m_userDao.findAll()) {
 			users.add(getScrubbedUser(user));
 		}
+		m_logger.debug("returning {} users", users == null? 0 : users.size());
 		return users;
 	}
 
 	@Override
+	@Transactional
 	public void putUser(final User user) {
+		m_logger.debug("saving user: {}", user);
 		m_userDao.save(user);
 	}
 
