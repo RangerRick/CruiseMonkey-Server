@@ -25,6 +25,7 @@ function Event(data) {
 	self.location     = ko.observable(data.location);
 	self.createdBy    = ko.observable(data["created-by"]);
 	self.owner        = ko.observable(data.owner);
+	self.favorite     = ko.observable(false);
 	self.timespan     = ko.computed(function() {
 		var start = start === null? null : formatTime(self.start(), false);
 		var end	= end	=== null? null : formatTime(self.end(), false);
@@ -109,45 +110,55 @@ function EventsViewModel() {
 	self.events = ko.observableArray();
 
 	self.updateData = function(allData) {
-		var mappedTasks = $.map(allData.event, function(event) {
-			var item = ko.utils.arrayFirst(self.events(), function(entry) {
-				if (entry) {
-					// console.log("entry = " + ko.toJSON(entry));
-					event["@id"] = event["@id"].replace(/[\W\@]+/g, '');
-					if (entry.id() == event["@id"]) {
-						return true;
+		var favorites = [];
+		if (allData.favorites && allData.favorites.favorite) {
+			favorites = $.map(allData.favorites.favorite, function(favorite) {
+				return favorite["@event"].replace(/[\W\@]+/g, '');
+			});
+		}
+		if (allData.events && allData.events.event) {
+			var mappedTasks = $.map(allData.events.event, function(event) {
+				event["@id"] = event["@id"].replace(/[\W\@]+/g, '');
+				var isFavorite = (favorites.indexOf(event["@id"]) != -1);
+				var item = ko.utils.arrayFirst(self.events(), function(entry) {
+					if (entry) {
+						if (entry.id() == event["@id"]) {
+							return true;
+						} else {
+							return false;
+						}
 					} else {
-						return false;
+						console.log("no entry");
 					}
+				});
+				if (item) {
+					var startDate = new Date(event.start);
+					var endDate	= new Date(event.end);
+					var createdBy = event["created-by"];
+
+					item.favorite(isFavorite);
+					if (item.summary()         != event.summary)       { item.summary(event.summary); }
+					if (item.description()     != event.description)   { item.description(event.description); }
+					if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
+					if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
+					if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
+					if (item.owner()           != event.owner)         { item.owner(event.owner); }
+					return item;
 				} else {
-					console.log("no entry");
+					var e = new Event(event);
+					e.favorite(isFavorite);
+					return e;
 				}
 			});
-			if (item) {
-				// console.log("reusing " + ko.toJSON(item));
-				var startDate = new Date(event.start);
-				var endDate	= new Date(event.end);
-				var createdBy = event["created-by"];
-
-				if (item.summary()         != event.summary)       { item.summary(event.summary); }
-				if (item.description()     != event.description)   { item.description(event.description); }
-				if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
-				if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
-				if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
-				if (item.owner()           != event.owner)         { item.owner(event.owner); }
-				return item;
-			} else {
-				return new Event(event);
-			}
-		});
-		self.events(mappedTasks);
+			self.events(mappedTasks);
+		}
 		// console.log("saving ReST events");
 		amplify.store("events", allData);
 	}
 	
 	self.updateDataFromJSON = function() {
 		$.ajax({
-			url: serverModel.cruisemonkey() + '/rest/events',
+			url: serverModel.cruisemonkey() + '/rest/cruisemonkey/events',
 			dataType: 'json',
 			cache: false,
 			username: serverModel.username(),

@@ -19,8 +19,6 @@ import javax.ws.rs.core.UriInfo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -39,7 +37,7 @@ import com.sun.jersey.api.spring.Autowire;
 @Scope("request")
 @Path("/favorites")
 @Autowire
-public class FavoriteRestService implements InitializingBean {
+public class FavoriteRestService extends RestServiceBase implements InitializingBean {
 	@InjectParam("favoriteDao")
 	@Autowired
 	FavoriteDao m_favoriteDao;
@@ -69,7 +67,9 @@ public class FavoriteRestService implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
 		Assert.notNull(m_favoriteDao);
+		Assert.notNull(m_eventDao);
 	}
 
 	@Transactional(readOnly=true)
@@ -124,11 +124,4 @@ public class FavoriteRestService implements InitializingBean {
 		return Response.ok().build();
 	}
 
-	private String getCurrentUser() {
-		final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (principal instanceof UserDetails) {
-			return ((UserDetails)principal).getUsername();
-		}
-		return null;
-	}
 }
