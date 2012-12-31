@@ -33,15 +33,15 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
 FOUNDATION = $(shell find foundation -type f)
 
-RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html $(wildcard views/*.html) $(wildcard images/*) $(FOUNDATION) cruisemonkey.manifest
+RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html $(wildcard views/*.html) $(wildcard images/*) $(FOUNDATION)
 
-PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml)
+PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml cruisemonkey.manifest)
 
 MAKEFILE=Makefile
 
 DESTDIR=/tmp/foo
 
-all: $(RUNTIME)
+all: $(RUNTIME) cruisemonkey.manifest
 
 DATE=$(shell date '+%s')
 GITHASH=$(shell git log -1 | grep -E '^commit' | cut -d' ' -f2)
