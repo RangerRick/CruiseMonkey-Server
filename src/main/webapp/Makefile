@@ -31,25 +31,43 @@ CRUISEMONKEYCSS = \
 
 CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
-all: 3rdparty.js cruisemonkey.js cruisemonkey.css
+DISTILLED = 3rdparty.js cruisemonkey.js cruisemonkey.css
 
-temp/%.min.js: %.js Makefile
+INSTALLFILES = $(patsubst %,$(DESTDIR)/%,$(CRUISEMONKEYJS) $(DISTILLED) $(wildcard *.html) $(wildcard views/*.html) $(wildcard images/*))
+
+MAKEFILE=Makefile
+
+DESTDIR=/tmp/foo
+
+all: $(DISTILLED)
+
+
+temp/%.min.js: %.js $(MAKEFILE)
 	@install -d $(shell dirname $@)
-	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
+	@echo "- minifying $<"
+	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
-temp/%.min.css: %.css Makefile
+temp/%.min.css: %.css $(MAKEFILE)
 	@install -d $(shell dirname $@)
-	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@"
+	@echo "- minifying $<"
+	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
-3rdparty.js: $(3RDPARTYJS) Makefile
+3rdparty.js: $(3RDPARTYJS) $(MAKEFILE)
 	@echo > 3rdparty.js; for FILE in $(3RDPARTYJS); do \
 		cat $$FILE >> 3rdparty.js; \
 		echo "" >> 3rdparty.js; \
 	done
 
-cruisemonkey.js: $(CRUISEMONKEYMINJS) Makefile
-	cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
+cruisemonkey.js: $(CRUISEMONKEYMINJS) $(MAKEFILE)
+	@cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
 
+cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(MAKEFILE)
+	@cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css
 
-cruisemonkey.css: $(CRUISEMONKEYMINCSS) Makefile
-	cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css
+$(DESTDIR)/%: %
+	@DIR="$(DESTDIR)/`dirname $<`"; \
+		echo "$< -> $@"; \
+		install -d -m 755 "$$DIR"; \
+		install -c -m 644 "$<" "$@"
+
+install: $(INSTALLFILES)

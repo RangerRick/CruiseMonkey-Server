@@ -101,12 +101,8 @@ input[type="search"] {
 (min-resolution: 192dpi) { 
 	.favorite input[type=checkbox] + label {
 		background:url(images/star-white@2x.png) no-repeat;
-		width: 32px;
-		height: 32px;
 	}
 	.favorite input[type=checkbox]:checked + label {
 		background:url(images/star-yellow@2x.png) no-repeat;
-		width: 32px;
-		height: 32px;
 	}
 }
