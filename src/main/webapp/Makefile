@@ -31,7 +31,9 @@ CRUISEMONKEYCSS = \
 
 CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
-RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html $(wildcard views/*.html) $(wildcard images/*)
+FOUNDATION = $(shell find foundation -type f)
+
+RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html $(wildcard views/*.html) $(wildcard images/*) $(FOUNDATION) cruisemonkey.manifest
 
 PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml)
 
@@ -40,6 +42,25 @@ MAKEFILE=Makefile
 DESTDIR=/tmp/foo
 
 all: $(RUNTIME)
+
+DATE=$(shell date '+%s')
+GITHASH=$(shell git log -1 | grep -E '^commit' | cut -d' ' -f2)
+
+cruisemonkey.manifest: cruisemonkey.manifest.in $(3RDPARTYJS) $(CRUISEMONKEYJS) $(RUNTIME) $(MAKEFILE)
+	@echo "$< -> $@"
+	@sed -e 's,@GITHASH@,$(GITHASH),g' -e 's,@DATE@,$(DATE),g' "$<" > "$@"
+	@echo "CACHE:" >> "$@"
+	@for FILE in $(3RDPARTYJS) $(CRUISEMONKEYJS) $(RUNTIME); do \
+		echo "$$FILE"; \
+		done | sort -u >> "$@";
+
+$(DESTDIR)/cruisemonkey.manifest: cruisemonkey.manifest.in $(RUNTIME) $(MAKEFILE)
+	@echo "$< -> $@"
+	@sed -e 's,@GITHASH@,$(GITHASH),g' -e 's,@DATE@,$(DATE),g' "$<" > "$@"
+	@echo "CACHE:" >> "$@"
+	@for FILE in $(RUNTIME); do \
+		echo "$$FILE"; \
+		done | sort -u >> "$@";
 
 index.html: index.html.in $(MAKEFILE)
 	@echo "$< -> $@"
