@@ -61,6 +61,7 @@ function TemplateLoader(urls) {
 			};
 			$.ajax({
 				url: url,
+				cache: false,
 				success: templateLoaded,
 				error: failed,
 				dataType: 'text'
