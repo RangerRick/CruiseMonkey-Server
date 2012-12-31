@@ -22,7 +22,7 @@
 			<script src="html5shim/html5.js"></script>
 		<![endif]-->
 	</head>
-	<body>
+	<body onload="onLoad()">
 		<div id="header"></div>
 		<div id="content"><div class="loading">loading...</div></div>
 
@@ -57,22 +57,29 @@
 		<script src="init.js"></script>
 
 		<script>
-			var initializeApp = function() {
+			var m_deviceReady = false,
+			m_isPhoneGap = false,
+			initializeApp = function(event) {
 				console.log('Device is ready; initializing.');
-				document.removeEventListener("deviceready", initializeApp, false);
+				if (m_deviceReady) {
+					console.log("already initialized!");
+					return;
+				}
+				m_deviceReady = true;
 				templateLoader.load();
+			},
+			onLoad = function() {
+				$.getScript('phonegap.js')
+					.done(function() {
+						console.log("loaded phonegap.js");
+						m_isPhoneGap = true;
+						document.addEventListener("deviceready", initializeApp, false);
+					}).fail(function() {
+						console.log("phonegap.js not found: starting in browser mode");
+						m_isPhoneGap = false;
+						initializeApp();
+					});
 			};
-
-			document.addEventListener("deviceready", initializeApp, false);
-
-			// if phonegap never initializes, fire manually
-			setTimeout(function() {
-				var evt = document.createEvent('Event');
-				evt.initEvent('deviceready', true, true);
-				document.dispatchEvent(evt);
-			}, 5000);
 		</script>
-
-		<script src="phonegap.js"></script>
 	</body>
 </html>

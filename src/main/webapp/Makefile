@@ -33,7 +33,7 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
 DISTILLED = 3rdparty.js cruisemonkey.js cruisemonkey.css
 
-INSTALLFILES = $(patsubst %,$(DESTDIR)/%,$(CRUISEMONKEYJS) $(DISTILLED) $(wildcard *.html) $(wildcard views/*.html) $(wildcard images/*))
+INSTALLFILES = $(patsubst %,$(DESTDIR)/%,$(CRUISEMONKEYJS) $(DISTILLED) $(wildcard *.html) $(wildcard views/*.html) $(wildcard images/*) config.xml)
 
 MAKEFILE=Makefile
 
@@ -52,6 +52,11 @@ temp/%.min.css: %.css $(MAKEFILE)
 	@echo "- minifying $<"
 	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
+temp/index.html: index.html $(MAKEFILE)
+	@install -d $(shell dirname $@)
+	@echo "- stripping $<"
+	@cat "$<" | grep -v '// PHONEGAP' > "$@" 2>/dev/null
+
 3rdparty.js: $(3RDPARTYJS) $(MAKEFILE)
 	@echo > 3rdparty.js; for FILE in $(3RDPARTYJS); do \
 		cat $$FILE >> 3rdparty.js; \
@@ -69,5 +74,10 @@ $(DESTDIR)/%: %
 		echo "$< -> $@"; \
 		install -d -m 755 "$$DIR"; \
 		install -c -m 644 "$<" "$@"
+
+$(DESTDIR)/index.html: temp/index.html
+	@echo "$< -> $@"; \
+	install -d -m 755 "$(DESTDIR)"; \
+	install -c -m 644 "$<" "$@"
 
 install: $(INSTALLFILES)
