@@ -87,11 +87,13 @@ input[type="search"] {
 
 .favorite input[type=checkbox] + label {
 	background:url(images/star-white.png) no-repeat;
+	background-size: 26px 26px;
 	width: 32px;
 	height: 32px;
 }
 .favorite input[type=checkbox]:checked + label {
 	background:url(images/star-yellow.png) no-repeat;
+	background-size: 26px 26px;
 	width: 32px;
 	height: 32px;
 }
@@ -101,8 +103,10 @@ input[type="search"] {
 (min-resolution: 192dpi) { 
 	.favorite input[type=checkbox] + label {
 		background:url(images/star-white@2x.png) no-repeat;
+		background-size: 26px 26px;
 	}
 	.favorite input[type=checkbox]:checked + label {
 		background:url(images/star-yellow@2x.png) no-repeat;
+		background-size: 26px 26px;
 	}
 }

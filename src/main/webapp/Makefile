@@ -8,9 +8,9 @@
 	foundation/javascripts/foundation.min.js \
 	datejs/date.min.js \
 	amplifyjs/amplify.min.js \
-	jsOauth/jsOAuth-1.3.6.min.js \
 	jquery-url-parser/purl.js \
 	jquery.scrollTo/jquery.scrollTo.min.js
+#	jsOauth/jsOAuth-1.3.6.min.js \
 
 CRUISEMONKEYJS = \
 	cm_utils.js \
@@ -20,8 +20,8 @@ CRUISEMONKEYJS = \
 	template_loader.js \
 	date.js \
 	app.js \
-	init.js \
-	auth.js
+	init.js
+#	auth.js
 
 CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
 
