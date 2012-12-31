@@ -206,8 +206,9 @@ checkIfAuthorized = function(success, failure) {
 		cache: false,
 		dataType: 'json',
 		type: 'GET',
-		username: username,
-		password: password,
+		beforeSend: function(xhr) {
+			xhr.setRequestHeader("Authorization", "Basic " + window.btoa(username + ":" + password));
+		},
 		success: function(data) {
 			if (data == true) {
 				setOnline();
@@ -439,8 +440,9 @@ function Event(data) {
 			cache: false,
 			dataType: 'json',
 			type: type,
-			username: serverModel.username(),
-			password: serverModel.password()
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader("Authorization", "Basic " + window.btoa(serverModel.username() + ":" + serverModel.password()));
+			}
 		});
 	});
 }
@@ -581,8 +583,9 @@ function EventsViewModel() {
 			timeout: m_timeout,
 			cache: false,
 			dataType: 'json',
-			username: serverModel.username(),
-			password: serverModel.password(),
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader("Authorization", "Basic " + window.btoa(serverModel.username() + ":" + serverModel.password()));
+			},
 			success: self.updateData
 		});
 	};
