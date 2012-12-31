@@ -88,7 +88,7 @@ setupHeader = function() {
     	if (hash !== undefined && hash != "") {
     		// $(element).off('click');
     		$(element).on('click.fndtn touchstart.fndtn', function(e) {
-    			// e.preventDefault();
+    			e.preventDefault();
             	console.log("navigation event: " + hash);
             	navigateTo(hash);
 				if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
@@ -100,6 +100,7 @@ setupHeader = function() {
 
     $(nav).find('.signin').each(function(index, element) {
     	$(element).on('click.fndtn touchstart.fndtn', function(e) {
+			e.preventDefault();
     		setOffline();
     		navigateTo('login');
 			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
@@ -107,6 +108,7 @@ setupHeader = function() {
     });
     $(nav).find('.signout').each(function(index, element) {
     	$(element).on('click.fndtn touchstart.fndtn', function(e) {
+			e.preventDefault();
     		setOffline();
     		serverModel.username(null);
     		serverModel.password(null);
@@ -328,12 +330,12 @@ createLoginView = function() {
     	$(div).css('display', 'none');
     	$(div).html(html);
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
-			e.stopPropagation();
+			e.preventDefault();
 			console.log("cancel clicked");
 			serverModel.reset();
 		});
 		$(div).find('#login_save').on('click.fndtn touchstart.fndtn', function(e) {
-			e.stopPropagation();
+			e.preventDefault();
 			console.log("save clicked");
 			serverModel.persist();
 			showLoginOrCurrent();
