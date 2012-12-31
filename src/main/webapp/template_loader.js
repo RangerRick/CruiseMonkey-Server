@@ -67,6 +67,7 @@ function TemplateLoader(urls) {
 				};
 				$.ajax({
 					url: url,
+					timeout: m_timeout,
 					cache: false,
 					success: templateLoaded,
 					error: failed,

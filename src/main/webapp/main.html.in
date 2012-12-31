@@ -98,6 +98,7 @@
 		<!-- PHONEGAP --><script>var m_isPhoneGap = true;</script>
 		<!-- BROWSER --><script>var m_isPhoneGap = false;</script>
 		<script>
+			var m_timeout = 5000;
 			var m_deviceReady = false,
 			initializeApp = function(event) {
 				console.log('Initializing Cruise Monkey.');
@@ -157,6 +158,5 @@
 		<!-- BROWSER --><script src="template_loader.js"></script>
 		<!-- BROWSER --><script src="date.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>
-		<!-- BROWSER --><script src="init.js"></script>
 	</body>
 </html>

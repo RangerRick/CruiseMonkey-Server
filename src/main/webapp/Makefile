@@ -19,8 +19,8 @@ CRUISEMONKEYJS = \
 	page_navigator.js \
 	template_loader.js \
 	date.js \
-	app.js \
-	init.js
+	app.js
+#	init.js
 #	auth.js
 
 CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
