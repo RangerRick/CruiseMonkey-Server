@@ -58,7 +58,9 @@ templateLoader.onFinished = function() {
 		}
 	}
 
-	navigator.splashscreen.hide();
+	if (m_isPhoneGap) {
+		navigator.splashscreen.hide();
+	}
 };
 
 var pageTracker = new PageTracker(amplify, '.scrollable'),
