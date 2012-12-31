@@ -33,7 +33,7 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
 FOUNDATION = $(shell find foundation -type f)
 
-RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html $(wildcard views/*.html) $(wildcard images/*) $(FOUNDATION)
+RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html main.html $(wildcard views/*.html) $(wildcard images/*) $(FOUNDATION)
 
 PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml cruisemonkey.manifest)
 
@@ -62,11 +62,11 @@ $(DESTDIR)/cruisemonkey.manifest: cruisemonkey.manifest.in $(RUNTIME) $(MAKEFILE
 		echo "$$FILE"; \
 		done | sort -u >> "$@";
 
-index.html: index.html.in $(MAKEFILE)
+main.html: main.html.in $(MAKEFILE)
 	@echo "$< -> $@"
 	@cat "$<" | grep -v '<!-- PHONEGAP -->' | sed -e 's,<!-- BROWSER -->,,g' > "$@" 2>/dev/null
 
-$(DESTDIR)/index.html: index.html.in $(MAKEFILE)
+$(DESTDIR)/main.html: main.html.in $(MAKEFILE)
 	@echo "$< -> $@"
 	@install -d -m 755 "$(DESTDIR)"
 	@cat "$<" | grep -v '<!-- BROWSER -->' | sed -e 's,<!-- PHONEGAP -->,,g' > "$@" 2>/dev/null
