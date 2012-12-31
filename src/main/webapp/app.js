@@ -33,7 +33,7 @@ scrollManager.onScrollStop = function(enabled) {
 };
 
 var templates = ['#header.html', '#events.html', '#login.html'],
- 	templateLoader  = new TemplateLoader(templates);
+	templateLoader  = new TemplateLoader(templates);
 
 templateLoader.onFinished = function() {
 	createLoginView();
@@ -56,8 +56,9 @@ templateLoader.onFinished = function() {
 		}
 	}
 
+	setupDefaultView();
 
-    setupDefaultView();
+	navigator.splashscreen.hide();
 };
 
 var pageTracker = new PageTracker(amplify, '.scrollable'),
