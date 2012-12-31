@@ -344,10 +344,12 @@ function createLoginView() {
     	$(div).css('display', 'none');
     	$(div).html(html);
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
+			e.stopPropagation();
 			console.log("cancel clicked");
 			serverModel.reset();
 		});
 		$(div).find('#login_save').on('click.fndtn touchstart.fndtn', function(e) {
+			e.stopPropagation();
 			console.log("save clicked");
 			serverModel.persist();
 			showLoginOrCurrent();

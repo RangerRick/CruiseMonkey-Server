@@ -40,6 +40,10 @@ function Event(data) {
 	}, self);
 	self.favorite     = ko.observable(false);
 	self.favorite.subscribe(function(isFavorite) {
+		if (eventsModel.updating()) {
+			// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
+			return;
+		}
 		console.log(self.id() + " favorite has changed to: " + isFavorite);
 		var type = "PUT";
 		if (isFavorite) {
@@ -126,8 +130,10 @@ var serverModel = new ServerModel();
 function EventsViewModel() {
 	var self = this;
 	self.events = ko.observableArray();
+	self.updating = ko.observable(false);
 
 	self.updateData = function(allData) {
+		self.updating(true);
 		var favorites = [], dataFavorites = [], dataEvents = [];
 		if (allData.favorites && allData.favorites.favorite) {
 			if (allData.favorites.favorite instanceof Array) {
@@ -139,7 +145,6 @@ function EventsViewModel() {
 				return favorite["@event"];
 			});
 		}
-		console.log("favorites = " + ko.toJSON(favorites));
 		if (allData.events && allData.events.event) {
 			if (allData.events.event instanceof Array) {
 				dataEvents = allData.events.event;
@@ -148,9 +153,6 @@ function EventsViewModel() {
 			}
 			var mappedTasks = $.map(dataEvents, function(event) {
 				var isFavorite = (favorites.indexOf(event["@id"]) != -1);
-				if (isFavorite) {
-					console.log(event["@id"] + " is a favorite!");
-				}
 				var item = ko.utils.arrayFirst(self.events(), function(entry) {
 					if (entry) {
 						if (entry.id() == event["@id"]) {
@@ -185,6 +187,7 @@ function EventsViewModel() {
 		}
 		// console.log("saving ReST events");
 		amplify.store("events", allData);
+		self.updating(false);
 	}
 	
 	self.updateDataFromJSON = function() {
@@ -278,10 +281,5 @@ navModel.notSignedIn = ko.dependentObservable(function() {
 	var self = this;
 	return ! self.signedIn();
 }, navModel);
-
-var favoriteClicked = function(obj) {
-	var context = ko.contextFor(this);
-	console.log("context = " + ko.toJSON(context));
-}
 
 console.log("app.js loaded");
