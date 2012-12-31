@@ -32,7 +32,7 @@ import com.sun.jersey.api.spring.Autowire;
 @Scope("request")
 @Path("/events")
 @Autowire
-public class EventRestService implements InitializingBean {
+public class EventRestService extends RestServiceBase implements InitializingBean {
 	final Logger m_logger = LoggerFactory.getLogger(EventRestService.class);
 
 	@InjectParam("eventService")
@@ -45,11 +45,13 @@ public class EventRestService implements InitializingBean {
 	public EventRestService() {}
 
 	public EventRestService(@InjectParam("eventService") final EventService eventService) {
+		super();
 		m_eventService = eventService;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
 		Assert.notNull(m_eventService);
 	}
 
@@ -79,6 +81,6 @@ public class EventRestService implements InitializingBean {
 	public Response putEvent(final Event event) {
 		m_logger.debug("event = {}", event);
 		m_eventService.putEvent(event);
-		return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getEvent").build(event.getId())).build();
+		return Response.seeOther(getRedirectUri(m_uriInfo, event.getId())).build();
 	}
 }

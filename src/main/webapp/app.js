@@ -26,7 +26,6 @@ function Event(data) {
 	self.location     = ko.observable(data.location);
 	self.createdBy    = ko.observable(data["created-by"]);
 	self.owner        = ko.observable(data.owner);
-	self.favorite     = ko.observable(false);
 	self.timespan     = ko.computed(function() {
 		var start = start === null? null : formatTime(self.start(), false);
 		var end	= end	=== null? null : formatTime(self.end(), false);
@@ -39,6 +38,24 @@ function Event(data) {
 		}
 		return retVal;
 	}, self);
+	self.favorite     = ko.observable(false);
+	self.favorite.subscribe(function(isFavorite) {
+		console.log(self.id() + " favorite has changed to: " + isFavorite);
+		var type = "PUT";
+		if (isFavorite) {
+			type = 'PUT';
+		} else {
+			type = 'DELETE';
+		}
+		$.ajax({
+			url: serverModel.cruisemonkey() + '/rest/favorites?event=' + encodeURI(self.id()),
+			dataType: 'json',
+			type: type,
+			cache: false,
+			username: serverModel.username(),
+			password: serverModel.password()
+		});
+	});
 }
 
 /** used for filter/searching, match an event based on a filter **/
@@ -111,15 +128,29 @@ function EventsViewModel() {
 	self.events = ko.observableArray();
 
 	self.updateData = function(allData) {
-		var favorites = [];
+		var favorites = [], dataFavorites = [], dataEvents = [];
 		if (allData.favorites && allData.favorites.favorite) {
-			favorites = $.map(allData.favorites.favorite, function(favorite) {
+			if (allData.favorites.favorite instanceof Array) {
+				dataFavorites = allData.favorites.favorite;
+			} else {
+				dataFavorites.push(allData.favorites.favorite);
+			}
+			favorites = $.map(dataFavorites, function(favorite) {
 				return favorite["@event"];
 			});
 		}
+		console.log("favorites = " + ko.toJSON(favorites));
 		if (allData.events && allData.events.event) {
-			var mappedTasks = $.map(allData.events.event, function(event) {
+			if (allData.events.event instanceof Array) {
+				dataEvents = allData.events.event;
+			} else {
+				dataEvents.push(allData.events.event);
+			}
+			var mappedTasks = $.map(dataEvents, function(event) {
 				var isFavorite = (favorites.indexOf(event["@id"]) != -1);
+				if (isFavorite) {
+					console.log(event["@id"] + " is a favorite!");
+				}
 				var item = ko.utils.arrayFirst(self.events(), function(entry) {
 					if (entry) {
 						if (entry.id() == event["@id"]) {
@@ -191,15 +222,15 @@ function OfficialEventsModel() {
 var officialEventsModel = new OfficialEventsModel();
 officialEventsModel.filter.subscribe(onFilterChange, officialEventsModel);
 officialEventsModel.filteredEvents = ko.dependentObservable(function() {
-	var self = this;
-
-	var filter = self.filter().toLowerCase();
+	var self = this,
+		filter = self.filter().toLowerCase(),
+		username = serverModel.username();
 
 	var matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-		if (event.owner() != 'google') {
-			return false;
+		if (event.owner() == 'google') {
+			return true;
 		}
-		return true;
+		return false;
 	});
 
 	if (!filter) {
@@ -224,10 +255,11 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 		filter = self.filter().toLowerCase(),
 
 	matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-		if (event.owner() == 'google') {
-			return false;
+		if (event.favorite()) return true;
+		if (event.owner() != 'google') {
+			return true;
 		}
-		return true;
+		return false;
 	});
 
 	if (!filter) {
@@ -246,5 +278,10 @@ navModel.notSignedIn = ko.dependentObservable(function() {
 	var self = this;
 	return ! self.signedIn();
 }, navModel);
+
+var favoriteClicked = function(obj) {
+	var context = ko.contextFor(this);
+	console.log("context = " + ko.toJSON(context));
+}
 
 console.log("app.js loaded");

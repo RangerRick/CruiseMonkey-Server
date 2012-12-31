@@ -48,7 +48,7 @@ input[type="search"] {
 	/* padding-left: 100px; */
 	padding: 5px;
 
-	background: #ccc; /* for non-css3 browsers */
+	background: #eee; /* for non-css3 browsers */
 
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee'); /* for IE */
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee)); /* for webkit browsers */
@@ -68,6 +68,10 @@ input[type="search"] {
 	font-family: monospace;
 }
 
+.location {
+	font-weight: bolder;
+}
+
 .favorite {
 	position: absolute;
 	display: block;
@@ -77,6 +81,32 @@ input[type="search"] {
 	top: 0;
 }
 
-.location {
-	font-weight: bolder;
+.favorite input[type=checkbox] {
+	display:none;
+}
+
+.favorite input[type=checkbox] + label {
+	background:url(images/star-white.png) no-repeat;
+	width: 32px;
+	height: 32px;
+}
+.favorite input[type=checkbox]:checked + label {
+	background:url(images/star-yellow.png) no-repeat;
+	width: 32px;
+	height: 32px;
+}
+
+@media 
+(-webkit-min-device-pixel-ratio: 2), 
+(min-resolution: 192dpi) { 
+	.favorite input[type=checkbox] + label {
+		background:url(images/star-white@2x.png) no-repeat;
+		width: 32px;
+		height: 32px;
+	}
+	.favorite input[type=checkbox]:checked + label {
+		background:url(images/star-yellow@2x.png) no-repeat;
+		width: 32px;
+		height: 32px;
+	}
 }

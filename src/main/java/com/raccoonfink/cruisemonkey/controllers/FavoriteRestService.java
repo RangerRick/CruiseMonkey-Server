@@ -109,7 +109,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 
 		final Favorite favorite = m_favoriteService.addFavorite(userName, eventId);
 		m_logger.debug("created: {}", favorite);
-		return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getFavorite").build(favorite.getId())).build();
+		return Response.seeOther(getRedirectUri(m_uriInfo, favorite.getId())).build();
 	}
 
 	@POST
@@ -123,7 +123,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 
 		final Favorite saved = m_favoriteService.addFavorite(favorite);
 		m_logger.debug("saved favorite = {}", favorite);
-		return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getFavorite").build(saved.getId())).build();
+		return Response.seeOther(getRedirectUri(m_uriInfo, saved.getId())).build();
 	}
 
 	@DELETE

@@ -71,8 +71,8 @@ public class HibernateFavoriteDao extends AbstractHibernateDao<Favorite,Integer>
 			throw new IllegalArgumentException("You must provide both the userName and eventId parameters!");
 		}
 		Criteria criteria = session.createCriteria(Favorite.class)
-//				.add(Restrictions.eq("user", userName).ignoreCase())
-//				.add(Restrictions.eq("event", eventId))
+				.add(Restrictions.eq("user", userName).ignoreCase())
+				.add(Restrictions.eq("event", eventId))
 				;
 		final List<Favorite> favorites = resultWithDefaultSort(criteria);
 
