@@ -1,6 +1,6 @@
-i.*.swp
+.*.swp
 /temp
-index.html.phonegap
+index.html
 3rdparty.js
 cruisemonkey.css
 cruisemonkey.js

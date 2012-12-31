@@ -33,7 +33,7 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
 DISTILLED = 3rdparty.js cruisemonkey.js cruisemonkey.css
 
-INSTALLFILES = $(patsubst %,$(DESTDIR)/%,$(CRUISEMONKEYJS) $(DISTILLED) $(wildcard *.html) $(wildcard views/*.html) $(wildcard images/*) config.xml)
+INSTALLFILES = $(patsubst %,$(DESTDIR)/%,$(CRUISEMONKEYJS) $(DISTILLED) $(wildcard *.html) $(wildcard views/*.html) $(wildcard images/*) index.html config.xml)
 
 MAKEFILE=Makefile
 
@@ -41,6 +41,14 @@ DESTDIR=/tmp/foo
 
 all: $(DISTILLED)
 
+index.html: index.html.in $(MAKEFILE)
+	@echo "$< -> $@"
+	@cat "$<" | grep -v '<!-- PHONEGAP -->' | sed -e 's,<!-- BROWSER -->,,g' > "$@" 2>/dev/null
+
+$(DESTDIR)/index.html: index.html.in $(MAKEFILE)
+	@echo "$< -> $@"
+	@install -d -m 755 "$(DESTDIR)"
+	@cat "$<" | grep -v '<!-- BROWSER -->' | sed -e 's,<!-- PHONEGAP -->,,g' > "$@" 2>/dev/null
 
 temp/%.min.js: %.js $(MAKEFILE)
 	@install -d $(shell dirname $@)
@@ -69,15 +77,10 @@ cruisemonkey.js: $(CRUISEMONKEYMINJS) $(MAKEFILE)
 cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(MAKEFILE)
 	@cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css
 
-$(DESTDIR)/%: %
+$(DESTDIR)/%: % $(MAKEFILE)
 	@DIR="$(DESTDIR)/`dirname $<`"; \
 		echo "$< -> $@"; \
 		install -d -m 755 "$$DIR"; \
 		install -c -m 644 "$<" "$@"
-
-$(DESTDIR)/index.html: temp/index.html
-	@echo "$< -> $@"; \
-	install -d -m 755 "$(DESTDIR)"; \
-	install -c -m 644 "$<" "$@"
 
 install: $(INSTALLFILES)
