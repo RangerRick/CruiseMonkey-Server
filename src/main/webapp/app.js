@@ -40,6 +40,8 @@ templateLoader.onFinished = function() {
 	createOfficialEventsView();
 	createMyEventsView();
 
+	setupDefaultView();
+
 	if (typeof(Storage) !== "undefined") {
 		var events = amplify.store("events");
 		console.log("read events:");
@@ -55,8 +57,6 @@ templateLoader.onFinished = function() {
 			console.log("no stored ReST events");
 		}
 	}
-
-	setupDefaultView();
 
 	navigator.splashscreen.hide();
 };
@@ -94,49 +94,49 @@ isSignedIn = function() {
 
 setupHeader = function() {
 	console.log('setupHeader()');
-    header = pageTracker.getHeader();
-    header.html(templateLoader.renderTemplate('#header.html'));
-    
-    var nav = $(header).find('nav')[0];
+	header = pageTracker.getHeader();
+	header.html(templateLoader.renderTemplate('#header.html'));
+	
+	var nav = $(header).find('nav')[0];
 
-    $(nav).find('a').each(function(index, element) {
-    	var hash = undefined;
-    	if (element.href !== undefined) {
-    		hash = element.href.split('#')[1];
-    	}
-    	if (hash !== undefined && hash != "") {
-    		// $(element).off('click');
-    		$(element).on('click.fndtn touchstart.fndtn', function(e) {
-    			e.preventDefault();
-            	console.log("navigation event: " + hash);
-            	navigateTo(hash);
+	$(nav).find('a').each(function(index, element) {
+		var hash = undefined;
+		if (element.href !== undefined) {
+			hash = element.href.split('#')[1];
+		}
+		if (hash !== undefined && hash != "") {
+			// $(element).off('click');
+			$(element).on('click.fndtn touchstart.fndtn', function(e) {
+				e.preventDefault();
+				console.log("navigation event: " + hash);
+				navigateTo(hash);
 				if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
-    		});
-    	}
-    });
+			});
+		}
+	});
 
-    $(document).foundationTopBar();
+	$(document).foundationTopBar();
 
-    $(nav).find('.signin').each(function(index, element) {
-    	$(element).on('click.fndtn touchstart.fndtn', function(e) {
+	$(nav).find('.signin').each(function(index, element) {
+		$(element).on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
-    		setOffline();
-    		navigateTo('login');
+			setOffline();
+			navigateTo('login');
 			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
-    	});
-    });
-    $(nav).find('.signout').each(function(index, element) {
-    	$(element).on('click.fndtn touchstart.fndtn', function(e) {
+		});
+	});
+	$(nav).find('.signout').each(function(index, element) {
+		$(element).on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
-    		setOffline();
-    		serverModel.username(null);
-    		serverModel.password(null);
-    		navigateTo('login');
+			setOffline();
+			serverModel.username(null);
+			serverModel.password(null);
+			navigateTo('login');
 			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
-    	});
-    });
+		});
+	});
 
-    ko.applyBindings(navModel, nav);
+	ko.applyBindings(navModel, nav);
 },
 
 navigateTo = function(pageId) {
@@ -233,42 +233,44 @@ checkIfAuthorized = function(success, failure) {
 showLoginOrCurrent = function() {
 	var current_page = pageNavigator.getCurrentPage();
 
-    checkIfAuthorized(
-    	// success
-    	function() {
-    		console.log("checkIfAuthorized: success");
-    	    navigateTo(current_page);
-    	},
-    	// failure
-    	function() {
-    		console.log("checkIfAuthorized: failure");
-    		navigateTo('login');
-    	}
-    );
+	checkIfAuthorized(
+		// success
+		function() {
+			console.log("checkIfAuthorized: success");
+			navigateTo(current_page);
+		},
+		// failure
+		function() {
+			console.log("checkIfAuthorized: failure");
+			navigateTo('login');
+		}
+	);
 },
 
 setupDefaultView = function() {
-	
+
 	console.log('setupDefaultView()');
-    setupHeader();
+	setupHeader();
 
-    m_interval = setInterval(function() {
-    	eventsModel.updateDataFromJSON();
-    }, 60000);
+	m_interval = setInterval(function() {
+		if (eventsModel) {
+			eventsModel.updateDataFromJSON();
+		}
+	}, 60000);
 
-    // Hide address bar on mobile devices
-    /*
-    var Modernizr = window.Modernizr;
-    if (Modernizr.touch) {
-        $(window).load(function () {
-            setTimeout(function () {
-                window.scrollTo(0, 1);
-            }, 0);
-        });
-    }
-    */
+	// Hide address bar on mobile devices
+	/*
+	var Modernizr = window.Modernizr;
+	if (Modernizr.touch) {
+		$(window).load(function () {
+			setTimeout(function () {
+				window.scrollTo(0, 1);
+			}, 0);
+		});
+	}
+	*/
 
-    showLoginOrCurrent();
+	showLoginOrCurrent();
 },
 
 replaceCurrentPage = function(pageId) {
@@ -280,15 +282,15 @@ replaceCurrentPage = function(pageId) {
 	pageTracker.getContainer().children().css('display', 'none');
 	page.css('display', 'block');
 
-    if (!Modernizr.touch) {
-    	// on non-mobile devices, focus the search input
-    	if (search) {
-    		search.focus();
-    	}
-    }
-    if (pageId != 'login') {
-        amplify.store('current_page', pageId);
-    }
+	if (!Modernizr.touch) {
+		// on non-mobile devices, focus the search input
+		if (search) {
+			search.focus();
+		}
+	}
+	if (pageId != 'login') {
+		amplify.store('current_page', pageId);
+	}
 	return pageTracker.getContainer()[0];
 },
 
@@ -297,23 +299,23 @@ createOfficialEventsView = function() {
 	if (!pages.official) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "official" });
 
-    	var div = document.createElement('div');
-    	div.setAttribute('id', 'official-events');
-    	$(div).css('display', 'none');
-    	$(div).html(html);
-    	var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = document.createElement('div');
+		div.setAttribute('id', 'official-events');
+		$(div).css('display', 'none');
+		$(div).html(html);
+		var appended = pageTracker.getContainer()[0].appendChild(div);
 
-    	pages.official = div;
+		pages.official = div;
 
-        ko.applyBindings(officialEventsModel, appended);
-    }
+		ko.applyBindings(officialEventsModel, appended);
+	}
 },
 
 showOfficialEventsView = function() {
 	console.log('showOfficialEventsView()');
 	createOfficialEventsView();
 	var content = replaceCurrentPage('official-events');
-    $(content).find('ul.event-list').css('display', 'block');
+	$(content).find('ul.event-list').css('display', 'block');
 },
 
 createMyEventsView = function() {
@@ -321,23 +323,23 @@ createMyEventsView = function() {
 	if (!pages.my) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "my" });
 
-    	var div = document.createElement('div');
-    	div.setAttribute('id', 'my-events');
-    	$(div).css('display', 'none');
-    	$(div).html(html);
-    	var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = document.createElement('div');
+		div.setAttribute('id', 'my-events');
+		$(div).css('display', 'none');
+		$(div).html(html);
+		var appended = pageTracker.getContainer()[0].appendChild(div);
 
-    	pages.my = div;
+		pages.my = div;
 
-        ko.applyBindings(myEventsModel, appended);
-    }
+		ko.applyBindings(myEventsModel, appended);
+	}
 },
 
 showMyEventsView = function() {
 	console.log('showMyEventsView()');
 	createMyEventsView();
 	var content = replaceCurrentPage('my-events');
-    $(content).find('ul.event-list').css('display', 'block');
+	$(content).find('ul.event-list').css('display', 'block');
 },
 
 createLoginView = function() {
@@ -345,10 +347,10 @@ createLoginView = function() {
 	if (!pages.login) {
 		var html = templateLoader.renderTemplate('#login.html');
 
-    	var div = document.createElement('div');
-    	div.setAttribute('id', 'login');
-    	$(div).css('display', 'none');
-    	$(div).html(html);
+		var div = document.createElement('div');
+		div.setAttribute('id', 'login');
+		$(div).css('display', 'none');
+		$(div).html(html);
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
 			console.log("cancel clicked");
@@ -359,16 +361,16 @@ createLoginView = function() {
 			console.log("save clicked");
 			serverModel.persist();
 			showLoginOrCurrent();
-			if (eventsViewModel) {
-				eventsViewModel.updateDataFromJSON();
+			if (eventsModel) {
+				eventsModel.updateDataFromJSON();
 			}
 		});
-    	var appended = pageTracker.getContainer()[0].appendChild(div);
+		var appended = pageTracker.getContainer()[0].appendChild(div);
 
 		console.log("done creating loginView");
-    	pages.login = div;
+		pages.login = div;
 
-    	ko.applyBindings(serverModel, appended);
+		ko.applyBindings(serverModel, appended);
 	}
 },
 
