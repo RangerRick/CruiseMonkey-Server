@@ -53,19 +53,26 @@ function TemplateLoader(urls) {
 	f_loadTemplate = function(url) {
 		console.log('TemplateLoader::f_loadTemplate(' + url + ')');
 		(function() {
-			var templateLoaded = function( template ){
-				f_onLoad( url, template );
-			},
-			failed = function(jqXHR, textStatus, errorThrown) {
-				f_onFail(url, textStatus, errorThrown);
-			};
-			$.ajax({
-				url: url,
-				cache: false,
-				success: templateLoaded,
-				error: failed,
-				dataType: 'text'
-			});
+			if (url.indexOf('#') == 0) {
+				console.log('TemplateLoader::f_loadTemplate: id-based url');
+				var escaped = url.replace(/([^0-9A-Za-z\#])/g, '\\$1');
+				f_onLoad( url, $(escaped).html() );
+			} else {
+				console.log('TemplateLoader::f_loadTemplate: standard url');
+				var templateLoaded = function( template ){
+					f_onLoad( url, template );
+				},
+				failed = function(jqXHR, textStatus, errorThrown) {
+					f_onFail(url, textStatus, errorThrown);
+				};
+				$.ajax({
+					url: url,
+					cache: false,
+					success: templateLoaded,
+					error: failed,
+					dataType: 'text'
+				});
+			}
 		})();
 	};
 	

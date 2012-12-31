@@ -32,7 +32,7 @@ scrollManager.onScrollStop = function(enabled) {
 	}
 };
 
-var templates = ['views/header.html', 'views/events.html', 'views/login.html'],
+var templates = ['#header.html', '#events.html', '#login.html'],
  	templateLoader  = new TemplateLoader(templates);
 
 templateLoader.onFinished = function() {
@@ -76,7 +76,7 @@ isSignedIn = function() {
 setupHeader = function() {
 	console.log('setupHeader()');
     header = pageTracker.getHeader();
-    header.html(templateLoader.renderTemplate('views/header.html'));
+    header.html(templateLoader.renderTemplate('#header.html'));
     
     var nav = $(header).find('nav')[0];
 
@@ -275,7 +275,7 @@ replaceCurrentPage = function(pageId) {
 createOfficialEventsView = function() {
 	console.log('createOfficialEventsView()');
 	if (!pages.official) {
-		var html = templateLoader.renderTemplate('views/events.html', { eventType: "official" });
+		var html = templateLoader.renderTemplate('#events.html', { eventType: "official" });
 
     	var div = document.createElement('div');
     	div.setAttribute('id', 'official-events');
@@ -299,7 +299,7 @@ showOfficialEventsView = function() {
 createMyEventsView = function() {
 	console.log('createMyEventsView()');
 	if (!pages.my) {
-		var html = templateLoader.renderTemplate('views/events.html', { eventType: "my" });
+		var html = templateLoader.renderTemplate('#events.html', { eventType: "my" });
 
     	var div = document.createElement('div');
     	div.setAttribute('id', 'my-events');
@@ -323,7 +323,7 @@ showMyEventsView = function() {
 createLoginView = function() {
 	console.log('createLoginView()');
 	if (!pages.login) {
-		var html = templateLoader.renderTemplate('views/login.html');
+		var html = templateLoader.renderTemplate('#login.html');
 
     	var div = document.createElement('div');
     	div.setAttribute('id', 'login');
