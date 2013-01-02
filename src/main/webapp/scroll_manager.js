@@ -46,7 +46,7 @@ function ScrollManager() {
 
 		self.onScrollStop(enabled);
 	};
-	
+
 	/* Attach the scrolling callback */
 	$(window).scroll(f_onScrollStart);
 }

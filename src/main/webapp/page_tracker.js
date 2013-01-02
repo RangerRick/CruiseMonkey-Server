@@ -94,6 +94,7 @@ function PageTracker(amplify, elementCriteria) {
 		page.find(m_elementCriteria).each(function(index, element) {
 			id = $(element).attr('id');
 			if (id == topElement) {
+			    console.log('new PageElement(' + element + ', ' + id + ', ' + index + ')');
 				matched = new PageElement(element, id, index);
 				console.log('PageTracker::getElementForPageId(' + pageId + '): matched ' + matched.toString());
 				return false;

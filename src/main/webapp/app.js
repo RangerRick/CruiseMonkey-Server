@@ -32,7 +32,7 @@ scrollManager.onScrollStop = function(enabled) {
 	}
 };
 
-var templates = ['#header.html', '#events.html', '#amenities.html', '#login.html'],
+var templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html', '#login.html'],
 	templateLoader  = new TemplateLoader(templates, m_timeout);
 
 templateLoader.onFinished = function() {
@@ -40,6 +40,7 @@ templateLoader.onFinished = function() {
 	createOfficialEventsView();
 	createMyEventsView();
 	createAmenitiesView();
+	createDecksView();
 
 	setupDefaultView();
 
@@ -143,17 +144,16 @@ navigateTo = function(pageId) {
 	console.log('navigateTo(' + pageId + ')');
 	scrollManager.disable();
 
-	if (pageId == 'official-events') {
-		showOfficialEventsView();
-	} else if (pageId == 'my-events') {
-		showMyEventsView();
-	} else if (pageId == 'amenities') {
-		showAmenitiesView();
-	} else if (pageId == 'login') {
-		showLoginView();
-	} else {
-		console.log('unknown page ID: ' + pageId);
-		return false;
+	switch(pageId) {
+		case 'official-events': showOfficialEventsView(); break;
+		case 'my-events':       showMyEventsView(); break;
+		case 'amenities':       showAmenitiesView(); break;
+		case 'decks':           showDecksView(); break;
+		case 'login':           showLoginView(); break;
+		case '':                break;
+		default:
+			console.log('unknown page ID: ' + pageId);
+			return false;
 	}
 
 	var topElement = pageTracker.getTopElement(pageId);
@@ -174,7 +174,7 @@ navigateTo = function(pageId) {
 		setTimeout(function() {
 			pageTracker.getElement('body').scrollTo('#' + topElement.getId(), 0,
 				{
-					margin:false,
+					margin: false,
 					offset: {left:0, top:-45},
 					onAfter: function() {
 						setTimeout(function() {
@@ -405,6 +405,30 @@ var showAmenitiesView = function() {
 	createAmenitiesView();
 	var content = replaceCurrentPage('amenities');
 };
+
+var createDecksView = function() {
+	console.log('createDecksView()');
+	if (!pages.decks) {
+		var html = templateLoader.renderTemplate('#decks.html');
+
+		var div = document.createElement('div');
+		div.setAttribute('id', 'decks');
+		$(div).css('display', 'none');
+		$(div).html(html);
+		var appended = pageTracker.getContainer()[0].appendChild(div);
+
+		console.log("done creating decksView");
+		pages.decks = div;
+		
+		ko.applyBindings(decksModel, appended);
+	}
+};
+
+var showDecksView = function() {
+	console.log('showDecksView()');
+	createDecksView();
+	var content = replaceCurrentPage('decks');
+} ;
 
 var eventsModel;
 

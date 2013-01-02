@@ -31,3 +31,12 @@ test('testVenue', 4, function() {
 	equal(location.type(), 'Venue');
 	equal(location.description(), '2nd-deck theater.');
 });
+
+test('testDecks', 3, function() {
+	var deck = new Deck(2);
+	equal(deck.number(), 2);
+	equal(deck.image(), 'images/deck02-600.png');
+	
+	deck.size(300);
+	equal(deck.image(), 'images/deck02-300.png');
+});

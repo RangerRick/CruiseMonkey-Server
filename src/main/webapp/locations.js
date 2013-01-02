@@ -1,7 +1,3 @@
-function Deck(deckNum) {
-	self.deckNumber = ko.observable(dckNum);
-}
-
 function Location(deck, name, type) {
 	var self = this;
 
@@ -227,6 +223,33 @@ function AmenitiesModel() {
 }
 
 var amenitiesModel = new AmenitiesModel();
+
+Number.prototype.pad = function(size) {
+	return (1e15+this+"").slice(-size);
+}
+
+function Deck(number) {
+	var self = this;
+	self.number = ko.observable(number);
+	self.size = ko.observable(600);
+	self.id = ko.computed(function() {
+		return 'deck-' + self.number();
+	});
+	self.image = ko.computed(function() {
+		return 'images/deck' + self.number().pad(2) + '-' + self.size() + '.png';
+	});
+}
+
+function DecksModel() {
+	var self = this;
+
+	self.decks = ko.observableArray();
+	for (var i = 2; i <= 15; i++) {
+		self.decks.push(new Deck(i));
+	}
+}
+
+var decksModel = new DecksModel();
 
 // amenitiesModel.filter.subscribe(onFilterChange, amenitiesModel);
 
