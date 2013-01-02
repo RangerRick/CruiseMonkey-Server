@@ -751,6 +751,7 @@ var navModel = {
 	signedIn: ko.observable(false)
 };
 
+/*
 function Swiper() {
 	var self = this,
 		hasTouch = 'ontouchstart' in window,
@@ -931,5 +932,6 @@ var swiper = new Swiper();
 		}
 	});
 })();
+*/
 
 console.log("app.js loaded");
