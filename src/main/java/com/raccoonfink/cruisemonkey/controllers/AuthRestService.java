@@ -13,11 +13,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.api.spring.Autowire;
 
-@Transactional
 @Component
 @Scope("request")
 @Path("/auth")

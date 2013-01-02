@@ -1,10 +1,15 @@
 package com.raccoonfink.cruisemonkey.controllers;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -12,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -92,4 +98,20 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 
 		return collection;
 	}
+	
+    @POST
+    @Path("/photos")
+	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public void uploadPhoto(@FormParam("file") final String file, @FormParam("filename") final String fileName) {
+    	m_logger.debug("writing {}", fileName);
+    	final byte[] bytes = Base64.decodeBase64(file);
+    	try {
+			final OutputStream out = new FileOutputStream("/tmp/" + fileName);
+			out.write(bytes);
+			out.close();
+		} catch (final Exception e) {
+			m_logger.debug("failed to write to " + fileName, e);
+		}
+    }
 }
