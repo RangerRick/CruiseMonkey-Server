@@ -173,3 +173,7 @@ input[type="search"] {
 	font-weight: bolder;
 	padding: 5px;
 }
+
+.deck-list img {
+	padding: 10px;
+}
