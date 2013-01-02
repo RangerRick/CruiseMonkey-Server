@@ -9,11 +9,7 @@ input[type="search"] {
 }
 	/* margin: 3px 0 3px 0; */
 
-#official-search {
-	margin-bottom: 5px;
-}
-
-#my-search {
+#official-search,#my-search,#amenities-search {
 	margin-bottom: 5px;
 }
 
@@ -55,25 +51,25 @@ input[type="search"] {
 	background: -moz-linear-gradient(top,  #fff,  #eee); /* for firefox 3.6+ */
 }
 
-.summary {
+.calendar-event .summary {
 	font-size: larger;
 	font-weight: bolder;
 	margin-right: 32px;
 	min-height: 32px;
 }
 
-.time {
+.calendar-event .time {
 	font-weight: bolder;
 }
-.time span {
+.calendar-event .time span {
 	font-family: monospace;
 }
 
-.location {
+.calendar-event .location {
 	font-weight: bolder;
 }
 
-.favorite {
+.calendar-event .favorite {
 	position: absolute;
 	display: inline-block;
 	float: right;
@@ -83,18 +79,19 @@ input[type="search"] {
 	top: 2px;
 }
 
-.favorite input[type=checkbox] {
+.calendar-event .favorite input[type=checkbox] {
 	display:none;
 }
 
-.favorite input[type=checkbox] + label {
+.calendar-event .favorite input[type=checkbox] + label {
 	background:url(images/star-white.png) no-repeat;
 	background-position: center center;
 	background-size: 26px 26px;
 	width: 32px;
 	height: 32px;
 }
-.favorite input[type=checkbox]:checked + label {
+
+.calendar-event .favorite input[type=checkbox]:checked + label {
 	background:url(images/star-yellow.png) no-repeat;
 	background-position: center center;
 	background-size: 26px 26px;
@@ -105,10 +102,57 @@ input[type="search"] {
 @media 
 (-webkit-min-device-pixel-ratio: 2), 
 (min-resolution: 192dpi) { 
-	.favorite input[type=checkbox] + label {
+	.calendar-event .favorite input[type=checkbox] + label {
 		background-image:url(images/star-white@2x.png);
 	}
-	.favorite input[type=checkbox]:checked + label {
+	.calendar-event .favorite input[type=checkbox]:checked + label {
 		background-image:url(images/star-yellow@2x.png);
 	}
+}
+
+.amenities-list {
+	margin-left: -5px;
+	margin-right: -5px;
+	margin-top: 5px;
+	margin-bottom: -5px;
+	border-top: 1px solid black;
+	position: relative;
+}
+
+.amenities-list .divider {
+	background-color: black;
+	color: white;
+	font-size: larger;
+	font-weight: bolder;
+	padding: 5px;
+}
+
+.amenity {
+	position: relative;
+	border-bottom: 1px solid black;
+	/* height: 100px; */
+	width: 100%;
+	overflow: auto;
+	list-style-type: none;
+	/* padding-left: 100px; */
+	padding: 5px;
+
+	background: #eee; /* for non-css3 browsers */
+
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#eeeeee'); /* for IE */
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #fff,  #eee); /* for firefox 3.6+ */
+}
+
+.amenity .deck {
+	display: none;
+}
+
+.amenity .name {
+	font-size: larger;
+	font-weight: bolder;
+}
+
+.amenity .description {
+	
 }

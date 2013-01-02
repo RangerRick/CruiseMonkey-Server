@@ -41,17 +41,25 @@ asyncTest('testFailedGet', 2, function() {
 	templateLoader.load();
 });
 
-asyncTest('testSuccessfulGet', 3, function() {
+asyncTest('testSuccessfulGet', 4, function() {
 	var templateLoader = new TemplateLoader();
 	var url = 'tests/template_loader/testSuccessfulGet.html';
 	templateLoader.add(url);
 
-	var loadCount = 0;
-	templateLoader.onLoad = function() {
+	var loadCount = 0,
+		failCount = 0;
+	templateLoader.onLoad = function(url) {
+		console.log("loaded " + url);
 		loadCount++;
+	};
+	templateLoader.onFail = function(url) {
+		console.log("failed " + url);
+		failCount++;
 	};
 	templateLoader.onFinished = function() {
 		start();
+		equal(templateLoader.urls().length, 1);
+		equal(failCount, 0);
 		equal(loadCount, 1);
 		ok(templateLoader.getTemplate(url).indexOf('foo') !== -1);
 		equal(templateLoader.renderTemplate(url, {

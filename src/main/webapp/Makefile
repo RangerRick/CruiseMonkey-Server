@@ -19,7 +19,9 @@ CRUISEMONKEYJS = \
 	page_navigator.js \
 	template_loader.js \
 	date.js \
+	locations.js \
 	app.js
+#	photos.js
 #	init.js
 #	auth.js
 

@@ -13,11 +13,12 @@ if (!Array.prototype.indexOf) {
 	};
 }
 
-function TemplateLoader(urls) {
+function TemplateLoader(urls, timeout) {
 	var self = this,
 	m_templateUrls = urls || [],
 	m_failed = {},
 	m_templates = {},
+	m_timeout = timeout || 5000,
 
 	f_getSize = function(obj) {
 		// http://stackoverflow.com/a/6700/11236
@@ -52,8 +53,8 @@ function TemplateLoader(urls) {
 	},
 	f_loadTemplate = function(url) {
 		console.log('TemplateLoader::f_loadTemplate(' + url + ')');
-		(function() {
-			if (url.indexOf('#') == 0) {
+		(function loadUrl() {
+			if (url && url.indexOf('#') == 0) {
 				console.log('TemplateLoader::f_loadTemplate: id-based url');
 				var escaped = url.replace(/([^0-9A-Za-z\#])/g, '\\$1');
 				f_onLoad( url, $(escaped).html() );

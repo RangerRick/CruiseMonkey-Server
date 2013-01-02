@@ -32,13 +32,14 @@ scrollManager.onScrollStop = function(enabled) {
 	}
 };
 
-var templates = ['#header.html', '#events.html', '#login.html'],
-	templateLoader  = new TemplateLoader(templates);
+var templates = ['#header.html', '#events.html', '#amenities.html', '#login.html'],
+	templateLoader  = new TemplateLoader(templates, m_timeout);
 
 templateLoader.onFinished = function() {
 	createLoginView();
 	createOfficialEventsView();
 	createMyEventsView();
+	createAmenitiesView();
 
 	setupDefaultView();
 
@@ -57,14 +58,10 @@ templateLoader.onFinished = function() {
 			console.log("no stored ReST events");
 		}
 	}
-
-	if (m_isPhoneGap) {
-		navigator.splashscreen.hide();
-	}
 };
 
 var pageTracker = new PageTracker(amplify, '.scrollable'),
-pageNavigator   = new PageNavigator(amplify, pageTracker, 'official-events', '.calendar-event'),
+pageNavigator   = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
 
 setOffline = function() {
 	console.log('setOffline()');
@@ -98,7 +95,7 @@ setupHeader = function() {
 	console.log('setupHeader()');
 	header = pageTracker.getHeader();
 	header.html(templateLoader.renderTemplate('#header.html'));
-	
+
 	var nav = $(header).find('nav')[0];
 
 	$(nav).find('a').each(function(index, element) {
@@ -150,6 +147,8 @@ navigateTo = function(pageId) {
 		showOfficialEventsView();
 	} else if (pageId == 'my-events') {
 		showMyEventsView();
+	} else if (pageId == 'amenities') {
+		showAmenitiesView();
 	} else if (pageId == 'login') {
 		showLoginView();
 	} else {
@@ -383,6 +382,30 @@ showLoginView = function() {
 	var content = replaceCurrentPage('login');
 };
 
+var createAmenitiesView = function() {
+	console.log('createAmenitiesView()');
+	if (!pages.amenities) {
+		var html = templateLoader.renderTemplate('#amenities.html');
+
+		var div = document.createElement('div');
+		div.setAttribute('id', 'amenities');
+		$(div).css('display', 'none');
+		$(div).html(html);
+		var appended = pageTracker.getContainer()[0].appendChild(div);
+
+		console.log("done creating amenitiesView");
+		pages.amenities = div;
+		
+		ko.applyBindings(amenitiesModel, appended);
+	}
+};
+
+var showAmenitiesView = function() {
+	console.log('showAmenitiesView()');
+	createAmenitiesView();
+	var content = replaceCurrentPage('amenities');
+};
+
 var eventsModel;
 
 /** filter dates in Knockout data-bind **/
@@ -421,7 +444,7 @@ function Event(data) {
 		}
 		return retVal;
 	}, self);
-	self.favorite     = ko.observable(false);
+	self.favorite = ko.observable(false);
 	self.favorite.subscribe(function(isFavorite) {
 		if (eventsModel.updating()) {
 			// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
@@ -602,7 +625,7 @@ function OfficialEventsModel() {
 	self.events = eventsModel.events;
 }
 var officialEventsModel = new OfficialEventsModel();
-officialEventsModel.filter.subscribe(onFilterChange, officialEventsModel);
+// officialEventsModel.filter.subscribe(onFilterChange, officialEventsModel);
 officialEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var self = this,
 		filter = self.filter().toLowerCase(),
@@ -631,7 +654,7 @@ function MyEventsModel() {
 	self.events = eventsModel.events;
 }
 var myEventsModel = new MyEventsModel();
-myEventsModel.filter.subscribe(onFilterChange, myEventsModel);
+// myEventsModel.filter.subscribe(onFilterChange, myEventsModel);
 myEventsModel.filteredEvents = ko.dependentObservable(function() {
 	var self = this,
 		filter = self.filter().toLowerCase(),
