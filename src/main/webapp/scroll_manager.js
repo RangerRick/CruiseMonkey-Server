@@ -12,6 +12,7 @@ function ScrollManager() {
 	self.delay = 500; // ms
 	self.onScrollStart = function(enabled) {};
 	self.onScrollStop  = function(enabled) {};
+	self.onScroll      = function(enabled) {};
 
 	/* Public methods */
 	self.disable = function() {
@@ -35,6 +36,7 @@ function ScrollManager() {
 			clearTimeout(m_currentScroll.timeout);
 			m_currentScroll.timeout = setTimeout(f_onScrollStop, self.delay);
 		}
+		self.onScroll(enabled);
 	},
 	f_onScrollStop = function(callback) {
 		var enabled = m_currentScroll.enabled;

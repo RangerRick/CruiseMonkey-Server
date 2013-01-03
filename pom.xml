@@ -22,7 +22,7 @@
 		<hsqldb.version>2.2.9</hsqldb.version>
 		<jackson.version>1.9.9</jackson.version>
 		<jersey.version>1.16</jersey.version>
-		<junit.version>4.1</junit.version>
+		<junit.version>4.10</junit.version>
 		<servlet-api.version>2.5</servlet-api.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<xstream.version>1.4.3</xstream.version>
@@ -57,7 +57,7 @@
 					<connectors>
 						<connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
 							<port>8088</port>
-							<maxIdleTime>60000</maxIdleTime>
+							<maxIdleTime>120000</maxIdleTime>
 						</connector>
 					</connectors>
 						<requestLog implementation="org.eclipse.jetty.server.NCSARequestLog">

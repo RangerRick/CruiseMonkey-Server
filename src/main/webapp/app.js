@@ -466,16 +466,47 @@ var createDecksView = function() {
 
 		console.log("done creating decksView");
 		pages.decks = div;
-		
+
 		ko.applyBindings(decksModel, appended);
 	}
 };
 
-var showDecksView = function() {
+var m_decksInitialized = false,
+showDecksView = function() {
 	console.log('showDecksView()');
 	createDecksView();
 	var content = replaceCurrentPage('decks');
-} ;
+
+	/*
+	if (!m_decksInitialized) {
+		console.log("first time initialization of decks view");
+		// First time, the indicator needs a character
+		var fixedNav = $("#deck-list-nav-indicator-fixed");
+
+		var decks = decksModel.decks();
+		fixedNav.append(decks[0].number());
+
+		var changeToDeck = function(deck) {
+			fixedNav.replaceWith('<div class="deck-list-nav-indicator">Deck ' + deck + '</div>');
+		};
+
+		var deck, element;
+		scrollManager.onScroll = function() {
+			console.log('deck scrolling');
+
+			for (var i = 0; i < decks.length; i++) {
+				deck = decks[i];
+				element = $('#' + deck.id() + '-image')[0];
+				console.log('element = ' + element);
+				if (CMUtils.isElementVisible(element)) {
+					console.log('deck ' + deck.number() + ' is in viewport');
+				}
+			}
+		}
+		m_decksInitialized = true;
+	}
+	*/
+};
 
 var eventsModel;
 

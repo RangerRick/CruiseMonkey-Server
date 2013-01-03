@@ -12,5 +12,15 @@ var CMUtils = {
 		}
 
 		return ( top >= window.pageYOffset && (top + height) <= (window.pageYOffset + window.innerHeight) );
+	},
+	isElementVisible: function(element) {
+		var top = element.offsetTop;
+
+		while (element.offsetParent) {
+			element = element.offsetParent;
+			top += element.offsetTop;
+		}
+		
+		return ( top >= window.pageYOffset );
 	}
 };
