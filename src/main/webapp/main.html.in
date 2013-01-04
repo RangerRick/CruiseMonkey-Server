@@ -19,11 +19,6 @@
 		<!--[if lt IE 9]>
 			<script src="html5shim/html5.js"></script>
 		<![endif]-->
-	</head>
-	<body onload="onLoad()">
-		<div id="header"></div>
-		<div id="content"><div class="loading">loading...</div></div>
-
 		<script id="header.html" type="text/html">
 			<div class="fixed" style="display:block">
 				<nav class="top-bar">
@@ -114,14 +109,13 @@
 		<script id="decks.html" type="text/html">
 			<ul class="deck-list unstyled">
 				<!-- ko foreach: { data: decks, as: 'deck' } -->
-				<li data-bind="attr: { id: id() + '-header' }" class="divider"><span data-bind="text: 'Deck ' + number()"></span></li>
-				<li class="deck scrollable" data-bind="attr: { id: id() + '-image' }">
-					<img data-bind="attr: { src: image }" />
+				<li data-bind="attr: { id: id() } " class="deck scrollable">
+					<div data-bind="text: 'Deck ' + number()" class="divider"></div>
+					<img data-bind="attr: { id: id() + '-image', src: image }" />
 				</li>
 				<!-- /ko -->
 			</ul>
 		</script>
-
 		<!-- PHONEGAP --><script>var m_isPhoneGap = true;</script>
 		<!-- BROWSER --><script>var m_isPhoneGap = false;</script>
 		<script>
@@ -192,5 +186,9 @@
 		<!-- BROWSER --><!-- <script src="photos.js"></script> -->
 		<!-- BROWSER --><script src="locations.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>
+	</head>
+	<body onload="onLoad()">
+		<div id="header"></div>
+		<div id="content"><div class="loading">loading...</div></div>
 	</body>
 </html>

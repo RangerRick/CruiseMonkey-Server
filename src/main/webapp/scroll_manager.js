@@ -3,9 +3,10 @@ function Scroll(enabled, timeout) {
 	this.timeout = timeout;
 }
 
-function ScrollManager() {
+function ScrollManager(selector) {
 	var m_currentScroll  = null,
 		m_enabled        = true,
+		m_selector       = selector || window,
 		self             = this;
 
 	/* User-configurable options */
@@ -49,6 +50,5 @@ function ScrollManager() {
 		self.onScrollStop(enabled);
 	};
 
-	/* Attach the scrolling callback */
-	$(window).scroll(f_onScrollStart);
+	$(m_selector).scroll(f_onScrollStart);
 }

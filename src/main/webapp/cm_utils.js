@@ -1,26 +1,31 @@
 var CMUtils = {
+
 	getSummary: function(element) {
 		return $(element).find('div.summary').text();
 	},
+
 	isElementInViewport: function(element) {
-		var top    = element.offsetTop,
-		 	height = element.offsetHeight;
+		var m_top    = element.offsetTop,
+		 	m_height = element.offsetHeight;
+		
 
 		while (element.offsetParent) {
 			element = element.offsetParent;
-			top += element.offsetTop;
+			m_top += element.offsetTop;
 		}
 
-		return ( top >= window.pageYOffset && (top + height) <= (window.pageYOffset + window.innerHeight) );
+		return ( m_top >= window.pageYOffset && (m_top + m_height) <= (window.pageYOffset + window.innerHeight) );
 	},
+
 	isElementVisible: function(element) {
-		var top = element.offsetTop;
+		var m_top = element.offsetTop;
 
 		while (element.offsetParent) {
 			element = element.offsetParent;
-			top += element.offsetTop;
+			m_top += element.offsetTop;
 		}
 		
-		return ( top >= window.pageYOffset );
+		return ( m_top >= window.pageYOffset );
 	}
+
 };

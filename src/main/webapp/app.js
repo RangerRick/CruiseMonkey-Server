@@ -1,41 +1,35 @@
 console.log("app.js loading");
 
-var pages = {},
+var m_interval,
+_header,
+_container,
+scrollManager,
+templateLoader,
+pages               = {},
 page_scroll_element = [],
-online = false,
-m_interval,
-_header, _container;
-
-var scrollManager = new ScrollManager();
-scrollManager.delay = 100;
-
-/*
-scrollManager.onScrollStart = function(enabled) {
-	if (enabled) {
-		console.log('scrolling started while enabled');
-	} else {
-		console.log('scrolling started while disabled');
-	}
-};
-*/
-
-scrollManager.onScrollStop = function(enabled) {
-	if (enabled) {
-		var found = pageNavigator.findTopVisibleElement();
-		if (found) {
-			console.log("visible element: " + CMUtils.getSummary(found) + ' (' + $(found).attr('id') + ')');
-		} else {
-			console.log("no elements visible!");
-		}
-	} else {
-		console.log('scrolling stopped while disabled');
-	}
-};
-
-var templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html', '#login.html'],
-	templateLoader  = new TemplateLoader(templates, m_timeout);
+online              = false,
+templates           = templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html', '#login.html'],
+pageTracker         = new PageTracker(amplify, '.scrollable'),
+pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
+templateLoader      = new TemplateLoader(templates, m_timeout);
 
 templateLoader.onFinished = function() {
+	scrollManager = new ScrollManager('#content');
+	scrollManager.delay = 100;
+
+	scrollManager.onScrollStop = function(enabled) {
+		if (enabled) {
+			var found = pageNavigator.findTopVisibleElement();
+			if (found) {
+				console.log("visible element: " + CMUtils.getSummary(found) + ' (' + $(found).attr('id') + ')');
+			} else {
+				console.log("no elements visible!");
+			}
+		} else {
+			console.log('scrolling stopped while disabled');
+		}
+	};
+
 	createLoginView();
 	createOfficialEventsView();
 	createMyEventsView();
@@ -63,10 +57,7 @@ templateLoader.onFinished = function() {
 	}
 };
 
-var pageTracker = new PageTracker(amplify, '.scrollable'),
-pageNavigator   = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
-
-setOffline = function() {
+var setOffline = function() {
 	console.log('setOffline()');
 	if (online == true) {
 		console.log("setOffline: we were online but have gone offline");
@@ -163,7 +154,7 @@ navigateTo = function(pageId) {
 	if (!topElement || topElement.getIndex() == 0) {
 		console.log('scrolling to the top of the page');
 		setTimeout(function() {
-			pageTracker.getElement('body').scrollTo(0, 0, {
+			pageTracker.getElement('#content').scrollTo(0, 0, {
 				onAfter: function() {
 					setTimeout(function() {
 						scrollManager.enable();
@@ -174,10 +165,10 @@ navigateTo = function(pageId) {
 	} else {
 		console.log("scrolling to " + topElement.toString());
 		setTimeout(function() {
-			pageTracker.getElement('body').scrollTo('#' + topElement.getId(), 0,
+			pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
 				{
 					margin: false,
-					offset: {left:0, top:-45},
+					offset: {left:0, top:0},
 					onAfter: function() {
 						setTimeout(function() {
 							scrollManager.enable();

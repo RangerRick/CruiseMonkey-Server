@@ -1,3 +1,39 @@
+function HeightChecker(headerOffset, visibleWiggle) {
+	var m_window = $(window),
+		m_headerOffset = headerOffset || 0,
+		m_visibleWiggle = visibleWiggle || 0;
+
+	this.percentVisible = function(element) {
+	    var e = $(element),
+        	offset = e.offset(),
+        	windowTop = m_window.scrollTop() + m_headerOffset,
+	        windowBottom = m_window.innerHeight(),
+			windowHeight = windowBottom - windowTop,
+	        height = e.height(),
+			top = e.offset().top,
+	        bottom = top + height,
+
+			adjustedTop = top - windowTop,
+			adjustedBottom = bottom - windowBottom,
+
+			lowestTop = windowTop >= adjustedTop? windowTop : adjustedTop,
+			highestBottom = windowBottom <= bottom? windowBottom : bottom,
+
+			visibleHeight = highestBottom - lowestTop,
+
+			visiblePercent;
+
+		if (adjustedTop + m_visibleWiggle >= 0 && adjustedBottom <= 0) {
+			// entire object is visible
+			visiblePercent = 100.00;
+		} else {
+			visiblePercent = Math.max(0, visibleHeight / windowHeight * 100.0).toFixed(2);
+		}
+
+		return visiblePercent;
+	};
+}
+
 function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 	if (!amplify || !pageTracker || !defaultPage || !elementCriteria) {
 		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
@@ -7,6 +43,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 	 	m_pageTracker     = pageTracker,
 	 	m_defaultPage     = defaultPage,
 	 	m_elementCriteria = elementCriteria,
+		m_heightChecker   = new HeightChecker(45, 15),
 	 	self = this;
 
 	self.getCurrentPage = function() {
@@ -20,27 +57,47 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 	};
 
 	self.findTopVisibleElement = function() {
-		console.log('PageNavigator::findTopVisibleElement()');
+		var current_page = self.getCurrentPage(),
+			id = null,
+			el = null,
+			elementPercent = 0,
+			highestPercent = 0;
 
-		var found = null,
-		 	current_page = self.getCurrentPage(),
-			id = null;
+		console.log('PageNavigator::findTopVisibleElement(): current page = ' + current_page + ', search criteria = ' + m_elementCriteria);
 
 		pageTracker.getElement('#' + current_page).find(m_elementCriteria).each(function(index, element) {
-			if (CMUtils.isElementInViewport(element)) {
-				id = $(element).attr('id');
-				if (id) {
-					var summary = CMUtils.getSummary(element);
-					console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + summary + ' (' + id + ')');
-					m_pageTracker.setScrolledId(current_page, id);
-					found = element;
+			id = element.getAttribute('id');
+			if (id) {
+				elementPercent = m_heightChecker.percentVisible(element);
+				console.log(index + ': ' + id + ' = ' + elementPercent + ' (criteria = ' + m_elementCriteria + ')');
+				if (elementPercent == 100.0) {
+					el = element;
+					highestPercent = elementPercent;
+					return false;  // break out, we found a 100%
+				} else if (elementPercent > highestPercent) {
+					el = element;
+					highestPercent = elementPercent;
+				} else if (elementPercent < highestPercent) {
+					// percentage is trailing off, break the loop
 					return false;
 				}
+			} else {
+				console.log('no ID found for element: ' + element.html());
 			}
 			return true;
 		});
 
-		return found;
+		if (el && highestPercent > 0) {
+			var id = el.getAttribute('id');
+			var summary = CMUtils.getSummary(el);
+			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + summary + ' (' + id + ')');
+			m_pageTracker.setScrolledId(current_page, id);
+			return el;
+		} else {
+			console.log('no top visible element found!');
+		}
+
+		return null;
 	}
 
 

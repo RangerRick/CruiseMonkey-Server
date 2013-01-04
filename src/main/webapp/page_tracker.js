@@ -86,13 +86,14 @@ function PageTracker(amplify, elementCriteria) {
 		m_amplify.store('page_store_cache', new_page_store_cache);
 	},
 	f_getElementForPageId = function(pageId) {
+		// console.log('f_getElementForPageId(' + pageId + ', criteria = ' + m_elementCriteria + ')');
 		var topElement = self.getScrolledId(pageId),
 			page = self.getElement('#' + pageId),
 			matched = null,
 			id = null;
 
 		page.find(m_elementCriteria).each(function(index, element) {
-			id = $(element).attr('id');
+			id = element.getAttribute('id');
 			if (id == topElement) {
 			    console.log('new PageElement(' + element + ', ' + id + ', ' + index + ')');
 				matched = new PageElement(element, id, index);
