@@ -17,9 +17,13 @@ body {
 	left: 0;
 	color: #fff;
 	background-color: #000;
-	overflow: hidden;
+	/* overflow: hidden; */
 	display: block;
-	z-index: 99;
+	z-index: 2;
+}
+
+.top-bar {
+	margin: 0px;
 }
 
 #content::-webkit-scrollbar { display: none; }
@@ -45,10 +49,6 @@ input[type="search"] {
 
 #official-search,#my-search,#amenities-search {
 	margin-bottom: 5px;
-}
-
-.top-bar {
-	margin: 0px;
 }
 
 #content.columns {
