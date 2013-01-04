@@ -11,9 +11,9 @@ import com.raccoonfink.cruisemonkey.model.User;
 
 public class StatusNetServiceTest {
 
-	private static final String HOST     = System.getProperty("statusNetHost", "192.168.211.60");
+	private static final String HOST     = System.getProperty("statusNetHost", "c4.amberwood.net");
 	private static final int    PORT     = Integer.valueOf(System.getProperty("statusNetPort", "80"));
-	private static final String PATH     = System.getProperty("statusNetRoot", "/statusnet");
+	private static final String PATH     = System.getProperty("statusNetRoot", "");
 	private static final String USERNAME = System.getProperty("statusNetUser", "");
 	private static final String PASSWORD = System.getProperty("statusNetPassword", "");
 

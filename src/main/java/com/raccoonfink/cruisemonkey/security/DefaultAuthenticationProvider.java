@@ -26,9 +26,9 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
 	private UserDao m_userDao;
 
 	static {
-		StatusNetServiceFactory.setHost(System.getProperty("statusNetHost", "192.168.211.60"));
+		StatusNetServiceFactory.setHost(System.getProperty("statusNetHost", "c4.amberwood.net"));
 		StatusNetServiceFactory.setPort(Integer.valueOf(System.getProperty("statusNetPort", "80")));
-		StatusNetServiceFactory.setRoot(System.getProperty("statusNetRoot", "/statusnet"));
+		StatusNetServiceFactory.setRoot(System.getProperty("statusNetRoot", ""));
 	}
 
 	private StatusNetServiceFactory m_statusNetServiceFactory = StatusNetServiceFactory.getInstance();
