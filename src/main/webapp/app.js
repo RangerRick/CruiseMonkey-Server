@@ -75,27 +75,35 @@ var setupHeader = function() {
 	header = pageTracker.getHeader();
 	header.html(templateLoader.renderTemplate('#header.html'));
 
-	var nav = $(header).find('nav')[0];
+	var nav = $(header).find('nav')[0],
+		host = document.URL.replace(/\#$/, '');
 
 	$(nav).find('a').each(function(index, element) {
+		// console.log('url host = ' + host);
 		var hash = undefined,
 			href = undefined;
-		if (element.href !== undefined) {
-			if (element.href.indexOf('#') == 0) {
-				hash = element.href.split('#')[1];
+		if (element.href != undefined) {
+			href = element.href.replace(new RegExp('^' + CMUtils.escapeForRegExp(host)), '');
+			if (href && href != '') {
+				if (href.indexOf('#') >= 0) {
+					hash = element.href.split('#')[1];
+				}
 			} else {
-				href = element.href;
+				href = undefined;
 			}
 		}
-		if (hash !== undefined && hash != "") {
-			// $(element).off('click');
-			$(element).on('click.fndtn touchstart.fndtn', function(e) {
-				e.preventDefault();
-				console.log("navigation event: " + hash);
-				navigateTo(hash);
-				if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
-			});
-		} else if (href !== undefined && href != "") {
+		// console.log('a = ' + $(element).html() + ', href = ' + href + ', hash = ' + hash);
+		if (hash != undefined) {
+			if (hash != "") {
+				// $(element).off('click');
+				$(element).on('click.fndtn touchstart.fndtn', function(e) {
+					e.preventDefault();
+					console.log("navigation event: " + hash);
+					navigateTo(hash);
+					if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
+				});
+			}
+		} else if (href != undefined && href != "") {
 			$(element).on('click.fndtn touchstart.fndtn', function(e) {
 				e.preventDefault();
 				openLink(href);
@@ -342,27 +350,6 @@ createLoginView = function() {
 		$(div).html(html);
 		*/
 
-		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
-			e.stopPropagation();
-			console.log("cancel clicked");
-			serverModel.reset();
-		});
-
-		var save_button = $(div).find('#login_save');
-
-		save_button.on('click.fndtn touchstart.fndtn', function(e) {
-			console.log("save clicked");
-			setTimeout(function() {
-				serverModel.persist();
-				showLoginOrCurrent();
-				if (eventsModel) {
-					eventsModel.updateDataFromJSON();
-				} else {
-					console.log('no eventsModel found');
-				}
-			}, 0);
-		});
-
 		// enter doesn't submit for some reason, so handle it manually
 		$(div).find('input').keydown(function(e) {
 			var keyCode = e.keyCode || e.which;
@@ -383,6 +370,27 @@ createLoginView = function() {
 		/*
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 		*/
+
+		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
+			e.stopPropagation();
+			console.log("cancel clicked");
+			serverModel.reset();
+		});
+
+		var save_button = $(div).find('#login_save');
+
+		save_button.on('click.fndtn touchstart.fndtn', function(e) {
+			console.log("save clicked");
+			setTimeout(function() {
+				serverModel.persist();
+				showLoginOrCurrent();
+				if (eventsModel) {
+					eventsModel.updateDataFromJSON();
+				} else {
+					console.log('no eventsModel found');
+				}
+			}, 0);
+		});
 
 		console.log('done creating loginView');
 		pages.login = div;
@@ -670,7 +678,7 @@ function EventsViewModel() {
 			}
 			var mappedTasks = $.map(dataEvents, function(event) {
 				var isFavorite, item;
-				if (event.favorite !== undefined) {
+				if (event.favorite != undefined) {
 					isFavorite = event.favorite;
 				} else {
 					isFavorite = (favorites.indexOf(event["@id"]) != -1);
