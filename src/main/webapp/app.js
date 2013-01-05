@@ -365,10 +365,11 @@ createLoginView = function() {
 		
 		$(div).find('a').each(function(index, element) {
 			var href = element.attr('href');
+			console.log('a = ' + a.html() + ', href = ' + href);
 			if (href != undefined && href != "") {
 				element.click(function(e) {
-					e.preventDefault();
 					openUrl(href);
+					e.preventDefault();
 				});
 			}
 		});
