@@ -340,25 +340,19 @@ createLoginView = function() {
 	console.log('createLoginView()');
 	if (!pages.login) {
 		var div = $('#login')[0];
-
-		/*
-		var html = templateLoader.renderTemplate('#login.html');
-
-		var div = document.createElement('div');
-		div.setAttribute('id', 'login');
-		$(div).css('display', 'none');
-		$(div).html(html);
-		*/
+		console.log(div);
 
 		// enter doesn't submit for some reason, so handle it manually
+		console.log('trapping keydown');
 		$(div).find('input').keydown(function(e) {
 			var keyCode = e.keyCode || e.which;
 			if (keyCode == 13) save_button.click();
 		});
-		
+
+		console.log('handling href links');
 		$(div).find('a').each(function(index, element) {
 			var href = element.getAttribute('href');
-			console.log('a = ' + $(element).html() + ', href = ' + href);
+			// console.log('a = ' + $(element).html() + ', href = ' + href);
 			if (href != undefined && href != "") {
 				element.click(function(e) {
 					openUrl(href);
@@ -367,20 +361,19 @@ createLoginView = function() {
 			}
 		});
 
-		/*
-		var appended = pageTracker.getContainer()[0].appendChild(div);
-		*/
-
+		console.log('handling reset click');
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
-			e.stopPropagation();
+			e.preventDefault();
 			console.log("cancel clicked");
 			serverModel.reset();
 		});
 
 		var save_button = $(div).find('#login_save');
 
+		console.log('handling save click');
 		save_button.on('click.fndtn touchstart.fndtn', function(e) {
 			console.log("save clicked");
+			e.preventDefault();
 			setTimeout(function() {
 				serverModel.persist();
 				showLoginOrCurrent();
