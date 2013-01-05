@@ -37,7 +37,7 @@ FOUNDATION = $(shell find foundation -type f)
 
 RUNTIME = 3rdparty.js cruisemonkey.js cruisemonkey.css index.html main.html $(wildcard images/*) $(FOUNDATION) html5shim/html5.js
 
-PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml cruisemonkey.manifest)
+PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml)
 
 MAKEFILE=Makefile
 
