@@ -63,13 +63,11 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 			elementPercent = 0,
 			highestPercent = 0;
 
-		console.log('PageNavigator::findTopVisibleElement(): current page = ' + current_page + ', search criteria = ' + m_elementCriteria);
-
 		pageTracker.getElement('#' + current_page).find(m_elementCriteria).each(function(index, element) {
 			id = element.getAttribute('id');
 			if (id) {
 				elementPercent = m_heightChecker.percentVisible(element);
-				console.log(index + ': ' + id + ' = ' + elementPercent + ' (criteria = ' + m_elementCriteria + ')');
+				// console.log(index + ': ' + id + ' = ' + elementPercent + ' (criteria = ' + m_elementCriteria + ')');
 				if (elementPercent == 100.0) {
 					el = element;
 					highestPercent = elementPercent;

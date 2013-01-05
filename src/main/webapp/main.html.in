@@ -34,8 +34,8 @@
 							<li><a href="#decks">Deck Plans</a></li>
 						</ul>
 						<ul class="right">
-							<li data-bind="visible: !signedIn"><a href="#" class="signin">Sign In</a></li>
-							<li data-bind="visible: signedIn"><a href="#" class="signout">Sign Out</a></li>
+							<li data-bind="visible: showSignIn"><a href="#" class="signin">Sign In</a></li>
+							<li data-bind="visible: showSignOut"><a href="#" class="signout">Sign Out</a></li>
 						</ul>
 					</section>
 				</nav>
@@ -44,11 +44,19 @@
 		<script id="login.html" type="text/html">
 			<form>
 				<div class="row">
+					<div class="three columns">
+					</div>
+					<div class="nine mobile-four columns" style="margin-top: 20px; margin-bottom: 20px">
+						You will have to create an account on <a href="javascript:openLink('http://c4.amberwood.net'); return false">the Twit-arrr server</a>
+						before you can log in.
+					</div>
+				</div>
+				<div class="row">
 					<div class="three mobile-two columns">
 						<label class="right inline">CruiseMonkey URL:</label>
 					</div>
 					<div class="nine mobile-two columns">
-						<input type="text" placeholder="" data-bind="value: cruisemonkey" />
+						<input type="url" placeholder="" data-bind="value: cruisemonkey" />
 					</div>
 				</div>
 				<div class="row">
@@ -68,7 +76,7 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="twelve mobile-four columns">
+					<div class="twelve mobile-four columns" style="margin-top: 20px; margin-bottom: 20px">
 						<div class="right inline">
 							<a href="#" id="login_reset" class="round secondary button">Reset</a>
 							<a href="#" id="login_save"  class="round button">Save</a>
@@ -161,6 +169,7 @@
 		</script>
 
 		<!-- PHONEGAP --><script src="phonegap.js"></script>
+		<!-- PHONEGAP --><script src="childbrowser.js"></script>
 		<!-- PHONEGAP --><script src="3rdparty.js"></script>
 		<!-- BROWSER --><script src="jquery/jquery-1.8.1.min.js"></script>
 		<!-- BROWSER --><script src="mustache/mustache.min.js"></script>

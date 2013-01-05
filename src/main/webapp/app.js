@@ -1,5 +1,13 @@
 console.log("app.js loading");
 
+function openLink(url) {
+	if (window.plugins && window.plugins.childBrowser) {
+		window.plugins.childBrowser.showWebPage(url, { showNavigationBar: true });
+	} else {
+		window.open(url, '_blank');
+	}
+}
+
 var m_interval,
 _header,
 _container,
@@ -7,7 +15,6 @@ scrollManager,
 templateLoader,
 pages               = {},
 page_scroll_element = [],
-online              = false,
 templates           = templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html', '#login.html'],
 pageTracker         = new PageTracker(amplify, '.scrollable'),
 pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
@@ -36,7 +43,11 @@ templateLoader.onFinished = function() {
 	createAmenitiesView();
 	createDecksView();
 
+	/*
 	$(window).disableTextSelect();
+	$('#login').enableTextSelect();
+	$('#login').attr('contentEditable', true);
+	*/
 
 	setupDefaultView();
 
@@ -57,35 +68,7 @@ templateLoader.onFinished = function() {
 	}
 };
 
-var setOffline = function() {
-	console.log('setOffline()');
-	if (online == true) {
-		console.log("setOffline: we were online but have gone offline");
-	}
-	online = false;
-	navModel.signedIn(false);
-	console.log("online = " + online);
-},
-
-setOnline = function() {
-	console.log('setOnline()');
-	if (online == false) {
-		console.log("setOnline: we were offline but have gone online");
-	}
-	online = true;
-	navModel.signedIn(true);
-	console.log("online = " + online);
-},
-
-isOnline = function() {
-	return online;
-},
-
-isSignedIn = function() {
-	return online && loginModel.username() && loginModel.username().length > 0;
-},
-
-setupHeader = function() {
+var setupHeader = function() {
 	console.log('setupHeader()');
 	header = pageTracker.getHeader();
 	header.html(templateLoader.renderTemplate('#header.html'));
@@ -113,19 +96,18 @@ setupHeader = function() {
 	$(nav).find('.signin').each(function(index, element) {
 		$(element).on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
-			setOffline();
+			console.log('signin clicked');
+			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
 			navigateTo('login');
-			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
 		});
 	});
 	$(nav).find('.signout').each(function(index, element) {
 		$(element).on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
-			setOffline();
-			serverModel.username(null);
-			serverModel.password(null);
+			console.log('signout clicked');
+			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
+			navModel.logOut();
 			navigateTo('login');
-			if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
 		});
 	});
 
@@ -152,7 +134,7 @@ navigateTo = function(pageId) {
 	var topElement = pageTracker.getTopElement(pageId);
 
 	if (!topElement || topElement.getIndex() == 0) {
-		console.log('scrolling to the top of the page');
+		// console.log('scrolling to the top of the page');
 		setTimeout(function() {
 			pageTracker.getElement('#content').scrollTo(0, 0, {
 				onAfter: function() {
@@ -163,7 +145,7 @@ navigateTo = function(pageId) {
 			});
 		}, 0);
 	} else {
-		console.log("scrolling to " + topElement.toString());
+		// console.log("scrolling to " + topElement.toString());
 		setTimeout(function() {
 			pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
 				{
@@ -186,8 +168,8 @@ checkIfAuthorized = function(success, failure) {
 	console.log('checkIfAuthorized()');
 	var username = serverModel.username();
 	var password = serverModel.password();
-	
-	if (!username || !password) {
+
+	if (!username || username == null || !password || password == null) {
 		failure();
 		return;
 	}
@@ -203,23 +185,19 @@ checkIfAuthorized = function(success, failure) {
 		},
 		success: function(data) {
 			if (data == true) {
-				setOnline();
+				navModel.authorized(true);
 				console.log('test returned OK');
 				success();
 				return;
 			} else {
-				setOnline();
-				console.log('success function called, but data was not OK!');
+				navModel.authorized(false);
+				console.log('success function called, but data was not OK!  ' + ko.toJSON(data, null, 2));
 				failure();
 				return;
 			}
 		}
 	}).error(function(data) {
-		if (data && data.readyState == 0) {
-			setOffline();
-		} else {
-			setOnline();
-		}
+		navModel.authorized(false);
 		console.log("An error occurred: " + ko.toJSON(data, null, 2));
 		failure();
 	});
@@ -347,22 +325,35 @@ createLoginView = function() {
 		$(div).css('display', 'none');
 		$(div).html(html);
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
-			e.preventDefault();
+			e.stopPropagation();
 			console.log("cancel clicked");
 			serverModel.reset();
 		});
-		$(div).find('#login_save').on('click.fndtn touchstart.fndtn', function(e) {
-			e.preventDefault();
+
+		var save_button = $(div).find('#login_save');
+
+		save_button.on('click.fndtn touchstart.fndtn', function(e) {
 			console.log("save clicked");
-			serverModel.persist();
-			showLoginOrCurrent();
-			if (eventsModel) {
-				eventsModel.updateDataFromJSON();
-			}
+			setTimeout(function() {
+				serverModel.persist();
+				showLoginOrCurrent();
+				if (eventsModel) {
+					eventsModel.updateDataFromJSON();
+				} else {
+					console.log('no eventsModel found');
+				}
+			}, 0);
 		});
+
+		// enter doesn't submit for some reason, so handle it manually
+		$(div).find('input').keydown(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == 13) save_button.click();
+		});
+
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 
-		console.log("done creating loginView");
+		console.log('done creating loginView');
 		pages.login = div;
 
 		ko.applyBindings(serverModel, appended);
@@ -607,15 +598,17 @@ function ServerModel() {
 		self.password(amplify.store('password'));
 	};
 	
-	self.persist = function() {
+	self.persist = ko.computed(function() {
 		amplify.store('cruisemonkey_url', self.cruisemonkey());
 		amplify.store('username',         self.username());
 		amplify.store('password',         self.password());
-	};
-	
-	if (!self.cruisemonkey()) {
-		self.cruisemonkey(document.URL.host);
-	}
+	});
+
+	setTimeout(function() {
+		if (!self.cruisemonkey()) {
+			self.cruisemonkey(document.URL.host);
+		}
+	}, 0);
 }
 
 var serverModel = new ServerModel();
@@ -769,9 +762,49 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 	}
 }, myEventsModel);
 
-var navModel = {
-	signedIn: ko.observable(false)
-};
+function NavModel() {
+	var self = this,
+
+	f_hasUsername = ko.computed(function() {
+		return serverModel.username() != null
+			&& serverModel.username() != undefined
+			&& serverModel.username().length > 0;
+	}),
+
+	f_hasPassword = ko.computed(function() {
+		return serverModel.password() != null
+			&& serverModel.password() != undefined
+			&& serverModel.password().length > 0;
+	});
+
+	self.showSignOut = ko.computed(function() {
+		return f_hasUsername() && f_hasPassword();
+	});
+
+	self.showSignIn = ko.computed(function() {
+		return !self.showSignOut();
+	});
+
+	self.online = function() {
+		if (navigator && navigator.connection) {
+			console.log('connection type = ' + navigator.connection.type);
+			return navigator.connection.type != Connection.NONE;
+		} else {
+			/*	can't know if we're online, we'll just assume we are and let
+				authorized() fail if we can't connect to things */
+			return true;
+		}
+	};
+
+	self.authorized = ko.observable(false);
+
+	self.logOut = function() {
+		serverModel.password(null);
+		serverModel.persist();
+	};
+}
+
+var navModel = new NavModel();
 
 /*
 function Swiper() {
