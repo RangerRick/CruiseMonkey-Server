@@ -17,7 +17,7 @@ scrollManager,
 templateLoader,
 pages               = {},
 page_scroll_element = [],
-templates           = templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html', '#login.html'],
+templates           = templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html'],
 pageTracker         = new PageTracker(amplify, '.scrollable'),
 pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
 templateLoader      = new TemplateLoader(templates, m_timeout);
@@ -110,7 +110,7 @@ var setupHeader = function() {
 			e.preventDefault();
 			console.log('signin clicked');
 			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
-			navigateTo('login');
+			$('#login').reveal();
 		});
 	});
 	$(nav).find('.signout').each(function(index, element) {
@@ -119,7 +119,7 @@ var setupHeader = function() {
 			console.log('signout clicked');
 			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
 			navModel.logOut();
-			navigateTo('login');
+			$('#login').reveal();
 		});
 	});
 
@@ -136,7 +136,7 @@ navigateTo = function(pageId) {
 		case 'my-events':       showMyEventsView(); break;
 		case 'amenities':       showAmenitiesView(); break;
 		case 'decks':           showDecksView(); break;
-		case 'login':           showLoginView(); break;
+		// case 'login':           showLoginView(); break;
 		case '':                break;
 		default:
 			console.log('unknown page ID: ' + pageId);
@@ -222,12 +222,13 @@ showLoginOrCurrent = function() {
 		// success
 		function() {
 			console.log("checkIfAuthorized: success");
+			$('#login').trigger('reveal:close');
 			navigateTo(current_page);
 		},
 		// failure
 		function() {
 			console.log("checkIfAuthorized: failure");
-			navigateTo('login');
+			$('#login').reveal();
 		}
 	);
 },
@@ -330,12 +331,17 @@ showMyEventsView = function() {
 createLoginView = function() {
 	console.log('createLoginView()');
 	if (!pages.login) {
+		var div = $('#login')[0];
+
+		/*
 		var html = templateLoader.renderTemplate('#login.html');
 
 		var div = document.createElement('div');
 		div.setAttribute('id', 'login');
 		$(div).css('display', 'none');
 		$(div).html(html);
+		*/
+
 		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
 			e.stopPropagation();
 			console.log("cancel clicked");
@@ -364,8 +370,8 @@ createLoginView = function() {
 		});
 		
 		$(div).find('a').each(function(index, element) {
-			var href = element.attr('href');
-			console.log('a = ' + a.html() + ', href = ' + href);
+			var href = element.getAttribute('href');
+			console.log('a = ' + $(element).html() + ', href = ' + href);
 			if (href != undefined && href != "") {
 				element.click(function(e) {
 					openUrl(href);
@@ -374,19 +380,21 @@ createLoginView = function() {
 			}
 		});
 
+		/*
 		var appended = pageTracker.getContainer()[0].appendChild(div);
+		*/
 
 		console.log('done creating loginView');
 		pages.login = div;
 
-		ko.applyBindings(serverModel, appended);
+		ko.applyBindings(serverModel, div);
 	}
 },
 
 showLoginView = function() {
 	console.log('showLoginView()');
 	createLoginView();
-	var content = replaceCurrentPage('login');
+	$('#login').reveal();
 };
 
 var createAmenitiesView = function() {
