@@ -2,8 +2,10 @@ console.log("app.js loading");
 
 function openLink(url) {
 	if (window.plugins && window.plugins.childBrowser) {
-		window.plugins.childBrowser.showWebPage(url, { showNavigationBar: true });
+		console.log('openLink(' + url + '): using ChildBrowser plugin');
+		window.plugins.childBrowser.openExternal(url);
 	} else {
+		console.log('openLink(' + url + '): using window.open()');
 		window.open(url, '_blank');
 	}
 }
