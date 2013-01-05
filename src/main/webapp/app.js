@@ -333,7 +333,10 @@ showMyEventsView = function() {
 createLoginView = function() {
 	console.log('createLoginView()');
 	if (!pages.login) {
+		console.log('first time creation');
 		var div = $('#login')[0];
+		console.log('created:');
+		console.log(div);
 
 		// enter doesn't submit for some reason, so handle it manually
 		console.log('trapping keydown');
@@ -355,13 +358,13 @@ createLoginView = function() {
 		});
 
 		console.log('handling reset click');
-		$(div).find('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
+		$('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
 			console.log("cancel clicked");
 			serverModel.reset();
 		});
 
-		var save_button = $(div).find('#login_save');
+		var save_button = $('#login_save');
 
 		console.log('handling save click');
 		save_button.on('click.fndtn touchstart.fndtn', function(e) {
