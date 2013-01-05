@@ -10,7 +10,7 @@ function openLink(url) {
 	}
 }
 
-var m_interval,
+var m_eventUpdateInterval = 6000,
 _header,
 _container,
 scrollManager,
@@ -52,22 +52,6 @@ templateLoader.onFinished = function() {
 	*/
 
 	setupDefaultView();
-
-	if (typeof(Storage) !== "undefined") {
-		var events = amplify.store("events");
-		console.log("read events:");
-		// console.log(events);
-		if (events) {
-			console.log("loading stored ReST events");
-			try {
-				eventsModel.updateData(events);
-			} catch (err) {
-				console.log("an error occurred restoring events from storage: " + err.message);
-			}
-		} else {
-			console.log("no stored ReST events");
-		}
-	}
 };
 
 var setupHeader = function() {
@@ -195,13 +179,13 @@ checkIfAuthorized = function(success, failure) {
 	}
 
 	$.ajax({
-		url: serverModel.cruisemonkey() + '/rest/auth',
+		url: serverModel.authUrl(),
 		timeout: m_timeout,
 		cache: false,
 		dataType: 'json',
 		type: 'GET',
 		beforeSend: function(xhr) {
-			xhr.setRequestHeader("Authorization", "Basic " + window.btoa(username + ":" + password));
+			serverModel.setBasicAuth(xhr);
 		},
 		success: function(data) {
 			if (data == true) {
@@ -246,11 +230,21 @@ setupDefaultView = function() {
 	console.log('setupDefaultView()');
 	setupHeader();
 
-	m_interval = setInterval(function() {
-		if (eventsModel) {
-			eventsModel.updateDataFromJSON();
+	var events = amplify.store("events");
+	console.log("read events:");
+	// console.log(events);
+	if (events) {
+		console.log("loading stored ReST events");
+		try {
+			eventsModel.updateData(events);
+		} catch (err) {
+			console.log("an error occurred restoring events from storage: " + err.message);
 		}
-	}, 60000);
+	} else {
+		console.log("no stored ReST events");
+	}
+
+	ajaxUpdater.start();
 
 	// Hide address bar on mobile devices
 	/*
@@ -340,7 +334,6 @@ createLoginView = function() {
 	console.log('createLoginView()');
 	if (!pages.login) {
 		var div = $('#login')[0];
-		console.log(div);
 
 		// enter doesn't submit for some reason, so handle it manually
 		console.log('trapping keydown');
@@ -377,11 +370,7 @@ createLoginView = function() {
 			setTimeout(function() {
 				serverModel.persist();
 				showLoginOrCurrent();
-				if (eventsModel) {
-					eventsModel.updateDataFromJSON();
-				} else {
-					console.log('no eventsModel found');
-				}
+				ajaxUpdater.pollNow();
 			}, 0);
 		});
 
@@ -574,13 +563,13 @@ function Event(data) {
 			type = 'DELETE';
 		}
 		$.ajax({
-			url: serverModel.cruisemonkey() + '/rest/favorites?event=' + encodeURI(self.id()),
+			url: serverModel.favoritesUrl(self.id()),
 			timeout: m_timeout,
 			cache: false,
 			dataType: 'json',
 			type: type,
 			beforeSend: function(xhr) {
-				xhr.setRequestHeader("Authorization", "Basic " + window.btoa(serverModel.username() + ":" + serverModel.password()));
+				serverModel.setBasicAuth(xhr);
 			}
 		});
 	});
@@ -624,6 +613,22 @@ function ServerModel() {
 	self.username     = ko.observable(amplify.store('username'));
 	self.password     = ko.observable(amplify.store('password'));
 	
+	self.authUrl = ko.computed(function() {
+		return self.cruisemonkey() + '/rest/auth';
+	});
+
+	self.eventUrl = ko.computed(function() {
+		return self.cruisemonkey() + '/rest/cruisemonkey/events';
+	});
+	
+	self.favoritesUrl = function(id) {
+		return self.cruisemonkey() + '/rest/favorites?event=' + encodeURI(id);
+	};
+
+	self.setBasicAuth = function(xhr) {
+		xhr.setRequestHeader("Authorization", "Basic " + window.btoa(self.username() + ":" + self.password()));
+	};
+
 	self.reset = function() {
 		self.cruisemonkey(amplify.store('cruisemonkey_url'));
 		self.username(amplify.store('username'));
@@ -669,6 +674,7 @@ function EventsViewModel() {
 			} else {
 				dataEvents.push(allData.events.event);
 			}
+			console.log("EventsViewModel::updateData(): parsing " + dataEvents.length + " events");
 			var mappedTasks = $.map(dataEvents, function(event) {
 				var isFavorite, item;
 				if (event.favorite != undefined) {
@@ -718,23 +724,68 @@ function EventsViewModel() {
 		self.updating(false);
 	}
 	
-	self.updateDataFromJSON = function() {
-		$.ajax({
-			url: serverModel.cruisemonkey() + '/rest/cruisemonkey/events',
-			timeout: m_timeout,
-			cache: false,
-			dataType: 'json',
-			beforeSend: function(xhr) {
-				xhr.setRequestHeader("Authorization", "Basic " + window.btoa(serverModel.username() + ":" + serverModel.password()));
-			},
-			success: self.updateData
-		});
-	};
-
-	self.updateDataFromJSON();
+	self.updateData(amplify.store('events'));
 }
 
 eventsModel = new EventsViewModel();
+
+function AjaxUpdater() {
+	var self = this,
+		m_timer = null,
+		m_inFlight = false,
+	
+	f_updateEventModel = function() {
+		if (!serverModel || !eventsModel || !navModel) {
+			console.log('AjaxUpdater::f_updateEventModel(): Missing one of [serverModel, eventsModel, navModel], skipping update.');
+			return;
+		}
+
+		if (m_inFlight) {
+			console.log('AjaxUpdater::f_updateEventModel(): An update is already in-progress, skipping update.');
+		}
+
+		if (navModel.isAuthorized()) {
+			var url = serverModel.eventUrl();
+
+			console.log('updating event data from ' + url);
+			m_inFlight = true;
+			$.ajax({
+				url: url,
+				timeout: m_timeout,
+				cache: false,
+				dataType: 'json',
+				beforeSend: function(xhr) {
+					serverModel.setBasicAuth(xhr);
+				},
+				success: function(data) {
+					console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
+					eventsModel.updateData(data);
+					m_inFlight = false;
+				}
+			}).error(function(data) {
+				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
+				m_inFlight = false;
+			});
+		} else {
+			console.log('Not authorized according to navModel, skipping update.');
+		}
+	};
+	
+	self.pollNow = function() {
+		f_updateEventModel();
+	};
+	self.start = function() {
+		m_timer = setInterval(f_updateEventModel, m_eventUpdateInterval);
+	};
+	self.stop = function() {
+		if (m_timer != null) {
+			clearInterval(m_timer);
+			m_timer = null;
+		}
+	};
+}
+
+var ajaxUpdater = new AjaxUpdater();
 
 function OfficialEventsModel() {
 	var self   = this;
@@ -809,8 +860,12 @@ function NavModel() {
 			&& serverModel.password().length > 0;
 	});
 
-	self.showSignOut = ko.computed(function() {
+	self.isSignedIn = ko.computed(function() {
 		return f_hasUsername() && f_hasPassword();
+	});
+
+	self.showSignOut = ko.computed(function() {
+		return self.isSignedIn();
 	});
 
 	self.showSignIn = ko.computed(function() {
@@ -829,6 +884,10 @@ function NavModel() {
 	};
 
 	self.authorized = ko.observable(false);
+
+	self.isAuthorized = ko.computed(function() {
+		return self.isSignedIn() && self.authorized();
+	});
 
 	self.logOut = function() {
 		serverModel.password(null);
