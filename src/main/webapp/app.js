@@ -78,9 +78,14 @@ var setupHeader = function() {
 	var nav = $(header).find('nav')[0];
 
 	$(nav).find('a').each(function(index, element) {
-		var hash = undefined;
+		var hash = undefined,
+			href = undefined;
 		if (element.href !== undefined) {
-			hash = element.href.split('#')[1];
+			if (element.href.indexOf('#') == 0) {
+				hash = element.href.split('#')[1];
+			} else {
+				href = element.href;
+			}
 		}
 		if (hash !== undefined && hash != "") {
 			// $(element).off('click');
@@ -89,6 +94,11 @@ var setupHeader = function() {
 				console.log("navigation event: " + hash);
 				navigateTo(hash);
 				if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
+			});
+		} else if (href !== undefined && href != "") {
+			$(element).on('click.fndtn touchstart.fndtn', function(e) {
+				e.preventDefault();
+				openLink(href);
 			});
 		}
 	});
@@ -351,6 +361,16 @@ createLoginView = function() {
 		$(div).find('input').keydown(function(e) {
 			var keyCode = e.keyCode || e.which;
 			if (keyCode == 13) save_button.click();
+		});
+		
+		$(div).find('a').each(function(index, element) {
+			var href = element.attr('href');
+			if (href != undefined && href != "") {
+				element.click(function(e) {
+					e.preventDefault();
+					openUrl(href);
+				});
+			}
 		});
 
 		var appended = pageTracker.getContainer()[0].appendChild(div);
