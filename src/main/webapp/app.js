@@ -660,6 +660,10 @@ function EventsViewModel() {
 	self.updateData = function(allData) {
 		self.updating(true);
 		var favorites = [], dataFavorites = [], dataEvents = [];
+		if (!allData) {
+			console.log('EventsViewModel::updateData() called, but missing event data!');
+			return;
+		}
 		if (allData.favorites && allData.favorites.favorite) {
 			if (allData.favorites.favorite instanceof Array) {
 				dataFavorites = allData.favorites.favorite;
