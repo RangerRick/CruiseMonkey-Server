@@ -59,10 +59,9 @@ var setupHeader = function() {
 	header = pageTracker.getHeader();
 	header.html(templateLoader.renderTemplate('#header.html'));
 
-	var nav = $(header).find('nav')[0],
-		host = document.URL.replace(/\#$/, '');
+	var host = document.URL.replace(/\#$/, '');
 
-	$(nav).find('a').each(function(index, element) {
+	$(header).find('a').each(function(index, element) {
 		// console.log('url host = ' + host);
 		var hash = undefined,
 			href = undefined;
@@ -95,9 +94,9 @@ var setupHeader = function() {
 		}
 	});
 
-	$(document).foundationTopBar();
+	/* $(document).foundationTopBar(); */
 
-	$(nav).find('.signin').each(function(index, element) {
+	$(header).find('.signin a').each(function(index, element) {
 		$(element).on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
 			console.log('signin clicked');
@@ -105,7 +104,7 @@ var setupHeader = function() {
 			$('#login').reveal();
 		});
 	});
-	$(nav).find('.signout').each(function(index, element) {
+	$(header).find('.signout a').each(function(index, element) {
 		$(element).on('click.fndtn touchstart.fndtn', function(e) {
 			e.preventDefault();
 			console.log('signout clicked');
@@ -115,7 +114,7 @@ var setupHeader = function() {
 		});
 	});
 
-	ko.applyBindings(navModel, nav);
+	ko.applyBindings(navModel, $(header)[0]);
 },
 
 navigateTo = function(pageId) {
