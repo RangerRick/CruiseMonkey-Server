@@ -6,7 +6,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.FavoriteDao;
@@ -25,7 +24,6 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
 	public Favorite getFavorite(final String username, final Integer id) {
 		final Favorite favorite = m_favoriteDao.get(id);
 		if (favorite.getUser() == username) {
@@ -35,13 +33,11 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
 	public List<Favorite> getFavorites(final String username) {
 		return m_favoriteDao.findByUser(username);
 	}
 
 	@Override
-	@Transactional
 	public Favorite addFavorite(final Favorite favorite) {
 		if (favorite == null) {
 			throw new IllegalArgumentException("You must pass a favorite object!");
@@ -61,7 +57,6 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	@Transactional
 	public Favorite addFavorite(final String username, final String eventId) {
 		if (username == null || eventId == null) {
 			throw new IllegalArgumentException("You must specify a username and eventId!");
@@ -83,7 +78,6 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	@Transactional
 	public void removeFavorite(final String username, final Integer id) {
 		if (username == null || id == null) {
 			throw new IllegalArgumentException("You must specify a user and favorite ID!");
@@ -106,7 +100,6 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	@Transactional
 	public void removeFavorite(final String username, final String eventId) {
 		if (username == null || eventId == null) {
 			throw new IllegalArgumentException("You must specify a username and eventId!");

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.model.User;
@@ -50,6 +51,7 @@ public class UserRestService implements InitializingBean {
 
 	@GET
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public List<User> getAllUsers() {
 		return m_userService.getUsers();
 	}
@@ -57,6 +59,7 @@ public class UserRestService implements InitializingBean {
 	@GET
 	@Path("/{username}")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public User getUser(@PathParam("username") final String username) {
 		return m_userService.getUser(username);
 	}

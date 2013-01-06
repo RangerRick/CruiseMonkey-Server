@@ -7,13 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.User;
 
-@Transactional(readOnly=true)
 public class UserServiceImpl implements UserService, InitializingBean {
 	final Logger m_logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -49,7 +47,6 @@ public class UserServiceImpl implements UserService, InitializingBean {
 	}
 
 	@Override
-	@Transactional
 	public void putUser(final User user) {
 		m_logger.debug("saving user: {}", user);
 		m_userDao.save(user);

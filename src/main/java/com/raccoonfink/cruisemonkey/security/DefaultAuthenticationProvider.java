@@ -11,7 +11,6 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -48,7 +47,6 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
 	}
 
 	@Override
-	@Transactional
 	protected UserDetails retrieveUser(final String username, final UsernamePasswordAuthenticationToken token) throws AuthenticationException {
 		m_logger.debug("username = {}", username);
         if (!StringUtils.hasLength(username)) {

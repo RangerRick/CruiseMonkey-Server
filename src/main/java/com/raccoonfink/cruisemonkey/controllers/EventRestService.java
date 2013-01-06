@@ -21,6 +21,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.model.Event;
@@ -57,6 +58,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 
     @GET
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public List<Event> getEvents(@QueryParam("start") final Date start, @QueryParam("end") final Date end, @QueryParam("user") final String userName) {
     	m_logger.debug("start = {}, end = {}, user = {}", start, end, userName);
 		final List<Event> events;
@@ -71,6 +73,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@GET
 	@Path("/{id}")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public Event getEvent(@PathParam("id") final String id) {
 		m_logger.debug("id = {}", id);
 		return m_eventService.getEvent(id);
@@ -78,6 +81,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 
 	@POST
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional
 	public Response putEvent(final Event event) {
 		m_logger.debug("event = {}", event);
 		m_eventService.putEvent(event);

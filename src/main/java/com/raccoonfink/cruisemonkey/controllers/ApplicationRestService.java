@@ -35,7 +35,6 @@ import com.raccoonfink.cruisemonkey.server.UserService;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
-@Transactional
 @Component
 @Scope("request")
 @Path("/cruisemonkey")
@@ -74,10 +73,10 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 		Assert.notNull(m_userService);
 	}
 
-	@Transactional(readOnly=true)
     @GET
     @Path("/events")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public EventCollection getEventCollection(@QueryParam("start") final Date start, @QueryParam("end") final Date end) {
 		final String userName = getCurrentUser();
 		m_logger.debug("start = {}, end = {}, user = {}", start, end, userName);
@@ -103,6 +102,7 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
     @Path("/photos")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Transactional
     public void uploadPhoto(@FormParam("file") final String file, @FormParam("filename") final String fileName) {
     	m_logger.debug("writing {}", fileName);
     	final byte[] bytes = Base64.decodeBase64(file);

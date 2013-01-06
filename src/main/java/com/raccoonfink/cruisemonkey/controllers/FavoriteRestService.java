@@ -22,6 +22,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
@@ -83,6 +84,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 
     @GET
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public List<Favorite> getFavorites(@QueryParam("user") final String userName) {
 		final String user = userName == null? getCurrentUser() : userName;
 		m_logger.debug("user = {}", user);
@@ -92,6 +94,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 	@GET
 	@Path("/{id}")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
 	public Favorite getFavorite(@PathParam("id") final Integer id) {
 		final String user = getCurrentUser();
 		m_logger.debug("user = {}, id = {}", user, id);
@@ -99,6 +102,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 	}
 
 	@PUT
+	@Transactional
 	public Response putFavorite(@QueryParam("event") final String eventId) {
 		final String userName = getCurrentUser();
 
@@ -114,6 +118,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 
 	@POST
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional
 	public Response postFavorite(final Favorite favorite) {
 		final String userName = getCurrentUser();
 		
@@ -129,6 +134,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 	@DELETE
 	@Path("/{id}")
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional
 	public Response deleteFavoriteById(@PathParam("id") final Integer id) {
 		final String userName = getCurrentUser();
 		m_logger.debug("user = {}, id = {}", userName, id);
@@ -138,6 +144,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 
 	@DELETE
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional
 	public Response deleteFavoriteByEventId(@QueryParam("event") final String eventId) {
 		final String user = getCurrentUser();
 		m_logger.debug("user = {}, event = {}", user, eventId);

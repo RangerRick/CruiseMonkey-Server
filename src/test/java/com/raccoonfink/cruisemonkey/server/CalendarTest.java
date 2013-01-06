@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
@@ -22,7 +21,6 @@ import com.raccoonfink.cruisemonkey.model.Event;
 		"classpath:/META-INF/spring/dao-context.xml",
 		"classpath:/META-INF/spring/server-context.xml"
 })
-@Transactional
 public class CalendarTest {
 	@Autowired
 	private EventDao m_eventDao;
