@@ -37,7 +37,6 @@ function HeightChecker(headerOffset, visibleWiggle) {
 }
 
 function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
-	"use strict";
 	if (!amplify || !pageTracker || !defaultPage || !elementCriteria) {
 		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
 	}
@@ -47,7 +46,13 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 		m_defaultPage     = defaultPage,
 		m_elementCriteria = elementCriteria,
 		m_heightChecker   = new HeightChecker(45, 15),
+		m_scrollMananger,
+		
 		self = this;
+
+	self.setScrollManager = function(sm) {
+		m_scrollManager = sm;
+	};
 
 	self.getCurrentPage = function() {
 		"use strict";
@@ -104,4 +109,87 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 		return null;
 	};
 
+	self.replaceCurrentPage = function(pageId) {
+		"use strict";
+
+		console.log('replaceCurrentPage(' + pageId + ')');
+
+		var page = m_pageTracker.getElement('#' + pageId),
+			search = page.find('input[type=search]').first();
+
+		m_pageTracker.getContainer().children().css('display', 'none');
+		page.css('display', 'block');
+
+		if (!Modernizr.touch) {
+			// on non-mobile devices, focus the search input
+			if (search) {
+				search.focus();
+			}
+		}
+		return m_pageTracker.getContainer()[0];
+	};
+
+	self.navigateTo = function(pageId) {
+		"use strict";
+
+		console.log('----------------------------------------------------------------------------------');
+		console.log('navigateTo(' + pageId + ')');
+
+		var page, content, topElement;
+
+		page = $(pageId);
+		if (!page) {
+			console.log('unable to locate element for ' + pageId);
+			return false;
+		}
+
+		if (pageId != 'login') {
+			amplify.store('current_page', pageId);
+		}
+
+		if (m_scrollManager) {
+			m_scrollManager.disable();
+		}
+		content = self.replaceCurrentPage(pageId);
+
+		topElement = m_pageTracker.getTopElement(pageId);
+
+		if (!topElement || topElement.getIndex() === 0) {
+			// console.log('scrolling to the top of the page');
+			setTimeout(function() {
+				"use strict";
+
+				m_pageTracker.getElement('#content').scrollTo(0, 0, {
+					onAfter: function() {
+						setTimeout(function() {
+							if (m_scrollManager) {
+								m_scrollManager.enable();
+							}
+						}, 50);
+					}
+				});
+			}, 0);
+		} else {
+			// console.log("scrolling to " + topElement.toString());
+			setTimeout(function() {
+				"use strict";
+
+				m_pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
+					{
+						margin: false,
+						offset: {left:0, top:0},
+						onAfter: function() {
+							setTimeout(function() {
+								if (m_scrollManager) {
+									m_scrollManager.enable();
+								}
+							}, 50);
+						}
+					}
+				);
+			}, 0);
+		}
+
+		return true;
+	}
 }

@@ -29,6 +29,7 @@ templateLoader.onFinished = function() {
 
 	scrollManager = new ScrollManager('#content');
 	scrollManager.delay = 100;
+	pageNavigator.setScrollManager(scrollManager);
 
 	scrollManager.onScrollStop = function(enabled) {
 		"use strict";
@@ -93,7 +94,7 @@ var setupHeader = function() {
 
 					e.preventDefault();
 					console.log("navigation event: " + hash);
-					navigateTo(hash);
+					pageNavigator.navigateTo(hash);
 					if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
 				});
 			}
@@ -132,62 +133,6 @@ var setupHeader = function() {
 	});
 
 	ko.applyBindings(navModel, $(header)[0]);
-},
-
-navigateTo = function(pageId) {
-	"use strict";
-
-	console.log('----------------------------------------------------------------------------------');
-	console.log('navigateTo(' + pageId + ')');
-	scrollManager.disable();
-
-	switch(pageId) {
-		case 'official-events': showOfficialEventsView(); break;
-		case 'my-events':       showMyEventsView(); break;
-		case 'amenities':       showAmenitiesView(); break;
-		case 'decks':           showDecksView(); break;
-		// case 'login':           showLoginView(); break;
-		case '':                break;
-		default:
-			console.log('unknown page ID: ' + pageId);
-			return false;
-	}
-
-	var topElement = pageTracker.getTopElement(pageId);
-
-	if (!topElement || topElement.getIndex() === 0) {
-		// console.log('scrolling to the top of the page');
-		setTimeout(function() {
-			"use strict";
-
-			pageTracker.getElement('#content').scrollTo(0, 0, {
-				onAfter: function() {
-					setTimeout(function() {
-						scrollManager.enable();
-					}, 50);
-				}
-			});
-		}, 0);
-	} else {
-		// console.log("scrolling to " + topElement.toString());
-		setTimeout(function() {
-			"use strict";
-
-			pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
-				{
-					margin: false,
-					offset: {left:0, top:0},
-					onAfter: function() {
-						setTimeout(function() {
-							scrollManager.enable();
-						}, 50);
-					}
-				}
-			);
-		}, 0);
-	}
-
-	return true;
 },
 
 checkIfAuthorized = function(success, failure) {
@@ -254,7 +199,7 @@ showLoginOrCurrent = function() {
 			console.log("checkIfAuthorized: success");
 			navModel.authorized(true);
 			$('#login').trigger('reveal:close');
-			navigateTo(current_page);
+			pageNavigator.navigateTo(current_page);
 		},
 		// failure
 		function() {
@@ -304,29 +249,6 @@ setupDefaultView = function() {
 	showLoginOrCurrent();
 },
 
-replaceCurrentPage = function(pageId) {
-	"use strict";
-
-	console.log('replaceCurrentPage(' + pageId + ')');
-
-	var page = pageTracker.getElement('#' + pageId);
-	var search = page.find('input[type=search]').first();
-
-	pageTracker.getContainer().children().css('display', 'none');
-	page.css('display', 'block');
-
-	if (!Modernizr.touch) {
-		// on non-mobile devices, focus the search input
-		if (search) {
-			search.focus();
-		}
-	}
-	if (pageId != 'login') {
-		amplify.store('current_page', pageId);
-	}
-	return pageTracker.getContainer()[0];
-},
-
 createOfficialEventsView = function() {
 	"use strict";
 
@@ -346,15 +268,6 @@ createOfficialEventsView = function() {
 	}
 },
 
-showOfficialEventsView = function() {
-	"use strict";
-
-	console.log('showOfficialEventsView()');
-	createOfficialEventsView();
-	var content = replaceCurrentPage('official-events');
-	$(content).find('ul.event-list').css('display', 'block');
-},
-
 createMyEventsView = function() {
 	"use strict";
 
@@ -372,15 +285,6 @@ createMyEventsView = function() {
 
 		ko.applyBindings(myEventsModel, appended);
 	}
-},
-
-showMyEventsView = function() {
-	"use strict";
-
-	console.log('showMyEventsView()');
-	createMyEventsView();
-	var content = replaceCurrentPage('my-events');
-	$(content).find('ul.event-list').css('display', 'block');
 },
 
 createLoginView = function() {
@@ -474,14 +378,6 @@ var createAmenitiesView = function() {
 	}
 };
 
-var showAmenitiesView = function() {
-	"use strict";
-
-	console.log('showAmenitiesView()');
-	createAmenitiesView();
-	var content = replaceCurrentPage('amenities');
-};
-
 (function($) {
 	"use strict";
 
@@ -547,45 +443,6 @@ var createDecksView = function() {
 
 		ko.applyBindings(decksModel, appended);
 	}
-};
-
-var m_decksInitialized = false,
-showDecksView = function() {
-	"use strict";
-
-	console.log('showDecksView()');
-	createDecksView();
-	var content = replaceCurrentPage('decks');
-
-	/*
-	if (!m_decksInitialized) {
-		console.log("first time initialization of decks view");
-		// First time, the indicator needs a character
-		var fixedNav = $("#deck-list-nav-indicator-fixed");
-
-		var decks = decksModel.decks();
-		fixedNav.append(decks[0].number());
-
-		var changeToDeck = function(deck) {
-			fixedNav.replaceWith('<div class="deck-list-nav-indicator">Deck ' + deck + '</div>');
-		};
-
-		var deck, element;
-		scrollManager.onScroll = function() {
-			console.log('deck scrolling');
-
-			for (var i = 0; i < decks.length; i++) {
-				deck = decks[i];
-				element = $('#' + deck.id() + '-image')[0];
-				console.log('element = ' + element);
-				if (CMUtils.isElementVisible(element)) {
-					console.log('deck ' + deck.number() + ' is in viewport');
-				}
-			}
-		}
-		m_decksInitialized = true;
-	}
-	*/
 };
 
 var eventsModel;
