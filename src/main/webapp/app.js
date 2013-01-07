@@ -12,7 +12,7 @@ function openLink(url) {
 	}
 }
 
-var m_eventUpdateInterval = 6000,
+var m_eventUpdateInterval = 60000,
 _header,
 _container,
 scrollManager,
@@ -198,6 +198,7 @@ checkIfAuthorized = function(success, failure) {
 	var password = serverModel.password();
 
 	if (!username || username === null || !password || password === null) {
+		console.log('checkIfAuthorized(): username or password is null');
 		failure();
 		return;
 	}
@@ -208,6 +209,14 @@ checkIfAuthorized = function(success, failure) {
 		cache: false,
 		dataType: 'json',
 		type: 'GET',
+		statusCode: {
+			401: function() {
+				console.log('401 not authorized');
+				navModel.authorized(false);
+				serverModel.password(null);
+				$('#login').reveal();
+			}
+		},
 		beforeSend: function(xhr) {
 			serverModel.setBasicAuth(xhr);
 		},
@@ -215,13 +224,11 @@ checkIfAuthorized = function(success, failure) {
 			"use strict";
 
 			if (data === true) {
-				navModel.authorized(true);
-				console.log('test returned OK');
+				console.log('checkIfAuthorized(): test returned OK');
 				success();
 				return;
 			} else {
-				navModel.authorized(false);
-				console.log('success function called, but data was not OK!  ' + ko.toJSON(data, null, 2));
+				console.log('checkIfAuthorized(): success function called, but data was not OK!  ' + ko.toJSON(data, null, 2));
 				failure();
 				return;
 			}
@@ -229,8 +236,7 @@ checkIfAuthorized = function(success, failure) {
 	}).error(function(data) {
 		"use strict";
 
-		navModel.authorized(false);
-		console.log("An error occurred: " + ko.toJSON(data, null, 2));
+		console.log("checkIfAuthorized(): An error occurred: " + ko.toJSON(data, null, 2));
 		failure();
 	});
 },
@@ -246,6 +252,7 @@ showLoginOrCurrent = function() {
 			"use strict";
 
 			console.log("checkIfAuthorized: success");
+			navModel.authorized(true);
 			$('#login').trigger('reveal:close');
 			navigateTo(current_page);
 		},
@@ -254,6 +261,7 @@ showLoginOrCurrent = function() {
 			"use strict";
 
 			console.log("checkIfAuthorized: failure");
+			navModel.authorized(false);
 			$('#login').reveal();
 		}
 	);
@@ -643,6 +651,14 @@ function Event(data) {
 			cache: false,
 			dataType: 'json',
 			type: type,
+			statusCode: {
+				401: function() {
+					console.log('401 not authorized');
+					navModel.authorized(false);
+					serverModel.password(null);
+					$('#login').reveal();
+				}
+			},
 			beforeSend: function(xhr) {
 				serverModel.setBasicAuth(xhr);
 			}
@@ -849,6 +865,14 @@ function AjaxUpdater() {
 				timeout: m_timeout,
 				cache: false,
 				dataType: 'json',
+				statusCode: {
+					401: function() {
+						console.log('401 not authorized');
+						navModel.authorized(false);
+						serverModel.password(null);
+						$('#login').reveal();
+					}
+				},
 				beforeSend: function(xhr) {
 					serverModel.setBasicAuth(xhr);
 				},
@@ -857,8 +881,9 @@ function AjaxUpdater() {
 					eventsModel.updateData(data);
 					m_inFlight = false;
 				}
-			}).error(function(data) {
+			}).error(function(data, textStatus, errorThrown) {
 				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
+				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
 				m_inFlight = false;
 			});
 		} else {
@@ -992,6 +1017,8 @@ function NavModel() {
 
 	self.isAuthorized = ko.computed(function() {
 		"use strict";
+		console.log("isSignedIn = " + self.isSignedIn());
+		console.log('authorized = ' + self.authorized());
 		return self.isSignedIn() && self.authorized();
 	});
 
