@@ -83,6 +83,18 @@ var CMUtils = {
 	getStringFromDate: function(d) {
 		"use strict";
 		return d.getFullYear() + '-' + this.padNumber(d.getMonth() + 1) + '-' + this.padNumber(d.getDate()) + 'T' + this.padNumber(d.getHours()) + ':' + this.padNumber(d.getMinutes()) + ':' + this.padNumber(d.getSeconds()) + '-00:00';
+	},
+	
+	openLink: function(url) {
+		"use strict";
+
+		if (window.plugins && window.plugins.childBrowser) {
+			console.log('openLink(' + url + '): using ChildBrowser plugin');
+			window.plugins.childBrowser.openExternal(url);
+		} else {
+			console.log('openLink(' + url + '): using window.open()');
+			window.open(url, '_blank');
+		}
 	}
 };
 

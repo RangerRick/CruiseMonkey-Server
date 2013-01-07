@@ -1,28 +1,16 @@
 console.log("app.js loading");
 
-function openLink(url) {
-	"use strict";
-
-	if (window.plugins && window.plugins.childBrowser) {
-		console.log('openLink(' + url + '): using ChildBrowser plugin');
-		window.plugins.childBrowser.openExternal(url);
-	} else {
-		console.log('openLink(' + url + '): using window.open()');
-		window.open(url, '_blank');
-	}
-}
-
 var m_eventUpdateInterval = 60000,
 _header,
 _container,
-scrollManager,
-templateLoader,
 pages               = {},
 page_scroll_element = [],
-templates           = ['#header.html', '#events.html', '#amenities.html', '#decks.html'],
-pageTracker         = new PageTracker(amplify, '.scrollable'),
-pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
-templateLoader      = new TemplateLoader(templates, m_timeout);
+templates           = ['#header.html', '#events.html', '#amenities.html', '#decks.html'];
+
+var scrollManager;
+var pageTracker         = new PageTracker(amplify, '.scrollable');
+var pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable');
+var templateLoader      = new TemplateLoader(templates, m_timeout);
 
 templateLoader.onFinished = function() {
 	"use strict";
@@ -103,7 +91,7 @@ var setupHeader = function() {
 				"use strict";
 
 				e.preventDefault();
-				openLink(href);
+				CMUtils.openLink(href);
 			});
 		}
 	});
@@ -445,8 +433,6 @@ var createDecksView = function() {
 	}
 };
 
-var eventsModel;
-
 /** filter dates in Knockout data-bind **/
 ko.bindingHandlers.dateString = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -460,150 +446,13 @@ ko.bindingHandlers.dateString = {
 	}
 };
 
-/** represents a calendar event **/
-function Event(data) {
-	"use strict";
-
-	var self = this;
-
-	self.id           = ko.observable(data["@id"]);
-	self.cleanId      = ko.observable(data["@id"].replace(/[\W\@]+/g, ''));
-	self.summary      = ko.observable(data.summary);
-	self.description  = ko.observable(data.description);
-	self.start        = ko.observable(new Date(data.start));
-	self.end          = ko.observable(new Date(data.end));
-	self.location     = ko.observable(data.location);
-	self.createdBy    = ko.observable(data["created-by"]);
-	self.owner        = ko.observable(data.owner);
-	self.timespan     = ko.computed(function() {
-		var start = start === null? null : CMUtils.formatTime(self.start(), false);
-		var end	= end	=== null? null : CMUtils.formatTime(self.end(), false);
-		var retVal = "";
-		if (start !== null) {
-			retVal += start;
-			if (end !== null) {
-				retVal += "-" + end;
-			}
-		}
-		return retVal;
-	}, self);
-	self.favorite = ko.observable(false);
-	self.favorite.subscribe(function(isFavorite) {
-		"use strict";
-
-		if (eventsModel.updating()) {
-			// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
-			return;
-		}
-		console.log(self.id() + " favorite has changed to: " + isFavorite);
-		var type = "PUT";
-		if (isFavorite) {
-			type = 'PUT';
-		} else {
-			type = 'DELETE';
-		}
-		$.ajax({
-			url: serverModel.favoritesUrl(self.id()),
-			timeout: m_timeout,
-			cache: false,
-			dataType: 'json',
-			type: type,
-			statusCode: {
-				401: function() {
-					console.log('401 not authorized');
-					navModel.authorized(false);
-					serverModel.password(null);
-					$('#login').reveal();
-				}
-			},
-			beforeSend: function(xhr) {
-				serverModel.setBasicAuth(xhr);
-			}
-		});
-	});
-}
-
-/** used for filter/searching, match an event based on a filter **/
-var matchEventText = function(event, filter) {
-	"use strict";
-
-	if (event.summary().toLowerCase().search(filter) != -1) {
-		return true;
-	} else if (event.description().toLowerCase().search(filter) != -1) {
-		return true;
-	} else {
-		return false;
-	}
-};
-
 var serverModel = new ServerModel(m_isPhoneGap, amplify);
-
-eventsModel = new EventsViewModel();
-
-function OfficialEventsModel() {
-	"use strict";
-
-	var self   = this;
-
-	self.filter = ko.observable("");
-	self.events = eventsModel.events;
-}
-var officialEventsModel = new OfficialEventsModel();
-officialEventsModel.filteredEvents = ko.dependentObservable(function() {
-	"use strict";
-
-	var self = this,
-		filter = self.filter().toLowerCase(),
-		username = serverModel.username();
-
-	var matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-		if (event.owner() == 'google') {
-			return true;
-		}
-		return false;
-	});
-
-	if (!filter) {
-		return matchesGroup;
-	} else {
-		return ko.utils.arrayFilter(matchesGroup, function(event) {
-			return matchEventText(event, filter);
-		});
-	}
-}, officialEventsModel);
-
-function MyEventsModel() {
-	"use strict";
-
-	var self   = this;
-
-	self.filter = ko.observable("");
-	self.events = eventsModel.events;
-}
-var myEventsModel = new MyEventsModel();
-myEventsModel.filteredEvents = ko.dependentObservable(function() {
-	var self = this,
-		filter = self.filter().toLowerCase(),
-
-	matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-		if (event.favorite()) return true;
-		if (event.owner() != 'google') {
-			return true;
-		}
-		return false;
-	});
-
-	if (!filter) {
-		return matchesGroup;
-	} else {
-		return ko.utils.arrayFilter(matchesGroup, function(event) {
-			return matchEventText(event, filter);
-		});
-	}
-}, myEventsModel);
-
 var navModel = new NavModel(serverModel);
-
+var eventsModel = new EventsViewModel(navModel, serverModel);
 var ajaxUpdater = new AjaxUpdater(serverModel, eventsModel, navModel);
+
+var officialEventsModel = new OfficialEventsViewModel(eventsModel, serverModel);
+
+var myEventsModel = new MyEventsViewModel(eventsModel);
 
 console.log("app.js loaded");

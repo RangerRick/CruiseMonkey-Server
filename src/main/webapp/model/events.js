@@ -1,7 +1,39 @@
-function EventsViewModel() {
+/** represents a calendar event **/
+function Event(data) {
 	"use strict";
 
 	var self = this;
+
+	self.id           = ko.observable(data["@id"]);
+	self.cleanId      = ko.observable(data["@id"].replace(/[\W\@]+/g, ''));
+	self.summary      = ko.observable(data.summary);
+	self.description  = ko.observable(data.description);
+	self.start        = ko.observable(new Date(data.start));
+	self.end          = ko.observable(new Date(data.end));
+	self.location     = ko.observable(data.location);
+	self.createdBy    = ko.observable(data["created-by"]);
+	self.owner        = ko.observable(data.owner);
+	self.timespan     = ko.computed(function() {
+		var start = start === null? null : CMUtils.formatTime(self.start(), false);
+		var end	= end	=== null? null : CMUtils.formatTime(self.end(), false);
+		var retVal = "";
+		if (start !== null) {
+			retVal += start;
+			if (end !== null) {
+				retVal += "-" + end;
+			}
+		}
+		return retVal;
+	}, self);
+	self.favorite = ko.observable(false);
+}
+
+function EventsViewModel(navModel, serverModel) {
+	"use strict";
+
+	var self = this,
+		m_navModel = navModel,
+		m_serverModel = serverModel;
 	self.events = ko.observableArray();
 	self.updating = ko.observable(false);
 
@@ -68,6 +100,40 @@ function EventsViewModel() {
 				} else {
 					var e = new Event(event);
 					e.favorite(isFavorite);
+					e.favorite.subscribe(function(isFavorite) {
+						"use strict";
+
+						if (m_eventsModel.updating()) {
+							// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
+							return;
+						}
+						console.log(self.id() + " favorite has changed to: " + isFavorite);
+						var type = "PUT";
+						if (isFavorite) {
+							type = 'PUT';
+						} else {
+							type = 'DELETE';
+						}
+						$.ajax({
+							url: m_serverModel.favoritesUrl(self.id()),
+							timeout: m_timeout,
+							cache: false,
+							dataType: 'json',
+							type: type,
+							statusCode: {
+								401: function() {
+									console.log('401 not authorized');
+									m_navModel.authorized(false);
+									m_serverModel.password(null);
+									$('#login').reveal();
+								}
+							},
+							beforeSend: function(xhr) {
+								m_serverModel.setBasicAuth(xhr);
+							}
+						});
+					});
+
 					return e;
 				}
 			});
@@ -79,4 +145,78 @@ function EventsViewModel() {
 		// console.log("saving ReST events");
 		self.updating(false);
 	};
+}
+
+/** used for filter/searching, match an event based on a filter **/
+var matchEventText = function(event, filter) {
+	"use strict";
+
+	if (event.summary().toLowerCase().search(filter) != -1) {
+		return true;
+	} else if (event.description().toLowerCase().search(filter) != -1) {
+		return true;
+	} else {
+		return false;
+	}
+};
+
+function OfficialEventsViewModel(parentModel, serverModel) {
+	"use strict";
+
+	var self = this,
+		m_serverModel = serverModel;
+
+	$.extend(self, parentModel);
+	self.filter = ko.observable("");
+
+	self.filteredEvents = ko.dependentObservable(function() {
+		"use strict";
+
+		var username = m_serverModel.username(),
+			filter = self.filter().toLowerCase(),
+
+		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+			if (event.owner() == 'google') {
+				return true;
+			}
+			return false;
+		});
+
+		if (!filter) {
+			return matchesGroup;
+		} else {
+			return ko.utils.arrayFilter(matchesGroup, function(event) {
+				return matchEventText(event, filter);
+			});
+		}
+	});
+}
+
+function MyEventsViewModel(parentModel, serverModel) {
+	"use strict";
+
+	var self = this,
+		m_serverModel = serverModel;
+	$.extend(self, parentModel);
+	self.filter = ko.observable("");
+	
+	self.filteredEvents = ko.dependentObservable(function() {
+		var filter = self.filter().toLowerCase(),
+
+		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+			if (event.favorite()) return true;
+			if (event.owner() != 'google') {
+				return true;
+			}
+			return false;
+		});
+
+		if (!filter) {
+			return matchesGroup;
+		} else {
+			return ko.utils.arrayFilter(matchesGroup, function(event) {
+				return matchEventText(event, filter);
+			});
+		}
+	}, myEventsModel);
 }
