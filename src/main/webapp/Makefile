@@ -27,9 +27,7 @@ CRUISEMONKEYJS = \
 
 CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
 
-CRUISEMONKEYCSS = \
-	foundation/stylesheets/foundation.css \
-	styles.css
+CRUISEMONKEYCSS = styles.css
 
 CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 

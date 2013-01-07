@@ -15,6 +15,7 @@
 
 		<!-- BROWSER --><link rel="stylesheet" href="foundation/stylesheets/foundation.min.css">
 		<!-- BROWSER --><link rel="stylesheet" href="styles.css" type="text/css" />
+		<!-- PHONEGAP --><link rel="stylesheet" href="foundation/stylesheets/foundation.min.css">
 		<!-- PHONEGAP --><link rel="stylesheet" href="cruisemonkey.css" type="text/css" />
 		
 		<script src="foundation/javascripts/modernizr.foundation.js"></script>
