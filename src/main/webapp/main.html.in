@@ -172,6 +172,7 @@
 		<!-- BROWSER --><!-- <script src="photos.js"></script> -->
 		<!-- BROWSER --><script src="locations.js"></script>
 		<!-- BROWSER --><script src="model/nav.js"></script>
+		<!-- BROWSER --><script src="model/server.js"></script>
 		<!-- BROWSER --><!--<script src="lib/swiper.js"></script> -->
 		<!-- BROWSER --><script src="lib/ajax_updater.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>

@@ -20,6 +20,7 @@ CRUISEMONKEYJS = \
 	date.js \
 	locations.js \
 	model/nav.js \
+	model/server.js \
 	lib/ajax_updater.js \
 	app.js
 #	lib/swiper.js
@@ -62,35 +63,35 @@ $(DESTDIR)/cruisemonkey.manifest: cruisemonkey.manifest.in $(RUNTIME) $(MAKEFILE
 		echo "$$FILE"; \
 		done | sort -u >> "$@";
 
-main.html: main.html.in $(MAKEFILE)
+main.html: main.html.in
 	@echo "$< -> $@"
 	@cat "$<" | grep -v '<!-- PHONEGAP -->' | sed -e 's,<!-- BROWSER -->,,g' > "$@" 2>/dev/null
 
-$(DESTDIR)/main.html: main.html.in $(MAKEFILE)
+$(DESTDIR)/main.html: main.html.in
 	@echo "$< -> $@"
 	@install -d -m 755 "$(DESTDIR)"
 	@cat "$<" | grep -v '<!-- BROWSER -->' | sed -e 's,<!-- PHONEGAP -->,,g' > "$@" 2>/dev/null
 
-temp/%.min.js: %.js $(MAKEFILE)
+temp/%.min.js: %.js
 	@install -d $(shell dirname $@)
 	@echo "- minifying $<"
 	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
-temp/%.min.css: %.css $(MAKEFILE)
+temp/%.min.css: %.css
 	@install -d $(shell dirname $@)
 	@echo "- minifying $<"
 	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
-3rdparty.js: $(3RDPARTYJS) $(MAKEFILE)
+3rdparty.js: $(3RDPARTYJS)
 	@echo > 3rdparty.js; for FILE in $(3RDPARTYJS); do \
 		cat $$FILE >> 3rdparty.js; \
 		echo "" >> 3rdparty.js; \
 	done
 
-cruisemonkey.js: $(CRUISEMONKEYMINJS) $(MAKEFILE)
+cruisemonkey.js: $(CRUISEMONKEYMINJS)
 	@cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
 
-cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(MAKEFILE)
+cruisemonkey.css: $(CRUISEMONKEYMINCSS)
 	@cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css
 
 $(DESTDIR)/foundation/%: foundation/%
