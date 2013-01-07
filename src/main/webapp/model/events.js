@@ -101,6 +101,7 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 				} else {
 					var e = new Event(event);
 					e.favorite(isFavorite);
+					/*
 					e.favorite.subscribe(function(isFavorite) {
 						"use strict";
 
@@ -134,6 +135,7 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 							}
 						});
 					});
+					*/
 
 					return e;
 				}
