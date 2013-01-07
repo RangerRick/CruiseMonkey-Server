@@ -1,6 +1,6 @@
 console.log("app.js loading");
 
-var m_eventUpdateInterval = 60000,
+var m_eventUpdateInterval = 10000,
 _header,
 _container,
 pages               = {},
@@ -19,6 +19,7 @@ templateLoader.onFinished = function() {
 	scrollManager.delay = 100;
 	pageNavigator.setScrollManager(scrollManager);
 
+	/*
 	scrollManager.onScrollStop = function(enabled) {
 		"use strict";
 
@@ -33,6 +34,7 @@ templateLoader.onFinished = function() {
 			console.log('scrolling stopped while disabled');
 		}
 	};
+	*/
 
 	$.each(htmlInitialization, function(index, value) {
 		console.log('Initializing HTML for: ' + index);
@@ -54,7 +56,8 @@ var htmlInitialization = {
 		"use strict";
 
 		var header = pageTracker.getHeader(),
-			host = document.URL.replace(/\#$/, '');
+			host = document.URL.replace(/\#$/, ''),
+			hostRegex = new RegExp('^' + CMUtils.escapeForRegExp(host));
 
 		header.html(templateLoader.renderTemplate('#header.html'));
 
@@ -64,7 +67,7 @@ var htmlInitialization = {
 			// console.log('url host = ' + host);
 			var hash, href;
 			if (element.href !== undefined) {
-				href = element.href.replace(new RegExp('^' + CMUtils.escapeForRegExp(host)), '');
+				href = element.href.replace(hostRegex, '');
 				if (href && href !== '') {
 					if (href.indexOf('#') >= 0) {
 						hash = element.href.split('#')[1];
@@ -81,7 +84,7 @@ var htmlInitialization = {
 						"use strict";
 
 						e.preventDefault();
-						console.log("navigation event: " + hash);
+						// console.log("navigation event: " + hash);
 						pageNavigator.navigateTo(hash);
 						if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
 					});
@@ -122,12 +125,43 @@ var htmlInitialization = {
 	}
 };
 
+var statusCode = {
+	401: function() {
+		console.log('401 not authorized');
+		navModel.authorized(false);
+		serverModel.password(null);
+		$('#login').reveal();
+	}
+};
+
 checkIfAuthorized = function(success, failure) {
 	"use strict";
 
 	console.log('checkIfAuthorized()');
-	var username = serverModel.username();
-	var password = serverModel.password();
+	var username = serverModel.username(),
+		password = serverModel.password(),
+		m_beforeSend = function beforeSend(xhr) {
+			serverModel.setBasicAuth(xhr);
+		},
+		m_success = function(data) {
+			"use strict";
+
+			if (data === true) {
+				console.log('checkIfAuthorized(): test returned OK');
+				success();
+				return;
+			} else {
+				console.log('checkIfAuthorized(): success function called, but data was not OK!');
+				failure();
+				return;
+			}
+		},
+		m_error = function error(data) {
+			"use strict";
+
+			console.log("checkIfAuthorized(): An error occurred: " + ko.toJSON(data, null, 2));
+			failure();
+		};
 
 	if (!username || username === null || !password || password === null) {
 		console.log('checkIfAuthorized(): username or password is null');
@@ -141,36 +175,10 @@ checkIfAuthorized = function(success, failure) {
 		cache: false,
 		dataType: 'json',
 		type: 'GET',
-		statusCode: {
-			401: function() {
-				console.log('401 not authorized');
-				navModel.authorized(false);
-				serverModel.password(null);
-				$('#login').reveal();
-			}
-		},
-		beforeSend: function(xhr) {
-			serverModel.setBasicAuth(xhr);
-		},
-		success: function(data) {
-			"use strict";
-
-			if (data === true) {
-				console.log('checkIfAuthorized(): test returned OK');
-				success();
-				return;
-			} else {
-				console.log('checkIfAuthorized(): success function called, but data was not OK!  ' + ko.toJSON(data, null, 2));
-				failure();
-				return;
-			}
-		}
-	}).error(function(data) {
-		"use strict";
-
-		console.log("checkIfAuthorized(): An error occurred: " + ko.toJSON(data, null, 2));
-		failure();
-	});
+		statusCode: statusCode,
+		beforeSend: m_beforeSend,
+		success: m_success
+	}).error(m_error);
 },
 
 showLoginOrCurrent = function() {
@@ -205,7 +213,7 @@ setupDefaultView = function() {
 	console.log('setupDefaultView()');
 
 	var events = amplify.store("events");
-	console.log("read events:");
+	// console.log("read events:");
 	// console.log(events);
 	if (events) {
 		console.log("loading stored ReST events");
@@ -218,7 +226,9 @@ setupDefaultView = function() {
 		console.log("no stored ReST events");
 	}
 
-	ajaxUpdater.start();
+	setTimeout(function() {
+		ajaxUpdater.start();
+	}, 0);
 
 	// Hide address bar on mobile devices
 	/*

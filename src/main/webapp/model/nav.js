@@ -45,8 +45,10 @@ function NavModel(serverModel) {
 
 	self.isAuthorized = ko.computed(function() {
 		"use strict";
+		/*
 		console.log("isSignedIn = " + self.isSignedIn());
 		console.log('authorized = ' + self.authorized());
+		*/
 		return self.isSignedIn() && self.authorized();
 	});
 

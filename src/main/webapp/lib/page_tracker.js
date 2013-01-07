@@ -111,9 +111,10 @@ function PageTracker(amplify, elementCriteria) {
 			"use strict";
 			id = element.getAttribute('id');
 			if (id == topElement) {
-				console.log('new PageElement(' + element + ', ' + id + ', ' + index + ')');
+				// console.log('new PageElement(' + element + ', ' + id + ', ' + index + ')');
 				matched = new PageElement(element, id, index);
-				console.log('PageTracker::getElementForPageId(' + pageId + '): matched ' + matched.toString());
+				// console.log('PageTracker::getElementForPageId(' + pageId + '): matched ' + matched.toString());
+				console.log('PageTracker::getElementForPageId(' + pageId + '): matched');
 				return false;
 			}
 			return true;

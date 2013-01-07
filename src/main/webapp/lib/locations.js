@@ -7,9 +7,10 @@ function Location(deck, name, type) {
 	self.type = ko.observable(type);
 	self.id = ko.computed(function() {
 		var retval = self.deck() + '-' + self.name();
-		return retval.replace(/[^A-Za-z0-9\-]/g, '');
+		return retval.replace(self.alnumRegex, '');
 	});
 }
+Location.prototype.alnumRegex = /[^A-Za-z0-9\-]/g;
 
 function LocationWithDescription(deck, name, type, description) {
 	"use strict";

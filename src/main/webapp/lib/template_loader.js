@@ -64,7 +64,7 @@ function TemplateLoader(urls, timeout) {
 			"use strict";
 			if (url && url.indexOf('#') === 0) {
 				console.log('TemplateLoader::f_loadTemplate: id-based url');
-				var escaped = url.replace(/([^0-9A-Za-z\#])/g, '\\$1');
+				var escaped = url.replace(self.elementIdRegex, '\\$1');
 				f_onLoad( url, $(escaped).html() );
 			} else {
 				console.log('TemplateLoader::f_loadTemplate: standard url');
@@ -138,3 +138,4 @@ function TemplateLoader(urls, timeout) {
 	self.onFinished = function() {
 	};
 }
+TemplateLoader.prototype.elementIdRegex = /([^0-9A-Za-z\#])/g;

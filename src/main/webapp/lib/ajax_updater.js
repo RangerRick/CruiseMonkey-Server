@@ -7,6 +7,27 @@ function AjaxUpdater(serverModel, eventsModel, navModel) {
 		m_serverModel = serverModel,
 		m_eventsModel = eventsModel,
 		m_navModel = navModel,
+		m_statusCode = {
+			401: function status401() {
+				console.log('401 not authorized');
+				m_navModel.authorized(false);
+				m_serverModel.password(null);
+				$('#login').reveal();
+			}
+		},
+		m_setBasicAuth = function setBasicAuth(xhr) {
+			m_serverModel.setBasicAuth(xhr);
+		},
+		m_success = function success(data) {
+			console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
+			m_eventsModel.updateData(data);
+			m_inFlight = false;
+		},
+		m_error = function error(data, textStatus, errorThrown) {
+			console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
+			console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			m_inFlight = false;
+		},
 	
 	f_updateEventModel = function() {
 		"use strict";
@@ -30,27 +51,10 @@ function AjaxUpdater(serverModel, eventsModel, navModel) {
 				timeout: m_timeout,
 				cache: false,
 				dataType: 'json',
-				statusCode: {
-					401: function() {
-						console.log('401 not authorized');
-						m_navModel.authorized(false);
-						sm_erverModel.password(null);
-						$('#login').reveal();
-					}
-				},
-				beforeSend: function(xhr) {
-					m_serverModel.setBasicAuth(xhr);
-				},
-				success: function(data) {
-					console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
-					m_eventsModel.updateData(data);
-					m_inFlight = false;
-				}
-			}).error(function(data, textStatus, errorThrown) {
-				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
-				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
-				m_inFlight = false;
-			});
+				statusCode: m_statusCode,
+				beforeSend: m_setBasicAuth,
+				success: m_success
+			}).error(m_error);
 		} else {
 			console.log('Not authorized according to navModel, skipping update.');
 		}

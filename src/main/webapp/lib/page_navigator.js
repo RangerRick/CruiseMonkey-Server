@@ -90,15 +90,14 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 					return false;
 				}
 			} else {
-				console.log('no ID found for element: ' + element.html());
+				console.log('no ID found for element');
 			}
 			return true;
 		});
 
 		if (el && highestPercent > 0) {
 			var elementId = el.getAttribute('id');
-			var summary = CMUtils.getSummary(el);
-			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + summary + ' (' + elementId + ')');
+			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + elementId);
 			m_pageTracker.setScrolledId(current_page, elementId);
 			return el;
 		} else {

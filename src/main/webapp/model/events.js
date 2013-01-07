@@ -5,7 +5,7 @@ function Event(data) {
 	var self = this;
 
 	self.id           = ko.observable(data["@id"]);
-	self.cleanId      = ko.observable(data["@id"].replace(/[\W\@]+/g, ''));
+	self.cleanId      = ko.observable(data["@id"].replace(self.attributeRegex, ''));
 	self.summary      = ko.observable(data.summary);
 	self.description  = ko.observable(data.description);
 	self.start        = ko.observable(new Date(data.start));
@@ -28,13 +28,24 @@ function Event(data) {
 	}, self);
 	self.favorite = ko.observable(false);
 }
+Event.prototype.attributeRegex = /[\W\@]+/g;
 
 function EventsViewModel(navModel, serverModel, eventsModel) {
 	"use strict";
 
 	var self = this,
-		m_navModel = navModel,
-		m_serverModel = serverModel;
+		m_serverModel = serverModel,
+		m_statusCode = {
+			401: function status401() {
+				console.log('401 not authorized');
+				m_navModel.authorized(false);
+				m_serverModel.password(null);
+				$('#login').reveal();
+			}
+		},
+		m_beforeSend = function beforeSend(xhr) {
+			m_serverModel.setBasicAuth(xhr);
+		};
 	self.events = ko.observableArray();
 	self.updating = ko.observable(false);
 
@@ -86,6 +97,7 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 					}
 				});
 				if (item) {
+					console.log('found existing item');
 					var startDate = new Date(event.start);
 					var endDate	= new Date(event.end);
 					var createdBy = event["created-by"];
@@ -97,7 +109,9 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 					if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
 					if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
 					if (item.owner()           != event.owner)         { item.owner(event.owner); }
-					return item;
+					return function(n) {
+						return item;
+					}();
 				} else {
 					var e = new Event(event);
 					e.favorite(isFavorite);
@@ -122,28 +136,21 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 							cache: false,
 							dataType: 'json',
 							type: type,
-							statusCode: {
-								401: function() {
-									console.log('401 not authorized');
-									m_navModel.authorized(false);
-									m_serverModel.password(null);
-									$('#login').reveal();
-								}
-							},
-							beforeSend: function(xhr) {
-								m_serverModel.setBasicAuth(xhr);
-							}
+							statusCode: m_statusCode,
+							beforeSend: m_beforeSend
 						});
 					});
 					*/
 
-					return e;
+					return function(n) {
+						return e;
+					}();
 				}
 			});
 			self.events(mappedTasks);
 			amplify.store("events", allData);
 		} else {
-			console.log("no proper event data found: " + ko.toJSON(allData, null, 2));
+			console.log("no proper event data found");
 		}
 		// console.log("saving ReST events");
 		self.updating(false);
@@ -179,6 +186,9 @@ function OfficialEventsViewModel(parentModel, serverModel) {
 			filter = self.filter().toLowerCase(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+			if (event === undefined) {
+				return false;
+			}
 			if (event.owner() == 'google') {
 				return true;
 			}
