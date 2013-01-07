@@ -105,10 +105,10 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 						"use strict";
 
 						if (self.updating()) {
-							// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
+							// console.log("skipping ajax update for " + e.id() + ", we are in the middle of a server update");
 							return;
 						}
-						console.log(self.id() + " favorite has changed to: " + isFavorite);
+						console.log(e.id() + " favorite has changed to: " + isFavorite);
 						var type = "PUT";
 						if (isFavorite) {
 							type = 'PUT';
@@ -116,7 +116,7 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 							type = 'DELETE';
 						}
 						$.ajax({
-							url: m_serverModel.favoritesUrl(self.id()),
+							url: m_serverModel.favoritesUrl(e.id()),
 							timeout: m_timeout,
 							cache: false,
 							dataType: 'json',

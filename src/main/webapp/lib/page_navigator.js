@@ -176,7 +176,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 				m_pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
 					{
 						margin: false,
-						offset: {left:0, top:0},
+						offset: {left:0, top:-45},
 						onAfter: function() {
 							setTimeout(function() {
 								if (m_scrollManager) {

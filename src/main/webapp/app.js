@@ -284,7 +284,6 @@ createPublicEventsView = function() {
 		div.setAttribute('id', 'public-events');
 		$(div).css('display', 'none');
 		$(div).html(html);
-		console.log('public events html = ' + $(div).html());
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 
 		pages.publicEventsView = div;
