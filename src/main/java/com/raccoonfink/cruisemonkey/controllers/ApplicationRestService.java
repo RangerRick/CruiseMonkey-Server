@@ -82,11 +82,9 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 		m_logger.debug("start = {}, end = {}, user = {}", start, end, userName);
 		final List<Event> events = new ArrayList<Event>();
 		if (start != null && end != null) {
-			events.addAll(m_eventService.getEventsInRange(start, end, userName));
-			events.addAll(m_eventService.getEventsInRange(start, end, "google"));
+			events.addAll(m_eventService.getPublicEventsInRange(start, end, userName));
 		} else {
-			events.addAll(m_eventService.getEvents(userName));
-			events.addAll(m_eventService.getEvents("google"));
+			events.addAll(m_eventService.getPublicEvents(userName));
 		}
 		m_logger.debug("{} events found", events == null? 0 : events.size());
 

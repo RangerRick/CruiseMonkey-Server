@@ -54,7 +54,7 @@ public class Event extends AbstractRecord implements Serializable {
 	@XmlElement(name="end")
 	private Date m_endDate;
 
-	@XmlAttribute(name="public")
+	@XmlAttribute(name="isPublic")
 	private Boolean m_isPublic = false;
 
 	@XmlElement(name="owner")
@@ -101,7 +101,7 @@ public class Event extends AbstractRecord implements Serializable {
 	public Date getEndDate() { return m_endDate; }
 	public void setEndDate(final Date endDate) { m_endDate = endDate; }
 	
-	@Column(name="public")
+	@Column(name="isPublic")
 	public Boolean getIsPublic() { return m_isPublic; }
 	public void setIsPublic(final Boolean isPublic) { m_isPublic = isPublic; }
 
