@@ -1,17 +1,19 @@
 function HeightChecker(headerOffset, visibleWiggle) {
+	"use strict";
 	var m_window = $(window),
 		m_headerOffset = headerOffset || 0,
 		m_visibleWiggle = visibleWiggle || 0;
 
 	this.percentVisible = function(element) {
-	    var e = $(element),
-        	offset = e.offset(),
-        	windowTop = m_window.scrollTop() + m_headerOffset,
-	        windowBottom = m_window.innerHeight(),
+		"use strict";
+		var e = $(element),
+			offset = e.offset(),
+			windowTop = m_window.scrollTop() + m_headerOffset,
+			windowBottom = m_window.innerHeight(),
 			windowHeight = windowBottom - windowTop,
-	        height = e.height(),
+			height = e.height(),
 			top = e.offset().top,
-	        bottom = top + height,
+			bottom = top + height,
 
 			adjustedTop = top - windowTop,
 			adjustedBottom = bottom - windowBottom,
@@ -35,28 +37,31 @@ function HeightChecker(headerOffset, visibleWiggle) {
 }
 
 function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
+	"use strict";
 	if (!amplify || !pageTracker || !defaultPage || !elementCriteria) {
 		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
 	}
 
 	var m_amplify         = amplify,
-	 	m_pageTracker     = pageTracker,
-	 	m_defaultPage     = defaultPage,
-	 	m_elementCriteria = elementCriteria,
+		m_pageTracker     = pageTracker,
+		m_defaultPage     = defaultPage,
+		m_elementCriteria = elementCriteria,
 		m_heightChecker   = new HeightChecker(45, 15),
-	 	self = this;
+		self = this;
 
 	self.getCurrentPage = function() {
-	    var current_page = m_amplify.store('current_page');
-	    console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
-	    if (!current_page || current_page == 'login') {
-	    	current_page = m_defaultPage;
-	    	amplify.store('current_page', current_page);
-	    }
-	    return current_page;
+		"use strict";
+		var current_page = m_amplify.store('current_page');
+		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
+		if (!current_page || current_page == 'login') {
+			current_page = m_defaultPage;
+			amplify.store('current_page', current_page);
+		}
+		return current_page;
 	};
 
 	self.findTopVisibleElement = function() {
+		"use strict";
 		var current_page = self.getCurrentPage(),
 			id = null,
 			el = null,
@@ -64,6 +69,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 			highestPercent = 0;
 
 		pageTracker.getElement('#' + current_page).find(m_elementCriteria).each(function(index, element) {
+			"use strict";
 			id = element.getAttribute('id');
 			if (id) {
 				elementPercent = m_heightChecker.percentVisible(element);
@@ -86,17 +92,16 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 		});
 
 		if (el && highestPercent > 0) {
-			var id = el.getAttribute('id');
+			var elementId = el.getAttribute('id');
 			var summary = CMUtils.getSummary(el);
-			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + summary + ' (' + id + ')');
-			m_pageTracker.setScrolledId(current_page, id);
+			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + summary + ' (' + elementId + ')');
+			m_pageTracker.setScrolledId(current_page, elementId);
 			return el;
 		} else {
 			console.log('no top visible element found!');
 		}
 
 		return null;
-	}
-
+	};
 
 }

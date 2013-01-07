@@ -1,13 +1,14 @@
 var CMUtils = {
 
 	getSummary: function(element) {
+		"use strict";
 		return $(element).find('div.summary').text();
 	},
 
 	isElementInViewport: function(element) {
+		"use strict";
 		var m_top    = element.offsetTop,
-		 	m_height = element.offsetHeight;
-		
+			m_height = element.offsetHeight;
 
 		while (element.offsetParent) {
 			element = element.offsetParent;
@@ -18,6 +19,7 @@ var CMUtils = {
 	},
 
 	isElementVisible: function(element) {
+		"use strict";
 		var m_top = element.offsetTop;
 
 		while (element.offsetParent) {
@@ -31,43 +33,30 @@ var CMUtils = {
 };
 
 (function () {
-  // Referring to the table here:
-  // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/regexp
-  // these characters should be escaped
-  // \ ^ $ * + ? . ( ) | { } [ ]
-  // These characters only have special meaning inside of brackets
-  // they do not need to be escaped, but they MAY be escaped
-  // without any adverse effects (to the best of my knowledge and casual testing)
-  // : ! , = 
-  // my test "~!@#$%^&*(){}[]`/=?+\|-_;:'\",<.>".match(/[\#]/g)
+	"use strict";
+	// Referring to the table here:
+	// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/regexp
+	// these characters should be escaped
+	// \ ^ $ * + ? . ( ) | { } [ ]
+	// These characters only have special meaning inside of brackets
+	// they do not need to be escaped, but they MAY be escaped
+	// without any adverse effects (to the best of my knowledge and casual testing)
+	// : ! , = 
+	// my test "~!@#$%^&*(){}[]`/=?+\|-_;:'\",<.>".match(/[\#]/g)
 
-  var specials = [
-        // order matters for these
-          "-"
-        , "["
-        , "]"
-        // order doesn't matter for any of these
-        , "/"
-        , "{"
-        , "}"
-        , "("
-        , ")"
-        , "*"
-        , "+"
-        , "?"
-        , "."
-        , "\\"
-        , "^"
-        , "$"
-        , "|"
-      ]
+	var specials = [
+		// order matters for these
+		"-", "[", "]",
+		// order doesn't matter for any of these
+		"/", "{", "}", "(", ")", "*", "+", "?", ".", "\\", "^", "$", "|"
+	],
 
-      // I choose to escape every character with '\'
-      // even though only some strictly require it when inside of []
-    , regex = RegExp('[' + specials.join('\\') + ']', 'g')
-    ;
+	// I choose to escape every character with '\'
+	// even though only some strictly require it when inside of []
+	regex = RegExp('[' + specials.join('\\') + ']', 'g');
 
-  CMUtils.escapeForRegExp = function (str) {
-    return str.replace(regex, "\\$&");
-  };
+	CMUtils.escapeForRegExp = function (str) {
+		"use strict";
+		return str.replace(regex, "\\$&");
+	};
 }());

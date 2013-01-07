@@ -2,6 +2,7 @@ var days = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', '
 	months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 
 function formatTime(d, doSeconds) {
+	"use strict";
 	var hour, ret;
 
 	hour = String('0' + (d.getHours() % 12)).slice(-2);
@@ -23,16 +24,18 @@ function formatTime(d, doSeconds) {
 }
 
 function formatDate(d) {
+	"use strict";
 	return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
 }
 
 function getDateFromString(dateTime) {
+	"use strict";
 	if (dateTime instanceof Date) {
 		return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(), dateTime.getHours(), dateTime.getMinutes(), 0, 0);
 	}
 	var dateTimeParts = dateTime.split('T'),
-	 	dateParts = dateTimeParts[0].split('-'),
-	 	timeParts = dateTimeParts[1].split(':');
+		dateParts = dateTimeParts[0].split('-'),
+		timeParts = dateTimeParts[1].split(':');
 	
 	// console.log('year = ' + dateParts[0] + ', month = ' + dateParts[1] + ', day = ' + dateParts[2]);
 	// console.log('hours = ' + timeParts[0] + ', minutes = ' + timeParts[1]);
@@ -41,9 +44,11 @@ function getDateFromString(dateTime) {
 }
 
 function padNumber(num) {
+	"use strict";
 	return (String('0' + num).slice(-2));
 }
 
 function getStringFromDate(d) {
+	"use strict";
 	return d.getFullYear() + '-' + padNumber(d.getMonth() + 1) + '-' + padNumber(d.getDate()) + 'T' + padNumber(d.getHours()) + ':' + padNumber(d.getMinutes()) + ':' + padNumber(d.getSeconds()) + '-00:00';
 }

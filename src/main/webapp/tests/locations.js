@@ -2,6 +2,7 @@ module("Locations", {
 });
 
 test('testLocations', 4, function() {
+	"use strict";
 	var location = new Location(2, 'Shoe Store (Awesome!)', 'store');
 
 	equal(location.deck(), 2);
@@ -11,6 +12,7 @@ test('testLocations', 4, function() {
 });
 
 test('testLocationWithDescription', 6, function() {
+	"use strict";
 	var location = new LocationWithDescription(2, 'Shoe Store', 'store', 'Al Bundy works here.');
 	var location2 = new LocationWithDescription(3, 'Hat Store', 'store', 'They sell hats!');
 
@@ -24,6 +26,7 @@ test('testLocationWithDescription', 6, function() {
 });
 
 test('testVenue', 4, function() {
+	"use strict";
 	var location = new Venue(2, 'Arcadia Theater', '2nd-deck theater.');
 
 	equal(location.deck(), 2);
@@ -33,6 +36,7 @@ test('testVenue', 4, function() {
 });
 
 test('testDecks', 3, function() {
+	"use strict";
 	var deck = new Deck(2);
 	equal(deck.number(), 2);
 	equal(deck.image(), 'images/deck02-600.png');

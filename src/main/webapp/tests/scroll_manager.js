@@ -1,5 +1,6 @@
 module("ScrollManager", {
 	setup: function() {
+		"use strict";
 		var fixture = $('#qunit-fixture');
 		$(fixture).append('<ol>');
 		for (var i = 1; i <= 1000; i++) {
@@ -8,6 +9,7 @@ module("ScrollManager", {
 		$(fixture).append('</ol>');
 	},
 	teardown: function() {
+		"use strict";
 		var fixture = $('#qunit-fixture');
 		$(fixture).empty();
 	}
@@ -15,19 +17,23 @@ module("ScrollManager", {
 
 /* callbacks are called while enabled */
 asyncTest('testEnabled', 2, function() {
+	"use strict";
 	var scrollManager = new ScrollManager(window);
 	var started = 0;
 	var stopped = 0;
 	scrollManager.onScrollStart = function(enabled) {
+		"use strict";
 		if (enabled) { started++; }
 	};
 	scrollManager.onScrollStop = function(enabled) {
+		"use strict";
 		if (enabled) { stopped++; }
 	};
 	scrollManager.delay = 10;
 
 	$('#500').scroll();
 	setTimeout(function() {
+		"use strict";
 		equal(started, 1, 'ScrollManager should have started scrolling once.');
 		equal(stopped, 1, 'ScrollManager should have completed scrolling once.');
 		start();
@@ -36,12 +42,14 @@ asyncTest('testEnabled', 2, function() {
 
 /* callbacks should not be called while disabled */
 asyncTest('testDisabled', 4, function() {
+	"use strict";
 	var scrollManager = new ScrollManager(window);
 	var started = 0;
 	var stopped = 0;
 	var started_while_disabled = 0;
 	var stopped_while_disabled = 0;
 	scrollManager.onScrollStart = function(enabled) {
+		"use strict";
 		if (enabled) {
 			started++;
 		} else {
@@ -49,6 +57,7 @@ asyncTest('testDisabled', 4, function() {
 		}
 	};
 	scrollManager.onScrollStop = function(enabled) {
+		"use strict";
 		if (enabled) {
 			stopped++;
 		} else {
@@ -60,6 +69,7 @@ asyncTest('testDisabled', 4, function() {
 
 	$('#500').scroll();
 	setTimeout(function() {
+		"use strict";
 		equal(started, 0, 'ScrollManager should not have started scrolling.');
 		equal(stopped, 0, 'ScrollManager should not have completed scrolling.');
 		equal(started_while_disabled, 1, 'ScrollManager should have started disabled scrolling.');

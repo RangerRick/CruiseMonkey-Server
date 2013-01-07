@@ -1,4 +1,5 @@
 function Location(deck, name, type) {
+	"use strict";
 	var self = this;
 
 	self.deck = ko.observable(deck);
@@ -11,43 +12,51 @@ function Location(deck, name, type) {
 }
 
 function LocationWithDescription(deck, name, type, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new Location(deck, name, type));
 	self.description = ko.observable(description);
 }
 
 function Venue(deck, name, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Venue', description));
 }
 
 function Bar(deck, name, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Bar/Club', description));
 }
 
 function Miscellaneous(deck, name, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Miscellaneous', description));
 }
 
 function Food(deck, name, description, surcharge) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Food', description));
 	self.surcharge = ko.observable(surcharge);
 }
 
 function Shopping(deck, name, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Shopping', description));
 }
 
 function Pool(deck, name, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Pool', description));
 }
 
 function Fitness(deck, name, description) {
+	"use strict";
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Spa/Fitness', description));
 }
@@ -132,15 +141,18 @@ var locations = [
 ];
 
 (function($){
+	"use strict";
 	var _old = $.unique;
 
 	$.unique = function(arr){
+		"use strict";
 		// do the default behavior only if we got an array of elements
 		if (!!arr[0].nodeType){
 			return _old.apply(this,arguments);
 		} else {
 			// reduce the array to contain no dupes via grep/inArray
 			return $.grep(arr,function(v,k){
+				"use strict";
 				return $.inArray(v,arr) === k;
 			});
 		}
@@ -148,11 +160,13 @@ var locations = [
 })(jQuery);
 
 function AmenitiesModel() {
+	"use strict";
 	var self = this;
 	self.amenities = ko.observableArray(locations);
 	self.filter = ko.observable("");
 
 	self.filteredAmenities = ko.computed(function() {
+		"use strict";
 		var filter = self.filter().toLowerCase();
 
 		if (!filter) {
@@ -170,20 +184,24 @@ function AmenitiesModel() {
 	});
 	
 	self.orderedAmenities = ko.computed(function() {
+		"use strict";
 		var filteredAmenities = self.filteredAmenities(),
 		orderLeft, orderRight,
 		amenities;
 		/*
 		rawCategories = $.map(filteredAmenities, function(entry, index) {
+			"use strict";
 			return entry.deck();
 		});
 
 		rawCategories = $.unique(rawCategories).sort(function(left, right) {
+			"use strict";
 			return (left == right)? 0 : (left < right ? -1 : 1);
 		});
 		*/
 		
 		amenities = self.filteredAmenities().sort(function(left, right) {
+			"use strict";
 			// first, order by deck
 			orderLeft = left.deck();
 			orderRight = right.deck();
@@ -225,22 +243,27 @@ function AmenitiesModel() {
 var amenitiesModel = new AmenitiesModel();
 
 Number.prototype.pad = function(size) {
+	"use strict";
 	return (1e15+this+"").slice(-size);
-}
+};
 
 function Deck(number) {
+	"use strict";
 	var self = this;
 	self.number = ko.observable(number);
 	self.size = ko.observable(600);
 	self.id = ko.computed(function() {
+		"use strict";
 		return 'deck-' + self.number();
 	});
 	self.image = ko.computed(function() {
+		"use strict";
 		return 'images/deck' + self.number().pad(2) + '-' + self.size() + '.png';
 	});
 }
 
 function DecksModel() {
+	"use strict";
 	var self = this;
 
 	self.decks = ko.observableArray();

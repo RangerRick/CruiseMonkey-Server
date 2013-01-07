@@ -1,6 +1,8 @@
 console.log("app.js loading");
 
 function openLink(url) {
+	"use strict";
+
 	if (window.plugins && window.plugins.childBrowser) {
 		console.log('openLink(' + url + '): using ChildBrowser plugin');
 		window.plugins.childBrowser.openExternal(url);
@@ -17,16 +19,20 @@ scrollManager,
 templateLoader,
 pages               = {},
 page_scroll_element = [],
-templates           = templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html'],
+templates           = ['#header.html', '#events.html', '#amenities.html', '#decks.html'],
 pageTracker         = new PageTracker(amplify, '.scrollable'),
 pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable'),
 templateLoader      = new TemplateLoader(templates, m_timeout);
 
 templateLoader.onFinished = function() {
+	"use strict";
+
 	scrollManager = new ScrollManager('#content');
 	scrollManager.delay = 100;
 
 	scrollManager.onScrollStop = function(enabled) {
+		"use strict";
+
 		if (enabled) {
 			var found = pageNavigator.findTopVisibleElement();
 			if (found) {
@@ -55,19 +61,22 @@ templateLoader.onFinished = function() {
 };
 
 var setupHeader = function() {
+	"use strict";
+
 	console.log('setupHeader()');
-	header = pageTracker.getHeader();
+	var header = pageTracker.getHeader();
 	header.html(templateLoader.renderTemplate('#header.html'));
 
 	var host = document.URL.replace(/\#$/, '');
 
 	$(header).find('a').each(function(index, element) {
+		"use strict";
+
 		// console.log('url host = ' + host);
-		var hash = undefined,
-			href = undefined;
-		if (element.href != undefined) {
+		var hash, href;
+		if (element.href !== undefined) {
 			href = element.href.replace(new RegExp('^' + CMUtils.escapeForRegExp(host)), '');
-			if (href && href != '') {
+			if (href && href !== '') {
 				if (href.indexOf('#') >= 0) {
 					hash = element.href.split('#')[1];
 				}
@@ -76,18 +85,22 @@ var setupHeader = function() {
 			}
 		}
 		// console.log('a = ' + $(element).html() + ', href = ' + href + ', hash = ' + hash);
-		if (hash != undefined) {
-			if (hash != "") {
+		if (hash !== undefined) {
+			if (hash !== '') {
 				// $(element).off('click');
 				$(element).on('click.fndtn touchstart.fndtn', function(e) {
+					"use strict";
+
 					e.preventDefault();
 					console.log("navigation event: " + hash);
 					navigateTo(hash);
 					if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
 				});
 			}
-		} else if (href != undefined && href != "") {
+		} else if (href !== undefined && href !== '') {
 			$(element).on('click.fndtn touchstart.fndtn', function(e) {
+				"use strict";
+
 				e.preventDefault();
 				openLink(href);
 			});
@@ -98,6 +111,8 @@ var setupHeader = function() {
 
 	$(header).find('.signin a').each(function(index, element) {
 		$(element).on('click.fndtn touchstart.fndtn', function(e) {
+			"use strict";
+
 			e.preventDefault();
 			console.log('signin clicked');
 			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
@@ -106,6 +121,8 @@ var setupHeader = function() {
 	});
 	$(header).find('.signout a').each(function(index, element) {
 		$(element).on('click.fndtn touchstart.fndtn', function(e) {
+			"use strict";
+
 			e.preventDefault();
 			console.log('signout clicked');
 			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
@@ -118,6 +135,8 @@ var setupHeader = function() {
 },
 
 navigateTo = function(pageId) {
+	"use strict";
+
 	console.log('----------------------------------------------------------------------------------');
 	console.log('navigateTo(' + pageId + ')');
 	scrollManager.disable();
@@ -136,9 +155,11 @@ navigateTo = function(pageId) {
 
 	var topElement = pageTracker.getTopElement(pageId);
 
-	if (!topElement || topElement.getIndex() == 0) {
+	if (!topElement || topElement.getIndex() === 0) {
 		// console.log('scrolling to the top of the page');
 		setTimeout(function() {
+			"use strict";
+
 			pageTracker.getElement('#content').scrollTo(0, 0, {
 				onAfter: function() {
 					setTimeout(function() {
@@ -150,6 +171,8 @@ navigateTo = function(pageId) {
 	} else {
 		// console.log("scrolling to " + topElement.toString());
 		setTimeout(function() {
+			"use strict";
+
 			pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
 				{
 					margin: false,
@@ -168,11 +191,13 @@ navigateTo = function(pageId) {
 },
 
 checkIfAuthorized = function(success, failure) {
+	"use strict";
+
 	console.log('checkIfAuthorized()');
 	var username = serverModel.username();
 	var password = serverModel.password();
 
-	if (!username || username == null || !password || password == null) {
+	if (!username || username === null || !password || password === null) {
 		failure();
 		return;
 	}
@@ -187,7 +212,9 @@ checkIfAuthorized = function(success, failure) {
 			serverModel.setBasicAuth(xhr);
 		},
 		success: function(data) {
-			if (data == true) {
+			"use strict";
+
+			if (data === true) {
 				navModel.authorized(true);
 				console.log('test returned OK');
 				success();
@@ -200,6 +227,8 @@ checkIfAuthorized = function(success, failure) {
 			}
 		}
 	}).error(function(data) {
+		"use strict";
+
 		navModel.authorized(false);
 		console.log("An error occurred: " + ko.toJSON(data, null, 2));
 		failure();
@@ -207,17 +236,23 @@ checkIfAuthorized = function(success, failure) {
 },
 
 showLoginOrCurrent = function() {
+	"use strict";
+
 	var current_page = pageNavigator.getCurrentPage();
 
 	checkIfAuthorized(
 		// success
 		function() {
+			"use strict";
+
 			console.log("checkIfAuthorized: success");
 			$('#login').trigger('reveal:close');
 			navigateTo(current_page);
 		},
 		// failure
 		function() {
+			"use strict";
+
 			console.log("checkIfAuthorized: failure");
 			$('#login').reveal();
 		}
@@ -225,6 +260,7 @@ showLoginOrCurrent = function() {
 },
 
 setupDefaultView = function() {
+	"use strict";
 
 	console.log('setupDefaultView()');
 	setupHeader();
@@ -261,6 +297,8 @@ setupDefaultView = function() {
 },
 
 replaceCurrentPage = function(pageId) {
+	"use strict";
+
 	console.log('replaceCurrentPage(' + pageId + ')');
 
 	var page = pageTracker.getElement('#' + pageId);
@@ -282,6 +320,8 @@ replaceCurrentPage = function(pageId) {
 },
 
 createOfficialEventsView = function() {
+	"use strict";
+
 	console.log('createOfficialEventsView()');
 	if (!pages.official) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "official" });
@@ -299,6 +339,8 @@ createOfficialEventsView = function() {
 },
 
 showOfficialEventsView = function() {
+	"use strict";
+
 	console.log('showOfficialEventsView()');
 	createOfficialEventsView();
 	var content = replaceCurrentPage('official-events');
@@ -306,6 +348,8 @@ showOfficialEventsView = function() {
 },
 
 createMyEventsView = function() {
+	"use strict";
+
 	console.log('createMyEventsView()');
 	if (!pages.my) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "my" });
@@ -323,6 +367,8 @@ createMyEventsView = function() {
 },
 
 showMyEventsView = function() {
+	"use strict";
+
 	console.log('showMyEventsView()');
 	createMyEventsView();
 	var content = replaceCurrentPage('my-events');
@@ -330,12 +376,11 @@ showMyEventsView = function() {
 },
 
 createLoginView = function() {
+	"use strict";
+
 	console.log('createLoginView()');
 	if (!pages.login) {
-		console.log('first time creation');
 		var div = $('#login')[0];
-		console.log('created:');
-		console.log(div);
 
 		// enter doesn't submit for some reason, so handle it manually
 		console.log('trapping keydown');
@@ -344,20 +389,26 @@ createLoginView = function() {
 			if (keyCode == 13) save_button.click();
 		});
 
+		/*
 		console.log('handling href links');
 		$(div).find('a').each(function(index, element) {
+			"use strict";
+
 			var href = element.getAttribute('href');
 			// console.log('a = ' + $(element).html() + ', href = ' + href);
-			if (href != undefined && href != "") {
+			if (href !== undefined && href !== '') {
 				element.click(function(e) {
 					openUrl(href);
 					e.preventDefault();
 				});
 			}
 		});
+		*/
 
 		console.log('handling reset click');
 		$('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
+			"use strict";
+
 			e.preventDefault();
 			console.log("cancel clicked");
 			serverModel.reset();
@@ -367,9 +418,13 @@ createLoginView = function() {
 
 		console.log('handling save click');
 		save_button.on('click.fndtn touchstart.fndtn', function(e) {
+			"use strict";
+
 			console.log("save clicked");
 			e.preventDefault();
 			setTimeout(function() {
+				"use strict";
+
 				serverModel.persist();
 				showLoginOrCurrent();
 				ajaxUpdater.pollNow();
@@ -384,12 +439,16 @@ createLoginView = function() {
 },
 
 showLoginView = function() {
+	"use strict";
+
 	console.log('showLoginView()');
 	createLoginView();
 	$('#login').reveal();
 };
 
 var createAmenitiesView = function() {
+	"use strict";
+
 	console.log('createAmenitiesView()');
 	if (!pages.amenities) {
 		var html = templateLoader.renderTemplate('#amenities.html');
@@ -408,12 +467,16 @@ var createAmenitiesView = function() {
 };
 
 var showAmenitiesView = function() {
+	"use strict";
+
 	console.log('showAmenitiesView()');
 	createAmenitiesView();
 	var content = replaceCurrentPage('amenities');
 };
 
 (function($) {
+	"use strict";
+
     if ($.browser.mozilla) {
         $.fn.disableTextSelect = function() {
             return this.each(function() {
@@ -459,6 +522,8 @@ var showAmenitiesView = function() {
 })(jQuery);
 
 var createDecksView = function() {
+	"use strict";
+
 	console.log('createDecksView()');
 	if (!pages.decks) {
 		var html = templateLoader.renderTemplate('#decks.html');
@@ -478,6 +543,8 @@ var createDecksView = function() {
 
 var m_decksInitialized = false,
 showDecksView = function() {
+	"use strict";
+
 	console.log('showDecksView()');
 	createDecksView();
 	var content = replaceCurrentPage('decks');
@@ -518,16 +585,20 @@ var eventsModel;
 /** filter dates in Knockout data-bind **/
 ko.bindingHandlers.dateString = {
 	update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+		"use strict";
+
 		var value = valueAccessor(),
 			allBindings = allBindingsAccessor();
 		var valueUnwrapped = ko.utils.unwrapObservable(value);
 		var pattern = allBindings.datePattern || 'MM/dd/yyyy hh:mm:ss';
 		$(element).text(valueUnwrapped.toString(pattern));
 	}
-}
+};
 
 /** represents a calendar event **/
 function Event(data) {
+	"use strict";
+
 	var self = this;
 
 	self.id           = ko.observable(data["@id"]);
@@ -543,9 +614,9 @@ function Event(data) {
 		var start = start === null? null : formatTime(self.start(), false);
 		var end	= end	=== null? null : formatTime(self.end(), false);
 		var retVal = "";
-		if (start != null) {
+		if (start !== null) {
 			retVal += start;
-			if (end != null) {
+			if (end !== null) {
 				retVal += "-" + end;
 			}
 		}
@@ -553,6 +624,8 @@ function Event(data) {
 	}, self);
 	self.favorite = ko.observable(false);
 	self.favorite.subscribe(function(isFavorite) {
+		"use strict";
+
 		if (eventsModel.updating()) {
 			// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
 			return;
@@ -579,6 +652,8 @@ function Event(data) {
 
 /** used for filter/searching, match an event based on a filter **/
 var matchEventText = function(event, filter) {
+	"use strict";
+
 	if (event.summary().toLowerCase().search(filter) != -1) {
 		return true;
 	} else if (event.description().toLowerCase().search(filter) != -1) {
@@ -586,13 +661,15 @@ var matchEventText = function(event, filter) {
 	} else {
 		return false;
 	}
-}
+};
 
 /** Wait to make sure no other changes have happened,
   * then perform the mildly expensive check to see what
   * the latest visible element is.
   **/
 var onFilterChange = function() {
+	"use strict";
+
 	/*
 	if (scrollTimeout === null) {
 		scrollTimeout = setTimeout(function() {
@@ -609,6 +686,8 @@ var onFilterChange = function() {
 };
 
 function ServerModel() {
+	"use strict";
+
 	var self = this;
 
 	self.cruisemonkey = ko.observable(amplify.store('cruisemonkey_url'));
@@ -653,6 +732,8 @@ function ServerModel() {
 var serverModel = new ServerModel();
 
 function EventsViewModel() {
+	"use strict";
+
 	var self = this;
 	self.events = ko.observableArray();
 	self.updating = ko.observable(false);
@@ -682,14 +763,18 @@ function EventsViewModel() {
 			}
 			console.log("EventsViewModel::updateData(): parsing " + dataEvents.length + " events");
 			var mappedTasks = $.map(dataEvents, function(event) {
+				"use strict";
+
 				var isFavorite, item;
-				if (event.favorite != undefined) {
+				if (event.favorite !== undefined) {
 					isFavorite = event.favorite;
 				} else {
 					isFavorite = (favorites.indexOf(event["@id"]) != -1);
 				}
 				// console.log("loading event: " + event['@id'] + ' (favorite = ' + isFavorite + ')');
 				item = ko.utils.arrayFirst(self.events(), function(entry) {
+					"use strict";
+
 					if (entry) {
 						if (entry.id() == event["@id"]) {
 							return true;
@@ -728,7 +813,7 @@ function EventsViewModel() {
 			}
 		}, null, 2));
 		self.updating(false);
-	}
+	};
 	
 	self.updateData(amplify.store('events'));
 }
@@ -736,11 +821,15 @@ function EventsViewModel() {
 eventsModel = new EventsViewModel();
 
 function AjaxUpdater() {
+	"use strict";
+
 	var self = this,
 		m_timer = null,
 		m_inFlight = false,
 	
 	f_updateEventModel = function() {
+		"use strict";
+
 		if (!serverModel || !eventsModel || !navModel) {
 			console.log('AjaxUpdater::f_updateEventModel(): Missing one of [serverModel, eventsModel, navModel], skipping update.');
 			return;
@@ -784,7 +873,7 @@ function AjaxUpdater() {
 		m_timer = setInterval(f_updateEventModel, m_eventUpdateInterval);
 	};
 	self.stop = function() {
-		if (m_timer != null) {
+		if (m_timer !== null) {
 			clearInterval(m_timer);
 			m_timer = null;
 		}
@@ -794,6 +883,8 @@ function AjaxUpdater() {
 var ajaxUpdater = new AjaxUpdater();
 
 function OfficialEventsModel() {
+	"use strict";
+
 	var self   = this;
 
 	self.filter = ko.observable("");
@@ -802,6 +893,8 @@ function OfficialEventsModel() {
 var officialEventsModel = new OfficialEventsModel();
 // officialEventsModel.filter.subscribe(onFilterChange, officialEventsModel);
 officialEventsModel.filteredEvents = ko.dependentObservable(function() {
+	"use strict";
+
 	var self = this,
 		filter = self.filter().toLowerCase(),
 		username = serverModel.username();
@@ -823,6 +916,8 @@ officialEventsModel.filteredEvents = ko.dependentObservable(function() {
 }, officialEventsModel);
 
 function MyEventsModel() {
+	"use strict";
+
 	var self   = this;
 
 	self.filter = ko.observable("");
@@ -852,33 +947,37 @@ myEventsModel.filteredEvents = ko.dependentObservable(function() {
 }, myEventsModel);
 
 function NavModel() {
+	"use strict";
+
 	var self = this,
 
 	f_hasUsername = ko.computed(function() {
-		return serverModel.username() != null
-			&& serverModel.username() != undefined
-			&& serverModel.username().length > 0;
+		"use strict";
+		return serverModel.username() !== null && serverModel.username() !== undefined && serverModel.username().length > 0;
 	}),
 
 	f_hasPassword = ko.computed(function() {
-		return serverModel.password() != null
-			&& serverModel.password() != undefined
-			&& serverModel.password().length > 0;
+		"use strict";
+		return serverModel.password() !== null && serverModel.password() !== undefined && serverModel.password().length > 0;
 	});
 
 	self.isSignedIn = ko.computed(function() {
+		"use strict";
 		return f_hasUsername() && f_hasPassword();
 	});
 
 	self.showSignOut = ko.computed(function() {
+		"use strict";
 		return self.isSignedIn();
 	});
 
 	self.showSignIn = ko.computed(function() {
+		"use strict";
 		return !self.showSignOut();
 	});
 
 	self.online = function() {
+		"use strict";
 		if (navigator && navigator.connection) {
 			console.log('connection type = ' + navigator.connection.type);
 			return navigator.connection.type != Connection.NONE;
@@ -892,10 +991,12 @@ function NavModel() {
 	self.authorized = ko.observable(false);
 
 	self.isAuthorized = ko.computed(function() {
+		"use strict";
 		return self.isSignedIn() && self.authorized();
 	});
 
 	self.logOut = function() {
+		"use strict";
 		serverModel.password(null);
 		serverModel.persist();
 	};
@@ -905,6 +1006,8 @@ var navModel = new NavModel();
 
 /*
 function Swiper() {
+"use strict";
+
 	var self = this,
 		hasTouch = 'ontouchstart' in window,
 		resizeEvent = 'onorientationchange' in window ? 'orientationchange' : 'resize',
@@ -916,6 +1019,7 @@ function Swiper() {
 		w = $(window),
 
 	eventHandler = function(e) {
+		"use strict";
 		// console.log('e = ' + e.type);
 		switch(e.type) {
 			case startEvent:
@@ -935,6 +1039,7 @@ function Swiper() {
 	};
 
 	self.__start = function(e) {
+		"use strict";
 		console.log("__start: " + e);
 		//e.preventDefault();
 
@@ -957,6 +1062,7 @@ function Swiper() {
 		this.__event('touchstart');
 	};
 	self.__move = function(e) {
+		"use strict";
 		if (!self.initiated) return;
 
 		var point = hasTouch ? e.touches[0] : e,
@@ -1006,6 +1112,7 @@ function Swiper() {
 		// self.__pos(newX);
 	};
 	self.__end = function(e) {
+		"use strict";
 		console.log("__end: " + e);
 
 		if (!self.initiated) return;
@@ -1035,12 +1142,14 @@ function Swiper() {
 		// self.__checkPosition();
 	};
 	self.__resize = function(e) {
+		"use strict";
 		console.log("__resize: " + e);
 		
 		self.snapThreshold = Math.round($(window).width() * 0.15);
 	}
 
 	self.__event = function (type) {
+		"use strict";
 		console.log('event fired: ' + type);
 
 		var ev = document.createEvent("Event");
@@ -1059,10 +1168,12 @@ function Swiper() {
 
 var swiper = new Swiper();
 (function() {
+	"use strict";
 	var pageOrder = ['official-events', 'my-events', 'amenities', 'decks'];
 
 	var w = $(window);
 	w.on('swiper-moveout', function() {
+		"use strict";
 		var direction = swiper.directionX,
 			currentPage = pageNavigator.getCurrentPage(),
 			newPage,
