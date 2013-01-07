@@ -1,15 +1,15 @@
 3RDPARTYJS = \
-	jquery/jquery-1.8.1.min.js \
-	mustache/mustache.min.js \
-	knockout/knockout-2.2.0.js \
-	knockout/knockout.mapping-latest.js \
-	hammer/hammer.min.js \
-	hammer/jquery.hammer.min.js \
-	foundation/javascripts/foundation.min.js \
-	datejs/date.min.js \
-	amplifyjs/amplify.min.js \
-	jquery-url-parser/purl.js \
-	jquery.scrollTo/jquery.scrollTo.min.js
+	3rdparty/jquery/jquery-1.8.1.min.js \
+	3rdparty/mustache/mustache.min.js \
+	3rdparty/knockout/knockout-2.2.0.js \
+	3rdparty/knockout/knockout.mapping-latest.js \
+	3rdparty/hammer/hammer.min.js \
+	3rdparty/hammer/jquery.hammer.min.js \
+	3rdparty/foundation/javascripts/foundation.min.js \
+	3rdparty/datejs/date.min.js \
+	3rdparty/amplifyjs/amplify.min.js \
+	3rdparty/jquery-url-parser/purl.js \
+	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js
 
 CRUISEMONKEYJS = \
 	lib/cm_utils.js \
@@ -18,7 +18,7 @@ CRUISEMONKEYJS = \
 	lib/page_navigator.js \
 	lib/scroll_manager.js \
 	lib/template_loader.js \
-	date.js \
+	model/events.js \
 	model/nav.js \
 	model/server.js \
 	lib/ajax_updater.js \
@@ -32,9 +32,9 @@ CRUISEMONKEYCSS = styles.css
 
 CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
-FOUNDATION = $(shell find foundation -type f)
+FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
-RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css html5shim/html5.js
+RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js
 
 PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml)
 
