@@ -34,94 +34,93 @@ templateLoader.onFinished = function() {
 		}
 	};
 
+	$.each(htmlInitialization, function(index, value) {
+		console.log('Initializing HTML for: ' + index);
+		value();
+	});
+
 	createLoginView();
 	createOfficialEventsView();
 	createMyEventsView();
+	createPublicEventsView();
 	createAmenitiesView();
 	createDecksView();
-
-	/*
-	$(window).disableTextSelect();
-	$('#login').enableTextSelect();
-	$('#login').attr('contentEditable', true);
-	*/
 
 	setupDefaultView();
 };
 
-var setupHeader = function() {
-	"use strict";
-
-	console.log('setupHeader()');
-	var header = pageTracker.getHeader();
-	header.html(templateLoader.renderTemplate('#header.html'));
-
-	var host = document.URL.replace(/\#$/, '');
-
-	$(header).find('a').each(function(index, element) {
+var htmlInitialization = {
+	'header': function createHeader() {
 		"use strict";
 
-		// console.log('url host = ' + host);
-		var hash, href;
-		if (element.href !== undefined) {
-			href = element.href.replace(new RegExp('^' + CMUtils.escapeForRegExp(host)), '');
-			if (href && href !== '') {
-				if (href.indexOf('#') >= 0) {
-					hash = element.href.split('#')[1];
+		var header = pageTracker.getHeader(),
+			host = document.URL.replace(/\#$/, '');
+
+		header.html(templateLoader.renderTemplate('#header.html'));
+
+		$(header).find('a').each(function(index, element) {
+			"use strict";
+
+			// console.log('url host = ' + host);
+			var hash, href;
+			if (element.href !== undefined) {
+				href = element.href.replace(new RegExp('^' + CMUtils.escapeForRegExp(host)), '');
+				if (href && href !== '') {
+					if (href.indexOf('#') >= 0) {
+						hash = element.href.split('#')[1];
+					}
+				} else {
+					href = undefined;
 				}
-			} else {
-				href = undefined;
 			}
-		}
-		// console.log('a = ' + $(element).html() + ', href = ' + href + ', hash = ' + hash);
-		if (hash !== undefined) {
-			if (hash !== '') {
-				// $(element).off('click');
+			// console.log('a = ' + $(element).html() + ', href = ' + href + ', hash = ' + hash);
+			if (hash !== undefined) {
+				if (hash !== '') {
+					// $(element).off('click');
+					$(element).on('click.fndtn touchstart.fndtn', function(e) {
+						"use strict";
+
+						e.preventDefault();
+						console.log("navigation event: " + hash);
+						pageNavigator.navigateTo(hash);
+						if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
+					});
+				}
+			} else if (href !== undefined && href !== '') {
 				$(element).on('click.fndtn touchstart.fndtn', function(e) {
 					"use strict";
 
 					e.preventDefault();
-					console.log("navigation event: " + hash);
-					pageNavigator.navigateTo(hash);
-					if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
+					CMUtils.openLink(href);
 				});
 			}
-		} else if (href !== undefined && href !== '') {
+		});
+
+		$(header).find('.signin a').each(function(index, element) {
 			$(element).on('click.fndtn touchstart.fndtn', function(e) {
 				"use strict";
 
 				e.preventDefault();
-				CMUtils.openLink(href);
+				console.log('signin clicked');
+				if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
+				$('#login').reveal();
 			});
-		}
-	});
-
-	/* $(document).foundationTopBar(); */
-
-	$(header).find('.signin a').each(function(index, element) {
-		$(element).on('click.fndtn touchstart.fndtn', function(e) {
-			"use strict";
-
-			e.preventDefault();
-			console.log('signin clicked');
-			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
-			$('#login').reveal();
 		});
-	});
-	$(header).find('.signout a').each(function(index, element) {
-		$(element).on('click.fndtn touchstart.fndtn', function(e) {
-			"use strict";
+		$(header).find('.signout a').each(function(index, element) {
+			$(element).on('click.fndtn touchstart.fndtn', function(e) {
+				"use strict";
 
-			e.preventDefault();
-			console.log('signout clicked');
-			if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
-			navModel.logOut();
-			$('#login').reveal();
+				e.preventDefault();
+				console.log('signout clicked');
+				if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
+				navModel.logOut();
+				$('#login').reveal();
+			});
 		});
-	});
 
-	ko.applyBindings(navModel, $(header)[0]);
-},
+		ko.applyBindings(navModel, $(header)[0]);
+	}
+};
 
 checkIfAuthorized = function(success, failure) {
 	"use strict";
@@ -204,7 +203,6 @@ setupDefaultView = function() {
 	"use strict";
 
 	console.log('setupDefaultView()');
-	setupHeader();
 
 	var events = amplify.store("events");
 	console.log("read events:");
@@ -241,7 +239,7 @@ createOfficialEventsView = function() {
 	"use strict";
 
 	console.log('createOfficialEventsView()');
-	if (!pages.official) {
+	if (!pages.officialEventsView) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "official" });
 
 		var div = document.createElement('div');
@@ -250,7 +248,7 @@ createOfficialEventsView = function() {
 		$(div).html(html);
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 
-		pages.official = div;
+		pages.officialEventsView = div;
 
 		ko.applyBindings(officialEventsModel, appended);
 	}
@@ -260,7 +258,7 @@ createMyEventsView = function() {
 	"use strict";
 
 	console.log('createMyEventsView()');
-	if (!pages.my) {
+	if (!pages.myEventsView) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "my" });
 
 		var div = document.createElement('div');
@@ -269,9 +267,29 @@ createMyEventsView = function() {
 		$(div).html(html);
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 
-		pages.my = div;
+		pages.myEventsView = div;
 
 		ko.applyBindings(myEventsModel, appended);
+	}
+},
+
+createPublicEventsView = function() {
+	"use strict";
+
+	console.log('createPublicEventsView()');
+	if (!pages.publicEventsView) {
+		var html = templateLoader.renderTemplate('#events.html', { eventType: "public" });
+
+		var div = document.createElement('div');
+		div.setAttribute('id', 'public-events');
+		$(div).css('display', 'none');
+		$(div).html(html);
+		console.log('public events html = ' + $(div).html());
+		var appended = pageTracker.getContainer()[0].appendChild(div);
+
+		pages.publicEventsView = div;
+
+		ko.applyBindings(publicEventsModel, appended);
 	}
 },
 
@@ -279,7 +297,7 @@ createLoginView = function() {
 	"use strict";
 
 	console.log('createLoginView()');
-	if (!pages.login) {
+	if (!pages.loginView) {
 		var div = $('#login')[0];
 
 		// enter doesn't submit for some reason, so handle it manually
@@ -332,25 +350,17 @@ createLoginView = function() {
 		});
 
 		console.log('done creating loginView');
-		pages.login = div;
+		pages.loginView = div;
 
 		ko.applyBindings(serverModel, div);
 	}
-},
-
-showLoginView = function() {
-	"use strict";
-
-	console.log('showLoginView()');
-	createLoginView();
-	$('#login').reveal();
 },
 
 createAmenitiesView = function() {
 	"use strict";
 
 	console.log('createAmenitiesView()');
-	if (!pages.amenities) {
+	if (!pages.amenitiesView) {
 		var html = templateLoader.renderTemplate('#amenities.html');
 
 		var div = document.createElement('div');
@@ -360,64 +370,17 @@ createAmenitiesView = function() {
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 
 		console.log("done creating amenitiesView");
-		pages.amenities = div;
+		pages.amenitiesView = div;
 		
 		ko.applyBindings(amenitiesModel, appended);
 	}
 };
 
-(function($) {
-	"use strict";
-
-    if ($.browser.mozilla) {
-        $.fn.disableTextSelect = function() {
-            return this.each(function() {
-                $(this).css({
-                    'MozUserSelect' : 'none'
-                });
-            });
-        };
-        $.fn.enableTextSelect = function() {
-            return this.each(function() {
-                $(this).css({
-                    'MozUserSelect' : ''
-                });
-            });
-        };
-    } else if ($.browser.msie) {
-        $.fn.disableTextSelect = function() {
-            return this.each(function() {
-                $(this).bind('selectstart.disableTextSelect', function() {
-                    return false;
-                });
-            });
-        };
-        $.fn.enableTextSelect = function() {
-            return this.each(function() {
-                $(this).unbind('selectstart.disableTextSelect');
-            });
-        };
-    } else {
-        $.fn.disableTextSelect = function() {
-            return this.each(function() {
-                $(this).bind('mousedown.disableTextSelect', function() {
-                    return false;
-                });
-            });
-        };
-        $.fn.enableTextSelect = function() {
-            return this.each(function() {
-                $(this).unbind('mousedown.disableTextSelect');
-            });
-        };
-    }
-})(jQuery);
-
 var createDecksView = function() {
 	"use strict";
 
 	console.log('createDecksView()');
-	if (!pages.decks) {
+	if (!pages.decksView) {
 		var html = templateLoader.renderTemplate('#decks.html');
 
 		var div = document.createElement('div');
@@ -427,24 +390,26 @@ var createDecksView = function() {
 		var appended = pageTracker.getContainer()[0].appendChild(div);
 
 		console.log("done creating decksView");
-		pages.decks = div;
+		pages.decksView = div;
 
 		ko.applyBindings(decksModel, appended);
 	}
 };
 
-/** filter dates in Knockout data-bind **/
-ko.bindingHandlers.dateString = {
-	update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
-		"use strict";
+(function() {
+	/** filter dates in Knockout data-bind **/
+	ko.bindingHandlers.dateString = {
+		update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+			"use strict";
 
-		var value = valueAccessor(),
-			allBindings = allBindingsAccessor();
-		var valueUnwrapped = ko.utils.unwrapObservable(value);
-		var pattern = allBindings.datePattern || 'MM/dd/yyyy hh:mm:ss';
-		$(element).text(valueUnwrapped.toString(pattern));
-	}
-};
+			var value = valueAccessor(),
+				allBindings = allBindingsAccessor(),
+				valueUnwrapped = ko.utils.unwrapObservable(value),
+				pattern = allBindings.datePattern || 'MM/dd/yyyy hh:mm:ss';
+			$(element).text(valueUnwrapped.toString(pattern));
+		}
+	};
+})();
 
 var serverModel = new ServerModel(m_isPhoneGap, amplify);
 var navModel = new NavModel(serverModel);
@@ -452,7 +417,7 @@ var eventsModel = new EventsViewModel(navModel, serverModel);
 var ajaxUpdater = new AjaxUpdater(serverModel, eventsModel, navModel);
 
 var officialEventsModel = new OfficialEventsViewModel(eventsModel, serverModel);
-
-var myEventsModel = new MyEventsViewModel(eventsModel);
+var myEventsModel = new MyEventsViewModel(eventsModel, serverModel);
+var publicEventsModel = new PublicEventsViewModel(eventsModel, serverModel);
 
 console.log("app.js loaded");

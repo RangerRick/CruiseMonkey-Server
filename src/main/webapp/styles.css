@@ -134,7 +134,7 @@ input[type="search"] {
 }
 	/* margin: 3px 0 3px 0; */
 
-#official-search,#my-search,#amenities-search {
+#official-search,#my-search,#public-search,#amenities-search {
 	margin-bottom: 5px;
 }
 

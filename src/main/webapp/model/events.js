@@ -13,6 +13,7 @@ function Event(data) {
 	self.location     = ko.observable(data.location);
 	self.createdBy    = ko.observable(data["created-by"]);
 	self.owner        = ko.observable(data.owner);
+	self.isPublic     = ko.observable(data.isPublic);
 	self.timespan     = ko.computed(function() {
 		var start = start === null? null : CMUtils.formatTime(self.start(), false);
 		var end	= end	=== null? null : CMUtils.formatTime(self.end(), false);
@@ -28,7 +29,7 @@ function Event(data) {
 	self.favorite = ko.observable(false);
 }
 
-function EventsViewModel(navModel, serverModel) {
+function EventsViewModel(navModel, serverModel, eventsModel) {
 	"use strict";
 
 	var self = this,
@@ -103,7 +104,7 @@ function EventsViewModel(navModel, serverModel) {
 					e.favorite.subscribe(function(isFavorite) {
 						"use strict";
 
-						if (m_eventsModel.updating()) {
+						if (self.updating()) {
 							// console.log("skipping ajax update for " + self.id() + ", we are in the middle of a server update");
 							return;
 						}
@@ -202,10 +203,38 @@ function MyEventsViewModel(parentModel, serverModel) {
 	
 	self.filteredEvents = ko.dependentObservable(function() {
 		var filter = self.filter().toLowerCase(),
+			username = m_serverModel.username(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
 			if (event.favorite()) return true;
-			if (event.owner() != 'google') {
+			if (event.owner() == username) return true;
+			return false;
+		});
+
+		if (!filter) {
+			return matchesGroup;
+		} else {
+			return ko.utils.arrayFilter(matchesGroup, function(event) {
+				return matchEventText(event, filter);
+			});
+		}
+	});
+}
+
+function PublicEventsViewModel(parentModel, serverModel) {
+	"use strict";
+
+	var self = this,
+		m_serverModel = serverModel;
+	$.extend(self, parentModel);
+	self.filter = ko.observable("");
+	
+	self.filteredEvents = ko.dependentObservable(function() {
+		var filter = self.filter().toLowerCase(),
+			username = m_serverModel.username(),
+
+		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+			if (event.owner() != username && event.isPublic()) {
 				return true;
 			}
 			return false;
@@ -218,5 +247,5 @@ function MyEventsViewModel(parentModel, serverModel) {
 				return matchEventText(event, filter);
 			});
 		}
-	}, myEventsModel);
+	});
 }
