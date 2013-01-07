@@ -32,8 +32,7 @@ function PageTracker(amplify, elementCriteria) {
 		throw new TypeError("You must pass an Amplify storage class and an element match criteria!");
 	}
 
-	var m_amplify         = amplify,
-		m_elementCriteria = elementCriteria,
+	var m_elementCriteria = elementCriteria,
 		m_elementCache    = [],
 		self = this;
 
@@ -90,7 +89,7 @@ function PageTracker(amplify, elementCriteria) {
 	/** internal methods **/
 	var f_getPageCache = function() {
 		"use strict";
-		var page_store_cache = m_amplify.store('page_store_cache');
+		var page_store_cache = amplify.store('page_store_cache');
 		if (!page_store_cache) {
 			page_store_cache = {};
 		}
@@ -98,7 +97,7 @@ function PageTracker(amplify, elementCriteria) {
 	},
 	f_setPageCache = function(new_page_store_cache) {
 		"use strict";
-		m_amplify.store('page_store_cache', new_page_store_cache);
+		amplify.store('page_store_cache', new_page_store_cache);
 	},
 	f_getElementForPageId = function(pageId) {
 		"use strict";

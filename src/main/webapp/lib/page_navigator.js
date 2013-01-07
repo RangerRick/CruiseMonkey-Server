@@ -41,8 +41,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
 	}
 
-	var m_amplify         = amplify,
-		m_pageTracker     = pageTracker,
+	var m_pageTracker     = pageTracker,
 		m_defaultPage     = defaultPage,
 		m_elementCriteria = elementCriteria,
 		m_heightChecker   = new HeightChecker(45, 15),
@@ -56,7 +55,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 
 	self.getCurrentPage = function() {
 		"use strict";
-		var current_page = m_amplify.store('current_page');
+		var current_page = amplify.store('current_page');
 		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
 		if (!current_page || current_page == 'login') {
 			current_page = m_defaultPage;

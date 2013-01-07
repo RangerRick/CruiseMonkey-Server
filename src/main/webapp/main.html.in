@@ -163,18 +163,18 @@
 		<!-- BROWSER --><script src="jquery.scrollTo/jquery.scrollTo.min.js"></script>
 
 		<!-- PHONEGAP --><script src="cruisemonkey.js"></script>
-		<!-- BROWSER --><script src="cm_utils.js"></script>
-		<!-- BROWSER --><script src="scroll_manager.js"></script>
-		<!-- BROWSER --><script src="page_tracker.js"></script>
-		<!-- BROWSER --><script src="page_navigator.js"></script>
-		<!-- BROWSER --><script src="template_loader.js"></script>
 		<!-- BROWSER --><script src="date.js"></script>
-		<!-- BROWSER --><!-- <script src="photos.js"></script> -->
-		<!-- BROWSER --><script src="locations.js"></script>
 		<!-- BROWSER --><script src="model/nav.js"></script>
 		<!-- BROWSER --><script src="model/server.js"></script>
-		<!-- BROWSER --><!--<script src="lib/swiper.js"></script> -->
 		<!-- BROWSER --><script src="lib/ajax_updater.js"></script>
+		<!-- BROWSER --><script src="lib/cm_utils.js"></script>
+		<!-- BROWSER --><script src="lib/locations.js"></script>
+		<!-- BROWSER --><script src="lib/page_tracker.js"></script>
+		<!-- BROWSER --><script src="lib/page_navigator.js"></script>
+		<!-- BROWSER --><!-- <script src="lib/photos.js"></script> -->
+		<!-- BROWSER --><script src="lib/scroll_manager.js"></script>
+		<!-- BROWSER --><!--<script src="lib/swiper.js"></script> -->
+		<!-- BROWSER --><script src="lib/template_loader.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>
 	</head>
 	<body onload="onLoad()">

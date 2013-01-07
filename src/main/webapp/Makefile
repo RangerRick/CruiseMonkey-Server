@@ -12,19 +12,19 @@
 	jquery.scrollTo/jquery.scrollTo.min.js
 
 CRUISEMONKEYJS = \
-	cm_utils.js \
-	scroll_manager.js \
-	page_tracker.js \
-	page_navigator.js \
-	template_loader.js \
+	lib/cm_utils.js \
+	lib/locations.js \
+	lib/page_tracker.js \
+	lib/page_navigator.js \
+	lib/scroll_manager.js \
+	lib/template_loader.js \
 	date.js \
-	locations.js \
 	model/nav.js \
 	model/server.js \
 	lib/ajax_updater.js \
 	app.js
+#	lib/photos.js
 #	lib/swiper.js
-#	photos.js
 
 CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
 
