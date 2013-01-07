@@ -821,17 +821,13 @@ function EventsViewModel() {
 				}
 			});
 			self.events(mappedTasks);
+			amplify.store("events", allData);
+		} else {
+			console.log("no proper event data found: " + ko.toJSON(allData, null, 2));
 		}
 		// console.log("saving ReST events");
-		amplify.store("events", ko.toJSON({
-			events: {
-				event: self.events()
-			}
-		}, null, 2));
 		self.updating(false);
 	};
-	
-	self.updateData(amplify.store('events'));
 }
 
 eventsModel = new EventsViewModel();
@@ -895,6 +891,7 @@ function AjaxUpdater() {
 		f_updateEventModel();
 	};
 	self.start = function() {
+		f_updateEventModel();
 		m_timer = setInterval(f_updateEventModel, m_eventUpdateInterval);
 	};
 	self.stop = function() {
