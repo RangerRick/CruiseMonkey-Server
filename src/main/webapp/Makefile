@@ -10,7 +10,6 @@
 	amplifyjs/amplify.min.js \
 	jquery-url-parser/purl.js \
 	jquery.scrollTo/jquery.scrollTo.min.js
-#	jsOauth/jsOAuth-1.3.6.min.js \
 
 CRUISEMONKEYJS = \
 	cm_utils.js \
@@ -20,10 +19,11 @@ CRUISEMONKEYJS = \
 	template_loader.js \
 	date.js \
 	locations.js \
+	model/nav.js \
+	lib/ajax_updater.js \
 	app.js
+#	lib/swiper.js
 #	photos.js
-#	init.js
-#	auth.js
 
 CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
 
@@ -92,6 +92,18 @@ cruisemonkey.js: $(CRUISEMONKEYMINJS) $(MAKEFILE)
 
 cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(MAKEFILE)
 	@cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css
+
+$(DESTDIR)/foundation/%: foundation/%
+	@DIR="$(DESTDIR)/`dirname $<`"; \
+		echo "$< -> $@"; \
+		install -d -m 755 "$$DIR"; \
+		install -c -m 644 "$<" "$@"
+
+$(DESTDIR)/%.png: %.png
+	@DIR="$(DESTDIR)/`dirname $<`"; \
+		echo "$< -> $@"; \
+		install -d -m 755 "$$DIR"; \
+		install -c -m 644 "$<" "$@"
 
 $(DESTDIR)/%: % $(MAKEFILE)
 	@DIR="$(DESTDIR)/`dirname $<`"; \
