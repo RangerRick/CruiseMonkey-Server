@@ -23,22 +23,13 @@ templateLoader.onFinished = function() {
 	scrollManager = new ScrollManager('#content');
 	scrollManager.delay = 100;
 
-	/*
 	scrollManager.onScrollStop = function(enabled) {
 		"use strict";
 
 		if (enabled) {
-			var found = pageNavigator.findTopVisibleElement();
-			if (found) {
-				console.log("visible element: " + CMUtils.getSummary(found) + ' (' + $(found).attr('id') + ')');
-			} else {
-				console.log("no elements visible!");
-			}
-		} else {
-			console.log('scrolling stopped while disabled');
+			pageNavigator.updateTopVisibleElement();
 		}
 	};
-	*/
 
 	$.each(htmlInitialization, function(index, value) {
 		console.log('Initializing HTML for: ' + index);
@@ -425,7 +416,7 @@ var myEventsModel = new MyEventsViewModel(eventsModel);
 var publicEventsModel = new PublicEventsViewModel(eventsModel);
 
 statusCode = {
-	401: function() {
+	401: function four_oh_one() {
 		console.log('401 not authorized');
 		navModel.authorized(false);
 		serverModel.password(null);

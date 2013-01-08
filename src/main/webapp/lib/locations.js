@@ -274,11 +274,3 @@ function DecksModel() {
 }
 
 var decksModel = new DecksModel();
-
-// amenitiesModel.filter.subscribe(onFilterChange, amenitiesModel);
-
-/*
-amenitiesModel.filter("shop");
-var temp = amenitiesModel.orderedAmenities();
-console.log("temp = " + ko.toJSON(temp));
-*/

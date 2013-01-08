@@ -49,19 +49,29 @@ GITHASH=$(shell git log -1 | grep -E '^commit' | cut -d' ' -f2)
 
 cruisemonkey.manifest: cruisemonkey.manifest.in $(3RDPARTYJS) $(CRUISEMONKEYJS) $(RUNTIME) $(MAKEFILE)
 	@echo "$< -> $@"
-	@sed -e 's,@GITHASH@,$(GITHASH),g' -e 's,@DATE@,$(DATE),g' "$<" > "$@"
+	@echo "CACHE MANIFEST" > "$@"
+	@echo "# version $(GITHASH) $(DATE)" >> "$@"
+	@echo "" >> "$@"
 	@echo "CACHE:" >> "$@"
 	@for FILE in $(3RDPARTYJS) $(CRUISEMONKEYJS) $(RUNTIME); do \
 		echo "$$FILE"; \
 		done | sort -u >> "$@";
+	@echo "" >> "$@"
+	@echo "NETWORK:" >> "$@"
+	@echo "*" >> "$@"
 
 $(DESTDIR)/cruisemonkey.manifest: cruisemonkey.manifest.in $(RUNTIME) $(MAKEFILE)
 	@echo "$< -> $@"
-	@sed -e 's,@GITHASH@,$(GITHASH),g' -e 's,@DATE@,$(DATE),g' "$<" > "$@"
+	@echo "CACHE MANIFEST" > "$@"
+	@echo "# version $(GITHASH) $(DATE)" >> "$@"
+	@echo "" >> "$@"
 	@echo "CACHE:" >> "$@"
 	@for FILE in $(RUNTIME); do \
 		echo "$$FILE"; \
 		done | sort -u >> "$@";
+	@echo "" >> "$@"
+	@echo "NETWORK:" >> "$@"
+	@echo "*" >> "$@"
 
 main.html: main.html.in
 	@echo "$< -> $@"

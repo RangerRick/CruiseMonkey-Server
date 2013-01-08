@@ -37,12 +37,11 @@ function HeightChecker(headerOffset, visibleWiggle) {
 }
 
 function PageNavigator(defaultPage, elementCriteria) {
-	if (!amplify || !pageTracker || !defaultPage || !elementCriteria) {
-		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
+	if (!defaultPage || !elementCriteria) {
+		throw new TypeError("You must specify a default page and an element criteria!");
 	}
 
-	var self = this,
-		m_heightChecker = new HeightChecker(45, 15);
+	var self = this;
 
 	self.getCurrentPage = function() {
 		"use strict";
@@ -55,19 +54,20 @@ function PageNavigator(defaultPage, elementCriteria) {
 		return current_page;
 	};
 
-	self.findTopVisibleElement = function() {
+	self.updateTopVisibleElement = function() {
 		"use strict";
 		var current_page = self.getCurrentPage(),
 			id = null,
 			el = null,
 			elementPercent = 0,
-			highestPercent = 0;
+			highestPercent = 0,
+			heightChecker = new HeightChecker(45, 15);
 
 		pageTracker.getElement('#' + current_page).find(elementCriteria).each(function(index, element) {
 			"use strict";
 			id = element.getAttribute('id');
 			if (id) {
-				elementPercent = m_heightChecker.percentVisible(element);
+				elementPercent = heightChecker.percentVisible(element);
 				// console.log(index + ': ' + id + ' = ' + elementPercent + ' (criteria = ' + elementCriteria + ')');
 				if (elementPercent == 100.0) {
 					el = element;
@@ -90,12 +90,11 @@ function PageNavigator(defaultPage, elementCriteria) {
 			var elementId = el.getAttribute('id');
 			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + elementId);
 			pageTracker.setScrolledId(current_page, elementId);
-			return el;
 		} else {
 			console.log('no top visible element found!');
 		}
-
-		return null;
+		
+		current_page = id = el = elementPercent = highestPercent = null;
 	};
 
 	self.replaceCurrentPage = function(pageId) {
@@ -103,14 +102,14 @@ function PageNavigator(defaultPage, elementCriteria) {
 
 		console.log('replaceCurrentPage(' + pageId + ')');
 
-		var page = pageTracker.getElement('#' + pageId),
-			search = page.find('input[type=search]').first();
+		var page = pageTracker.getElement('#' + pageId);
 
 		pageTracker.getContainer().children().css('display', 'none');
 		page.css('display', 'block');
 
 		if (!Modernizr.touch) {
 			// on non-mobile devices, focus the search input
+			var search = page.find('input[type=search]').first();
 			if (search) {
 				search.focus();
 			}
