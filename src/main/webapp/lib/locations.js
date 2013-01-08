@@ -252,7 +252,7 @@ function Deck(number) {
 	"use strict";
 	var self = this;
 	self.number = ko.observable(number);
-	self.size = ko.observable(600);
+	self.size = ko.observable(300);
 	self.id = ko.computed(function() {
 		"use strict";
 		return 'deck-' + self.number();

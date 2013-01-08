@@ -73,7 +73,10 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 				dataEvents.push(allData.events.event);
 			}
 			console.log("EventsViewModel::updateData(): parsing " + dataEvents.length + " events");
-			var mappedTasks = $.map(dataEvents, function(event) {
+			var startDate,
+				endDate,
+				createdBy,
+				mappedTasks = $.map(dataEvents, function(event) {
 				"use strict";
 
 				var isFavorite, item;
@@ -97,12 +100,11 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 					}
 				});
 				if (item) {
-					console.log('found existing item');
-					var startDate = new Date(event.start);
-					var endDate	= new Date(event.end);
-					var createdBy = event["created-by"];
+					startDate = new Date(event.start);
+					endDate	= new Date(event.end);
+					createdBy = event["created-by"];
 
-					item.favorite(isFavorite);
+					if (item.favorite()        != isFavorite)          { item.favorite(isFavorite); }
 					if (item.summary()         != event.summary)       { item.summary(event.summary); }
 					if (item.description()     != event.description)   { item.description(event.description); }
 					if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
