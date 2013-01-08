@@ -115,7 +115,6 @@ function PageNavigator(defaultPage, elementCriteria) {
 				search.focus();
 			}
 		}
-		return pageTracker.getContainer()[0];
 	};
 
 	self.navigateTo = function(pageId) {
@@ -124,7 +123,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		console.log('----------------------------------------------------------------------------------');
 		console.log('navigateTo(' + pageId + ')');
 
-		var page, content, topElement;
+		var page, topElement;
 
 		page = $(pageId);
 		if (!page) {
@@ -139,7 +138,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		if (scrollManager) {
 			scrollManager.disable();
 		}
-		content = self.replaceCurrentPage(pageId);
+		self.replaceCurrentPage(pageId);
 
 		topElement = pageTracker.getTopElement(pageId);
 
