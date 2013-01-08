@@ -14,13 +14,12 @@ if (!Array.prototype.indexOf) {
 	};
 }
 
-function TemplateLoader(urls, timeout) {
+function TemplateLoader(urls) {
 	"use strict";
 	var self = this,
 	m_templateUrls = urls || [],
 	m_failed = {},
 	m_templates = {},
-	m_timeout = timeout || 5000,
 
 	f_getSize = function(obj) {
 		"use strict";

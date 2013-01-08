@@ -1,7 +1,5 @@
 /** represents a calendar event **/
 function Event(data) {
-	"use strict";
-
 	var self = this;
 
 	self.id           = ko.observable(data["@id"]);
@@ -30,22 +28,9 @@ function Event(data) {
 }
 Event.prototype.attributeRegex = /[\W\@]+/g;
 
-function EventsViewModel(navModel, serverModel, eventsModel) {
-	"use strict";
+function EventsViewModel() {
+	var self = this;
 
-	var self = this,
-		m_serverModel = serverModel,
-		m_statusCode = {
-			401: function status401() {
-				console.log('401 not authorized');
-				m_navModel.authorized(false);
-				m_serverModel.password(null);
-				$('#login').reveal();
-			}
-		},
-		m_beforeSend = function beforeSend(xhr) {
-			m_serverModel.setBasicAuth(xhr);
-		};
 	self.events = ko.observableArray();
 	self.updating = ko.observable(false);
 
@@ -76,6 +61,7 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 			var startDate,
 				endDate,
 				createdBy,
+				e,
 				mappedTasks = $.map(dataEvents, function(event) {
 				"use strict";
 
@@ -111,11 +97,9 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 					if (item.end().getTime()   != endDate.getTime())   { item.end(endDate); }
 					if (item.createdBy()       != createdBy)           { item.createdBy(createdBy); }
 					if (item.owner()           != event.owner)         { item.owner(event.owner); }
-					return function(n) {
-						return item;
-					}();
+					return item;
 				} else {
-					var e = new Event(event);
+					e = new Event(event);
 					e.favorite(isFavorite);
 					/*
 					e.favorite.subscribe(function(isFavorite) {
@@ -133,20 +117,18 @@ function EventsViewModel(navModel, serverModel, eventsModel) {
 							type = 'DELETE';
 						}
 						$.ajax({
-							url: m_serverModel.favoritesUrl(e.id()),
+							url: serverModel.favoritesUrl(e.id()),
 							timeout: m_timeout,
 							cache: false,
 							dataType: 'json',
 							type: type,
-							statusCode: m_statusCode,
-							beforeSend: m_beforeSend
+							statusCode: statusCode,
+							beforeSend: beforeSend
 						});
 					});
 					*/
 
-					return function(n) {
-						return e;
-					}();
+					return e;
 				}
 			});
 			self.events(mappedTasks);
@@ -172,19 +154,14 @@ var matchEventText = function(event, filter) {
 	}
 };
 
-function OfficialEventsViewModel(parentModel, serverModel) {
-	"use strict";
-
-	var self = this,
-		m_serverModel = serverModel;
+function OfficialEventsViewModel(parentModel) {
+	var self = this;
 
 	$.extend(self, parentModel);
 	self.filter = ko.observable("");
 
 	self.filteredEvents = ko.dependentObservable(function() {
-		"use strict";
-
-		var username = m_serverModel.username(),
+		var username = serverModel.username(),
 			filter = self.filter().toLowerCase(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
@@ -207,17 +184,14 @@ function OfficialEventsViewModel(parentModel, serverModel) {
 	});
 }
 
-function MyEventsViewModel(parentModel, serverModel) {
-	"use strict";
-
-	var self = this,
-		m_serverModel = serverModel;
+function MyEventsViewModel(parentModel) {
+	var self = this;
 	$.extend(self, parentModel);
 	self.filter = ko.observable("");
 	
 	self.filteredEvents = ko.dependentObservable(function() {
 		var filter = self.filter().toLowerCase(),
-			username = m_serverModel.username(),
+			username = serverModel.username(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
 			if (event.favorite()) return true;
@@ -235,17 +209,14 @@ function MyEventsViewModel(parentModel, serverModel) {
 	});
 }
 
-function PublicEventsViewModel(parentModel, serverModel) {
-	"use strict";
-
-	var self = this,
-		m_serverModel = serverModel;
+function PublicEventsViewModel(parentModel) {
+	var self = this;
 	$.extend(self, parentModel);
 	self.filter = ko.observable("");
 	
 	self.filteredEvents = ko.dependentObservable(function() {
 		var filter = self.filter().toLowerCase(),
-			username = m_serverModel.username(),
+			username = serverModel.username(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
 			if (event.owner() != username && event.isPublic()) {

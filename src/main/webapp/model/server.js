@@ -1,13 +1,11 @@
-function ServerModel(isPhoneGap, amplify) {
+function ServerModel() {
 	"use strict";
 
-	var self = this,
-		m_isPhoneGap = isPhoneGap,
-		m_amplify = amplify;
+	var self = this;
 
-	self.cruisemonkey = ko.observable(m_amplify.store('cruisemonkey_url'));
-	self.username     = ko.observable(m_amplify.store('username'));
-	self.password     = ko.observable(m_amplify.store('password'));
+	self.cruisemonkey = ko.observable(amplify.store('cruisemonkey_url'));
+	self.username     = ko.observable(amplify.store('username'));
+	self.password     = ko.observable(amplify.store('password'));
 	
 	self.authUrl = ko.computed(function() {
 		return self.cruisemonkey() + '/rest/auth';
@@ -26,9 +24,9 @@ function ServerModel(isPhoneGap, amplify) {
 	};
 
 	self.reset = function() {
-		self.cruisemonkey(m_amplify.store('cruisemonkey_url'));
-		self.username(m_amplify.store('username'));
-		self.password(m_amplify.store('password'));
+		self.cruisemonkey(amplify.store('cruisemonkey_url'));
+		self.username(amplify.store('username'));
+		self.password(amplify.store('password'));
 	};
 	
 	self.persist = ko.computed(function() {

@@ -36,29 +36,20 @@ function HeightChecker(headerOffset, visibleWiggle) {
 	};
 }
 
-function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
+function PageNavigator(defaultPage, elementCriteria) {
 	if (!amplify || !pageTracker || !defaultPage || !elementCriteria) {
 		throw new TypeError("You must specify an Amplify storage class, page tracker, default page, and an element criteria!");
 	}
 
-	var m_pageTracker     = pageTracker,
-		m_defaultPage     = defaultPage,
-		m_elementCriteria = elementCriteria,
-		m_heightChecker   = new HeightChecker(45, 15),
-		m_scrollMananger,
-		
-		self = this;
-
-	self.setScrollManager = function(sm) {
-		m_scrollManager = sm;
-	};
+	var self = this,
+		m_heightChecker = new HeightChecker(45, 15);
 
 	self.getCurrentPage = function() {
 		"use strict";
 		var current_page = amplify.store('current_page');
 		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
 		if (!current_page || current_page == 'login') {
-			current_page = m_defaultPage;
+			current_page = defaultPage;
 			amplify.store('current_page', current_page);
 		}
 		return current_page;
@@ -72,12 +63,12 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 			elementPercent = 0,
 			highestPercent = 0;
 
-		pageTracker.getElement('#' + current_page).find(m_elementCriteria).each(function(index, element) {
+		pageTracker.getElement('#' + current_page).find(elementCriteria).each(function(index, element) {
 			"use strict";
 			id = element.getAttribute('id');
 			if (id) {
 				elementPercent = m_heightChecker.percentVisible(element);
-				// console.log(index + ': ' + id + ' = ' + elementPercent + ' (criteria = ' + m_elementCriteria + ')');
+				// console.log(index + ': ' + id + ' = ' + elementPercent + ' (criteria = ' + elementCriteria + ')');
 				if (elementPercent == 100.0) {
 					el = element;
 					highestPercent = elementPercent;
@@ -98,7 +89,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 		if (el && highestPercent > 0) {
 			var elementId = el.getAttribute('id');
 			console.log("PageNavigator::findTopVisibleElement(): first visible element on " + current_page + ": " + elementId);
-			m_pageTracker.setScrolledId(current_page, elementId);
+			pageTracker.setScrolledId(current_page, elementId);
 			return el;
 		} else {
 			console.log('no top visible element found!');
@@ -112,10 +103,10 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 
 		console.log('replaceCurrentPage(' + pageId + ')');
 
-		var page = m_pageTracker.getElement('#' + pageId),
+		var page = pageTracker.getElement('#' + pageId),
 			search = page.find('input[type=search]').first();
 
-		m_pageTracker.getContainer().children().css('display', 'none');
+		pageTracker.getContainer().children().css('display', 'none');
 		page.css('display', 'block');
 
 		if (!Modernizr.touch) {
@@ -124,7 +115,7 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 				search.focus();
 			}
 		}
-		return m_pageTracker.getContainer()[0];
+		return pageTracker.getContainer()[0];
 	};
 
 	self.navigateTo = function(pageId) {
@@ -145,23 +136,23 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 			amplify.store('current_page', pageId);
 		}
 
-		if (m_scrollManager) {
-			m_scrollManager.disable();
+		if (scrollManager) {
+			scrollManager.disable();
 		}
 		content = self.replaceCurrentPage(pageId);
 
-		topElement = m_pageTracker.getTopElement(pageId);
+		topElement = pageTracker.getTopElement(pageId);
 
 		if (!topElement || topElement.getIndex() === 0) {
 			// console.log('scrolling to the top of the page');
 			setTimeout(function() {
 				"use strict";
 
-				m_pageTracker.getElement('#content').scrollTo(0, 0, {
+				pageTracker.getElement('#content').scrollTo(0, 0, {
 					onAfter: function() {
 						setTimeout(function() {
-							if (m_scrollManager) {
-								m_scrollManager.enable();
+							if (scrollManager) {
+								scrollManager.enable();
 							}
 						}, 50);
 					}
@@ -172,14 +163,14 @@ function PageNavigator(amplify, pageTracker, defaultPage, elementCriteria) {
 			setTimeout(function() {
 				"use strict";
 
-				m_pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
+				pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
 					{
 						margin: false,
 						offset: {left:0, top:-45},
 						onAfter: function() {
 							setTimeout(function() {
-								if (m_scrollManager) {
-									m_scrollManager.enable();
+								if (scrollManager) {
+									scrollManager.enable();
 								}
 							}, 50);
 						}

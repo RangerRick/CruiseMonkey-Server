@@ -1,17 +1,16 @@
-function NavModel(serverModel) {
+function NavModel() {
 	"use strict";
 
 	var self = this,
-	m_serverModel = serverModel,
 
 	f_hasUsername = ko.computed(function() {
 		"use strict";
-		return m_serverModel.username() !== null && m_serverModel.username() !== undefined && m_serverModel.username().length > 0;
+		return serverModel.username() !== null && serverModel.username() !== undefined && serverModel.username().length > 0;
 	}),
 
 	f_hasPassword = ko.computed(function() {
 		"use strict";
-		return m_serverModel.password() !== null && m_serverModel.password() !== undefined && m_serverModel.password().length > 0;
+		return serverModel.password() !== null && serverModel.password() !== undefined && serverModel.password().length > 0;
 	});
 
 	self.isSignedIn = ko.computed(function() {
@@ -54,7 +53,7 @@ function NavModel(serverModel) {
 
 	self.logOut = function() {
 		"use strict";
-		m_serverModel.password(null);
-		m_serverModel.persist();
+		serverModel.password(null);
+		serverModel.persist();
 	};
 }

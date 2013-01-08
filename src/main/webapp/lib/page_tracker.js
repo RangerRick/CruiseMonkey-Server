@@ -26,15 +26,13 @@ function PageElement(element, elementId, index) {
 	};
 }
 
-function PageTracker(amplify, elementCriteria) {
+function PageTracker(elementCriteria) {
 	"use strict";
-	if (!amplify|| !elementCriteria) {
+	if (!elementCriteria) {
 		throw new TypeError("You must pass an Amplify storage class and an element match criteria!");
 	}
 
-	var m_elementCriteria = elementCriteria,
-		m_elementCache    = [],
-		self = this;
+	var self = this;
 
 	/** public methods **/
 	self.getScrolledId = function(page) {
@@ -101,13 +99,13 @@ function PageTracker(amplify, elementCriteria) {
 	},
 	f_getElementForPageId = function(pageId) {
 		"use strict";
-		// console.log('f_getElementForPageId(' + pageId + ', criteria = ' + m_elementCriteria + ')');
+		// console.log('f_getElementForPageId(' + pageId + ', criteria = ' + elementCriteria + ')');
 		var topElement = self.getScrolledId(pageId),
 			page = self.getElement('#' + pageId),
 			matched = null,
 			id = null;
 
-		page.find(m_elementCriteria).each(function(index, element) {
+		page.find(elementCriteria).each(function(index, element) {
 			"use strict";
 			id = element.getAttribute('id');
 			if (id == topElement) {

@@ -5,19 +5,23 @@ _header,
 _container,
 pages               = {},
 page_scroll_element = [],
-templates           = ['#header.html', '#events.html', '#amenities.html', '#decks.html'];
+templates           = ['#header.html', '#events.html', '#amenities.html', '#decks.html'],
+statusCode,
+beforeSend,
+scrollManager,
+pageTracker,
+pageNavigator,
+templateLoader;
 
-var scrollManager;
-var pageTracker         = new PageTracker(amplify, '.scrollable');
-var pageNavigator       = new PageNavigator(amplify, pageTracker, 'official-events', '.scrollable');
-var templateLoader      = new TemplateLoader(templates, m_timeout);
+pageTracker         = new PageTracker('.scrollable');
+pageNavigator       = new PageNavigator('official-events', '.scrollable');
+templateLoader      = new TemplateLoader(templates);
 
 templateLoader.onFinished = function() {
 	"use strict";
 
 	scrollManager = new ScrollManager('#content');
 	scrollManager.delay = 100;
-	pageNavigator.setScrollManager(scrollManager);
 
 	/*
 	scrollManager.onScrollStop = function(enabled) {
@@ -122,15 +126,6 @@ var htmlInitialization = {
 		});
 
 		ko.applyBindings(navModel, $(header)[0]);
-	}
-};
-
-var statusCode = {
-	401: function() {
-		console.log('401 not authorized');
-		navModel.authorized(false);
-		serverModel.password(null);
-		$('#login').reveal();
 	}
 };
 
@@ -420,13 +415,26 @@ var createDecksView = function() {
 	};
 })();
 
-var serverModel = new ServerModel(m_isPhoneGap, amplify);
-var navModel = new NavModel(serverModel);
-var eventsModel = new EventsViewModel(navModel, serverModel);
-var ajaxUpdater = new AjaxUpdater(serverModel, eventsModel, navModel);
+var serverModel = new ServerModel();
+var navModel = new NavModel();
+var eventsModel = new EventsViewModel();
+var ajaxUpdater = new AjaxUpdater();
 
-var officialEventsModel = new OfficialEventsViewModel(eventsModel, serverModel);
-var myEventsModel = new MyEventsViewModel(eventsModel, serverModel);
-var publicEventsModel = new PublicEventsViewModel(eventsModel, serverModel);
+var officialEventsModel = new OfficialEventsViewModel(eventsModel);
+var myEventsModel = new MyEventsViewModel(eventsModel);
+var publicEventsModel = new PublicEventsViewModel(eventsModel);
+
+statusCode = {
+	401: function() {
+		console.log('401 not authorized');
+		navModel.authorized(false);
+		serverModel.password(null);
+		$('#login').reveal();
+	}
+};
+
+beforeSend = function beforeSend(xhr) {
+	serverModel.setBasicAuth(xhr);
+};
 
 console.log("app.js loaded");
