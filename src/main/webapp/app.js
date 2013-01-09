@@ -2,17 +2,29 @@ console.log('app.js loading');
 
 var m_eventUpdateInterval = 10000,
 _header, _container, scrollManager, pageTracker, pageNavigator, templateLoader, htmlInitialization, checkIfAuthorized,
-showLoginOrCurrent, setupDefaultView, createOfficialEventsView, createMyEventsView, createPublicEventsView, createLoginView, createAmenitiesView, createDecksView,
+showLoginOrCurrent, setupDefaultView,
 pages = {},
-page_scroll_element = [],
-templates = ['#header.html', '#events.html', '#amenities.html', '#decks.html'];
+page_scroll_element = [];
+
+var serverModel = new ServerModel();
+var navModel = new NavModel();
+var eventsModel = new EventsViewModel();
+var ajaxUpdater = new AjaxUpdater();
+
+var officialEventsModel = new OfficialEventsViewModel(eventsModel);
+var myEventsModel = new MyEventsViewModel(eventsModel);
+var publicEventsModel = new PublicEventsViewModel(eventsModel);
 
 pageTracker = new PageTracker('.scrollable');
 pageNavigator = new PageNavigator('official-events', '.scrollable');
-templateLoader = new TemplateLoader(templates);
+templateLoader = new TemplateLoader(['#header.html', '#login.html', '#events.html', '#amenities.html', '#decks.html']);
 
 templateLoader.onFinished = function() {
 	'use strict';
+
+	if (window.Modernizr.touch) {
+		$('#content').addClass('hide-scrollbar');
+	}
 
 	scrollManager = new ScrollManager('#content');
 	scrollManager.delay = 100; // ms
@@ -25,21 +37,36 @@ templateLoader.onFinished = function() {
 		}
 	};
 
-	$.each(htmlInitialization, function(index, value) {
-		console.log('Initializing HTML for: ' + index);
-		try {
-			value();
-		} catch(err) {
-			console.log('an error occurred initializing ' + index + ': ' + err.message);
-		}
-	});
+	$.each(htmlInitialization, function(index, data) {
+		if (pages[index]) {
+			console.log(index + ' has already been initialized');
+		} else {
+			console.log('initializing HTML for ' + index);
+			if (typeof data === 'function') {
+				data();
+			} else {
+				var div = $('<div>');
+				div.attr('id', index);
+				if (data.divClasses) {
+					for (var i = 0; i < data.divClasses.length; i++) {
+						div.addClass(data.divClasses[i]);
+					}
+				}
+				div.css('display', 'none');
+				var renderedHtml = templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {});
+				div.html(renderedHtml);
+				$('#content').append(div);
 
-	createLoginView();
-	createOfficialEventsView();
-	createMyEventsView();
-	createPublicEventsView();
-	createAmenitiesView();
-	createDecksView();
+				if (data.model) {
+					console.log('applying ' + data.model + ' to ' + index);
+					ko.applyBindings(data.model, div[0]);
+				}
+				div = null;
+			}
+			pages[index] = true;
+		}
+		index = data = null;
+	});
 
 	setupDefaultView();
 
@@ -88,7 +115,7 @@ templateLoader.onFinished = function() {
 window['templateLoader'] = templateLoader;
 
 htmlInitialization = {
-	'header': function createHeader() {
+	"header": function createHeader() {
 		'use strict';
 
 		var header = $('#header'),
@@ -156,6 +183,40 @@ htmlInitialization = {
 
 		ko.applyBindings(navModel, header[0]);
 		header = null;
+	},
+	"login": {
+		"templateSource": "#login.html",
+		"divClasses": ["reveal-modal", "full"],
+		"model": serverModel
+	},
+	"official-events": {
+		"templateSource": "#events.html",
+		"templateAttributes": {
+			"eventType": "official"
+		},
+		"model": officialEventsModel
+	},
+	"my-events": {
+		"templateSource": "#events.html",
+		"templateAttributes": {
+			"eventType": "my"
+		},
+		"model": myEventsModel
+	},
+	"public-events": {
+		"templateSource": "#events.html",
+		"templateAttributes": {
+			"eventType": "public"
+		},
+		"model": publicEventsModel
+	},
+	"amenities": {
+		"templateSource": "#amenities.html",
+		"model": amenitiesModel
+	},
+	"decks": {
+		"templateSource": "#decks.html",
+		"model": decksModel
 	}
 };
 
@@ -275,140 +336,6 @@ setupDefaultView = function() {
 	showLoginOrCurrent();
 };
 
-createOfficialEventsView = function() {
-	'use strict';
-
-	console.log('createOfficialEventsView()');
-	if (!pages.officialEventsView) {
-		var div = $('<div>');
-		div.attr('id', 'official-events');
-		div.css('display', 'none');
-		div.html(templateLoader.renderTemplate('#events.html', { eventType: 'official' }));
-		$('#content').append(div);
-
-		pages.officialEventsView = div;
-
-		ko.applyBindings(officialEventsModel, div[0]);
-		div = null;
-	}
-};
-
-createMyEventsView = function() {
-	'use strict';
-
-	console.log('createMyEventsView()');
-	if (!pages.myEventsView) {
-		var div = $('<div>');
-		div.attr('id', 'my-events');
-		div.css('display', 'none');
-		div.html(templateLoader.renderTemplate('#events.html', { eventType: 'my' }));
-		$('#content').append(div);
-
-		pages.myEventsView = div;
-
-		ko.applyBindings(myEventsModel, div[0]);
-		div = null;
-	}
-};
-
-createPublicEventsView = function() {
-	'use strict';
-
-	console.log('createPublicEventsView()');
-	if (!pages.publicEventsView) {
-		var div = $('<div>');
-		div.attr('id', 'public-events');
-		div.css('display', 'none');
-		div.html(templateLoader.renderTemplate('#events.html', { eventType: 'public' }));
-		$('#content').append(div);
-
-		pages.publicEventsView = div;
-
-		ko.applyBindings(publicEventsModel, div[0]);
-		div = null;
-	}
-};
-
-createLoginView = function() {
-	'use strict';
-
-	console.log('createLoginView()');
-	if (!pages.loginView) {
-		var div = $('#login');
-
-		console.log('done creating loginView');
-		pages.loginView = div;
-		ko.applyBindings(serverModel, div[0]);
-		div = null;
-
-		/*
-		(function _clickSetup() {
-			console.log('handling reset click');
-			$('#login_reset').on('click.cm touchstart.cm', function(e) {
-				'use strict';
-
-				e.preventDefault();
-				console.log('cancel clicked');
-				serverModel.reset();
-			});
-
-			console.log('handling save click');
-			$('#login_save').on('click.cm touchstart.cm', function(e) {
-				'use strict';
-
-				console.log('save clicked');
-				e.preventDefault();
-				setTimeout(function() {
-					'use strict';
-
-					serverModel.persist();
-					showLoginOrCurrent();
-					ajaxUpdater.pollNow();
-				}, 0);
-			});
-		})();
-		*/
-	}
-};
-
-createAmenitiesView = function() {
-	'use strict';
-
-	console.log('createAmenitiesView()');
-	if (!pages.amenitiesView) {
-		var div = $('<div>');
-		div.attr('id', 'amenities');
-		div.css('display', 'none');
-		div.html(templateLoader.renderTemplate('#amenities.html'));
-		$('#content').append(div);
-
-		console.log('done creating amenitiesView');
-		pages.amenitiesView = div;
-
-		ko.applyBindings(amenitiesModel, div[0]);
-		div = null;
-	}
-};
-
-createDecksView = function() {
-	'use strict';
-
-	console.log('createDecksView()');
-	if (!pages.decksView) {
-		var div = $('<div>');
-		div.attr('id', 'decks');
-		div.css('display', 'none');
-		div.html(templateLoader.renderTemplate('#decks.html'));
-		$('#content').append(div);
-
-		console.log('done creating decksView');
-		pages.decksView = div;
-
-		ko.applyBindings(decksModel, div[0]);
-		div = null;
-	}
-};
-
 (function() {
 	/** filter dates in Knockout data-bind **/
 	ko.bindingHandlers.dateString = {
@@ -423,14 +350,5 @@ createDecksView = function() {
 		}
 	};
 })();
-
-var serverModel = new ServerModel();
-var navModel = new NavModel();
-var eventsModel = new EventsViewModel();
-var ajaxUpdater = new AjaxUpdater();
-
-var officialEventsModel = new OfficialEventsViewModel(eventsModel);
-var myEventsModel = new MyEventsViewModel(eventsModel);
-var publicEventsModel = new PublicEventsViewModel(eventsModel);
 
 console.log('app.js loaded');
