@@ -11,5 +11,5 @@ for FILE in externs/*.js; do
 	EXTERNS="$EXTERNS --externs $FILE"
 done
 
-echo java -jar closure-compiler/compiler.jar --warning_level VERBOSE $EXTERNS $FILES
+echo java -jar closure-compiler/compiler.jar --warning_level VERBOSE $EXTERNS $FILES >&2
 java -jar closure-compiler/compiler.jar --warning_level VERBOSE $EXTERNS $FILES
