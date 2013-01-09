@@ -60,16 +60,6 @@ function PageTracker(elementCriteria) {
 		return id;
 	};
 
-	self.__getElement = function ___getElement(criteria) {
-		'use strict';
-		return $(criteria);
-	};
-	self.getElement = function _getElement(criteria) {
-		'use strict';
-		self._memoize = self._memoize || {};
-		return (criteria in self._memoize) ? self._memoize[criteria] : self._memoize[criteria] = self.__getElement(criteria);
-	};
-
 	self.getTopElement = function _getTopElement(pageId) {
 		'use strict';
 		var matched = f_getElementForPageId(pageId);
@@ -97,7 +87,7 @@ function PageTracker(elementCriteria) {
 		'use strict';
 		// console.log('f_getElementForPageId(' + pageId + ', criteria = ' + elementCriteria + ')');
 		var topElement = self.getScrolledId(pageId),
-			page = self.getElement('#' + pageId),
+			page = $('#' + pageId),
 			matched = null,
 			id = null;
 

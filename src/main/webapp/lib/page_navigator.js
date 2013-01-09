@@ -122,7 +122,10 @@ function PageNavigator(defaultPage, elementCriteria) {
 			if (search) {
 				search.focus();
 			}
+			search = null;
 		}
+		
+		page = null;
 	};
 
 	self.navigateTo = function _navigateTo(pageId) {
@@ -131,12 +134,10 @@ function PageNavigator(defaultPage, elementCriteria) {
 		console.log('----------------------------------------------------------------------------------');
 		console.log('navigateTo(' + pageId + ')');
 
-		var page, topElement;
+		var topElement;
 
-		page = $(pageId);
-		if (!page) {
+		if (!$(pageId)) {
 			console.log('unable to locate element for ' + pageId);
-			page = null;
 			pageId = null;
 			return false;
 		}

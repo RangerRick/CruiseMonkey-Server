@@ -10,16 +10,20 @@ function ServerModel() {
 	self.username = ko.observable(amplify.store('username'));
 	self.password = ko.observable(amplify.store('password'));
 
+	self._cruisemonkey = ko.computed(function() {
+		return self.cruisemonkey().replace(/\/$/, '');
+	});
+
 	self.authUrl = ko.computed(function() {
-		return self.cruisemonkey() + '/rest/auth';
+		return self._cruisemonkey() + '/rest/auth';
 	});
 
 	self.eventUrl = ko.computed(function() {
-		return self.cruisemonkey() + '/rest/cruisemonkey/events';
+		return self._cruisemonkey() + '/rest/cruisemonkey/events';
 	});
 
 	self.favoritesUrl = function(id) {
-		return self.cruisemonkey() + '/rest/favorites?event=' + encodeURI(id);
+		return self._cruisemonkey() + '/rest/favorites?event=' + encodeURI(id);
 	};
 
 	self.setBasicAuth = function(xhr) {
@@ -27,20 +31,20 @@ function ServerModel() {
 	};
 
 	self.reset = function() {
-		self.cruisemonkey(amplify.store('cruisemonkey_url'));
+		self.cruisemonkey(amplify.store('cruisemonkey_url').replace(/\/$/, ''));
 		self.username(amplify.store('username'));
 		self.password(amplify.store('password'));
 	};
 
 	self.persist = ko.computed(function() {
-		amplify.store('cruisemonkey_url', self.cruisemonkey());
+		amplify.store('cruisemonkey_url', self.cruisemonkey().replace(/\/$/, ''));
 		amplify.store('username', self.username());
 		amplify.store('password', self.password());
 	});
 
 	setTimeout(function() {
 		if (!self.cruisemonkey()) {
-			self.cruisemonkey('http://c4.amberwood.net');
+			self.cruisemonkey('http://server3.befunk.com:8088');
 		}
 	}, 0);
 }

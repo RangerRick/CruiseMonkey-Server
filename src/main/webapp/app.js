@@ -155,6 +155,7 @@ htmlInitialization = {
 		});
 
 		ko.applyBindings(navModel, header[0]);
+		header = null;
 	}
 };
 
@@ -253,6 +254,7 @@ setupDefaultView = function() {
 	} else {
 		console.log('no stored ReST events');
 	}
+	events = null;
 
 	setTimeout(function() {
 		ajaxUpdater.start();
@@ -278,17 +280,16 @@ createOfficialEventsView = function() {
 
 	console.log('createOfficialEventsView()');
 	if (!pages.officialEventsView) {
-		var html = templateLoader.renderTemplate('#events.html', { eventType: 'official' });
-
 		var div = $('<div>');
 		div.attr('id', 'official-events');
 		div.css('display', 'none');
-		div.html(html);
+		div.html(templateLoader.renderTemplate('#events.html', { eventType: 'official' }));
 		$('#content').append(div);
 
 		pages.officialEventsView = div;
 
 		ko.applyBindings(officialEventsModel, div[0]);
+		div = null;
 	}
 };
 
@@ -297,17 +298,16 @@ createMyEventsView = function() {
 
 	console.log('createMyEventsView()');
 	if (!pages.myEventsView) {
-		var html = templateLoader.renderTemplate('#events.html', { eventType: 'my' });
-
 		var div = $('<div>');
 		div.attr('id', 'my-events');
 		div.css('display', 'none');
-		div.html(html);
+		div.html(templateLoader.renderTemplate('#events.html', { eventType: 'my' }));
 		$('#content').append(div);
 
 		pages.myEventsView = div;
 
 		ko.applyBindings(myEventsModel, div[0]);
+		div = null;
 	}
 };
 
@@ -316,17 +316,16 @@ createPublicEventsView = function() {
 
 	console.log('createPublicEventsView()');
 	if (!pages.publicEventsView) {
-		var html = templateLoader.renderTemplate('#events.html', { eventType: 'public' });
-
 		var div = $('<div>');
 		div.attr('id', 'public-events');
 		div.css('display', 'none');
-		div.html(html);
+		div.html(templateLoader.renderTemplate('#events.html', { eventType: 'public' }));
 		$('#content').append(div);
 
 		pages.publicEventsView = div;
 
 		ko.applyBindings(publicEventsModel, div[0]);
+		div = null;
 	}
 };
 
@@ -336,13 +335,6 @@ createLoginView = function() {
 	console.log('createLoginView()');
 	if (!pages.loginView) {
 		var div = $('#login');
-
-		// enter doesn't submit for some reason, so handle it manually
-		console.log('trapping keydown');
-		div.find('input').keydown(function(e) {
-			var keyCode = e.keyCode || e.which;
-			if (keyCode == 13) save_button.click();
-		});
 
 		/*
 		console.log('handling href links');
@@ -359,37 +351,44 @@ createLoginView = function() {
 			}
 		});
 		*/
-
-		console.log('handling reset click');
-		$('#login_reset').on('click.cm touchstart.cm', function(e) {
-			'use strict';
-
-			e.preventDefault();
-			console.log('cancel clicked');
-			serverModel.reset();
-		});
-
-		var save_button = $('#login_save');
-
-		console.log('handling save click');
-		save_button.on('click.cm touchstart.cm', function(e) {
-			'use strict';
-
-			console.log('save clicked');
-			e.preventDefault();
-			setTimeout(function() {
-				'use strict';
-
-				serverModel.persist();
-				showLoginOrCurrent();
-				ajaxUpdater.pollNow();
-			}, 0);
+		
+		// enter doesn't submit for some reason, so handle it manually
+		console.log('trapping keydown');
+		div.find('input').keydown(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == 13) $('#login_save').click();
 		});
 
 		console.log('done creating loginView');
 		pages.loginView = div;
-
 		ko.applyBindings(serverModel, div[0]);
+		div = null;
+
+		(function _clickSetup() {
+			console.log('handling reset click');
+			$('#login_reset').on('click.cm touchstart.cm', function(e) {
+				'use strict';
+
+				e.preventDefault();
+				console.log('cancel clicked');
+				serverModel.reset();
+			});
+
+			console.log('handling save click');
+			$('#login_save').on('click.cm touchstart.cm', function(e) {
+				'use strict';
+
+				console.log('save clicked');
+				e.preventDefault();
+				setTimeout(function() {
+					'use strict';
+
+					serverModel.persist();
+					showLoginOrCurrent();
+					ajaxUpdater.pollNow();
+				}, 0);
+			});
+		});
 	}
 };
 
@@ -398,18 +397,17 @@ createAmenitiesView = function() {
 
 	console.log('createAmenitiesView()');
 	if (!pages.amenitiesView) {
-		var html = templateLoader.renderTemplate('#amenities.html');
-
 		var div = $('<div>');
 		div.attr('id', 'amenities');
 		div.css('display', 'none');
-		div.html(html);
+		div.html(templateLoader.renderTemplate('#amenities.html'));
 		$('#content').append(div);
 
 		console.log('done creating amenitiesView');
 		pages.amenitiesView = div;
 
 		ko.applyBindings(amenitiesModel, div[0]);
+		div = null;
 	}
 };
 
@@ -418,18 +416,17 @@ createDecksView = function() {
 
 	console.log('createDecksView()');
 	if (!pages.decksView) {
-		var html = templateLoader.renderTemplate('#decks.html');
-
 		var div = $('<div>');
 		div.attr('id', 'decks');
 		div.css('display', 'none');
-		div.html(html);
+		div.html(templateLoader.renderTemplate('#decks.html'));
 		$('#content').append(div);
 
 		console.log('done creating decksView');
 		pages.decksView = div;
 
 		ko.applyBindings(decksModel, div[0]);
+		div = null;
 	}
 };
 
