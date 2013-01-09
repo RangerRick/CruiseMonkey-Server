@@ -336,34 +336,12 @@ createLoginView = function() {
 	if (!pages.loginView) {
 		var div = $('#login');
 
-		/*
-		console.log('handling href links');
-		div.find('a').each(function(index, element) {
-			'use strict';
-
-			var href = element.getAttribute('href');
-			// console.log('a = ' + $(element).html() + ', href = ' + href);
-			if (href !== undefined && href !== '') {
-				element.click(function(e) {
-					openUrl(href);
-					e.preventDefault();
-				});
-			}
-		});
-		*/
-		
-		// enter doesn't submit for some reason, so handle it manually
-		console.log('trapping keydown');
-		div.find('input').keydown(function(e) {
-			var keyCode = e.keyCode || e.which;
-			if (keyCode == 13) $('#login_save').click();
-		});
-
 		console.log('done creating loginView');
 		pages.loginView = div;
 		ko.applyBindings(serverModel, div[0]);
 		div = null;
 
+		/*
 		(function _clickSetup() {
 			console.log('handling reset click');
 			$('#login_reset').on('click.cm touchstart.cm', function(e) {
@@ -389,6 +367,7 @@ createLoginView = function() {
 				}, 0);
 			});
 		})();
+		*/
 	}
 };
 

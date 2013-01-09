@@ -36,6 +36,11 @@ function ServerModel() {
 		self.password(amplify.store('password'));
 	};
 
+	self.onSubmit = function(formElement) {
+		self.persist();
+		showLoginOrCurrent();
+	};
+
 	self.persist = ko.computed(function() {
 		amplify.store('cruisemonkey_url', self.cruisemonkey().replace(/\/$/, ''));
 		amplify.store('username', self.username());
