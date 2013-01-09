@@ -1,3 +1,6 @@
+/**
+ * @constructor
+ */
 function Swiper() {
 'use strict';
 

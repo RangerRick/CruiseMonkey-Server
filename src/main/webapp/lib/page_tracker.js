@@ -1,23 +1,30 @@
+/**
+ * @constructor
+ */
 function PageElement(element, elementId, index) {
 	'use strict';
 	if (!element || !elementId || index === undefined) {
 		throw new TypeError('You must pass an element, element ID, and match index!');
 	}
+	var self = this;
 
-	this.getElement = function _getElement() {
+	self.getElement = function _getElement() {
 		return element;
 	};
-	this.getId = function _getId() {
+	self.getId = function _getId() {
 		return elementId;
 	};
-	this.getIndex = function _getIndex() {
+	self.getIndex = function _getIndex() {
 		return index;
 	};
-	this.toString = function _toString() {
-		return this.getElement() + ' (' + this.getIndex() + ')';
+	self.toString = function _toString() {
+		return self.getElement() + ' (' + self.getIndex() + ')';
 	};
 }
 
+/**
+ * @constructor
+ */
 function PageTracker(elementCriteria) {
 	'use strict';
 	if (!elementCriteria) {

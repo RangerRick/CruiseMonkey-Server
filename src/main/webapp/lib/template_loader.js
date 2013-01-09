@@ -14,6 +14,9 @@ if (!Array.prototype.indexOf) {
 	};
 }
 
+/**
+ * @constructor
+ */
 function TemplateLoader(urls) {
 	'use strict';
 	var self = this,
@@ -134,9 +137,17 @@ function TemplateLoader(urls) {
 			f_loadTemplate(url);
 		}
 	};
-	self.onLoad = function(url) {
+	/**
+	 * @param {String|string=} url
+	 * @param {String|string=} template
+	 */
+	self.onLoad = function(url, template) {
 	};
-	self.onFail = function(url) {
+	/**
+	 * @param {String|string=} url
+	 * @param {String|string=} template
+	 */
+	self.onFail = function(url, template) {
 	};
 	self.onFinished = function() {
 	};

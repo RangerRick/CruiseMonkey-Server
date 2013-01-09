@@ -1,3 +1,6 @@
+/**
+ * @constructor
+ */
 function ServerModel() {
 	'use strict';
 

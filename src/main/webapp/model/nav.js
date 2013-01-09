@@ -1,3 +1,6 @@
+/**
+ * @constructor
+ */
 function NavModel() {
 	'use strict';
 

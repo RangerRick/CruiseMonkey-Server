@@ -1,3 +1,6 @@
+/**
+ * @constructor
+ */
 function Photos() {
 	'use strict';
 	var self = this,

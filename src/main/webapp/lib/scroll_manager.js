@@ -1,3 +1,6 @@
+/**
+ * @constructor
+ */
 function ScrollManager(selector) {
 	'use strict';
 	var m_activeTimeout = null,

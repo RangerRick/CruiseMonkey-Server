@@ -1,4 +1,10 @@
-function Location(deck, name, type) {
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string} type
+ */
+function Loc(deck, name, type) {
 	'use strict';
 	var self = this;
 
@@ -10,48 +16,106 @@ function Location(deck, name, type) {
 		return retval.replace(self.alnumRegex, '');
 	});
 }
-Location.prototype.alnumRegex = /[^A-Za-z0-9\-]/g;
+Loc.prototype.alnumRegex = /[^A-Za-z0-9\-]/g;
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string} type
+ * @param {String|string=} description
+ */
 function LocationWithDescription(deck, name, type, description) {
 	'use strict';
-	$.extend(this, new Location(deck, name, type));
-	this.description = ko.observable(description);
+	var self = this;
+	$.extend(self, new Loc(deck, name, type));
+	self.description = ko.observable(description);
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ */
 function Venue(deck, name, description) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Venue', description));
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Venue', description));
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ */
 function Bar(deck, name, description) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Bar/Club', description));
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Bar/Club', description));
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ */
 function Miscellaneous(deck, name, description) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Miscellaneous', description));
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Miscellaneous', description));
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ * @param {number=} surcharge
+ */
 function Food(deck, name, description, surcharge) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Food', description));
-	this.surcharge = ko.observable(surcharge);
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Food', description));
+	self.surcharge = ko.observable(surcharge);
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ */
 function Shopping(deck, name, description) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Shopping', description));
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Shopping', description));
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ */
 function Pool(deck, name, description) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Pool', description));
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Pool', description));
 }
 
+/**
+ * @constructor
+ * @param {number} deck
+ * @param {String|string} name
+ * @param {String|string=} description
+ */
 function Fitness(deck, name, description) {
 	'use strict';
-	$.extend(this, new LocationWithDescription(deck, name, 'Spa/Fitness', description));
+	var self = this;
+	$.extend(self, new LocationWithDescription(deck, name, 'Spa/Fitness', description));
 }
 
 var locations = [
@@ -152,6 +216,9 @@ var locations = [
 	};
 })(jQuery);
 
+/**
+ * @constructor
+ */
 function AmenitiesModel() {
 	'use strict';
 	var self = this;
@@ -240,6 +307,9 @@ Number.prototype.pad = function _pad(size) {
 	return (1e15 + this + '').slice(-size);
 };
 
+/**
+ * @constructor
+ */
 function Deck(number) {
 	'use strict';
 	var self = this;
@@ -255,13 +325,17 @@ function Deck(number) {
 	});
 }
 
+/**
+ * @constructor
+ */
 function DecksModel() {
 	'use strict';
+	var self = this;
 
-	this.decks = ko.observableArray();
+	self.decks = ko.observableArray();
 
 	for (var i = 2; i <= 15; i++) {
-		this.decks.push(new Deck(i));
+		self.decks.push(new Deck(i));
 	}
 }
 

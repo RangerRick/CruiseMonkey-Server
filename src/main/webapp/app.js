@@ -82,11 +82,11 @@ htmlInitialization = {
 
 		var header = $('#header'),
 			host = document.URL.replace(/\#$/, ''),
-			hostRegex = new RegExp('^' + CMUtils.escapeForRegExp(host));
+			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host));
 
 		header.html(templateLoader.renderTemplate('#header.html'));
 
-		$(header).find('a').each(function(index, element) {
+		header.find('a').each(function(index, element) {
 			'use strict';
 
 			// console.log('url host = ' + host);
@@ -105,48 +105,45 @@ htmlInitialization = {
 			if (hash !== undefined) {
 				if (hash !== '') {
 					// $(element).off('click');
-					$(element).on('click.fndtn touchstart.fndtn', function(e) {
+					$(element).on('click.cm touchstart.cm', function(e) {
 						'use strict';
 
 						e.preventDefault();
 						// console.log('navigation event: ' + hash);
 						pageNavigator.navigateTo(hash);
-						if ($('.top-bar').hasClass('expanded')) $('.toggle-topbar').find('a').click();
 					});
 				}
 			} else if (href !== undefined && href !== '') {
-				$(element).on('click.fndtn touchstart.fndtn', function(e) {
+				$(element).on('click.cm touchstart.cm', function(e) {
 					'use strict';
 
 					e.preventDefault();
-					CMUtils.openLink(href);
+					cmUtils.openLink(href);
 				});
 			}
 		});
 
 		$(header).find('.signin a').each(function(index, element) {
-			$(element).on('click.fndtn touchstart.fndtn', function(e) {
+			$(element).on('click.cm touchstart.cm', function(e) {
 				'use strict';
 
 				e.preventDefault();
 				console.log('signin clicked');
-				if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
 				$('#login').reveal();
 			});
 		});
 		$(header).find('.signout a').each(function(index, element) {
-			$(element).on('click.fndtn touchstart.fndtn', function(e) {
+			$(element).on('click.cm touchstart.cm', function(e) {
 				'use strict';
 
 				e.preventDefault();
 				console.log('signout clicked');
-				if ($('.top-bar').hasClass('expanded')) $('.top-bar').removeClass('expanded');
 				navModel.logOut();
 				$('#login').reveal();
 			});
 		});
 
-		ko.applyBindings(navModel, $(header)[0]);
+		ko.applyBindings(navModel, header[0]);
 	}
 };
 
@@ -351,7 +348,7 @@ createLoginView = function() {
 		*/
 
 		console.log('handling reset click');
-		$('#login_reset').on('click.fndtn touchstart.fndtn', function(e) {
+		$('#login_reset').on('click.cm touchstart.cm', function(e) {
 			'use strict';
 
 			e.preventDefault();
@@ -362,7 +359,7 @@ createLoginView = function() {
 		var save_button = $('#login_save');
 
 		console.log('handling save click');
-		save_button.on('click.fndtn touchstart.fndtn', function(e) {
+		save_button.on('click.cm touchstart.cm', function(e) {
 			'use strict';
 
 			console.log('save clicked');

@@ -1,5 +1,7 @@
-/** represents a calendar event **/
-function Event(data) {
+/**
+ * @constructor
+ */
+function CalendarEvent(data) {
 	var self = this;
 
 	self.id = ko.observable(data['@id']);
@@ -13,8 +15,8 @@ function Event(data) {
 	self.owner = ko.observable(data.owner);
 	self.isPublic = ko.observable(data.isPublic);
 	self.timespan = ko.computed(function() {
-		var start = start === null ? null : CMUtils.formatTime(self.start(), false);
-		var end = end === null ? null : CMUtils.formatTime(self.end(), false);
+		var start = self.start() === null ? null : cmUtils.formatTime(self.start(), false);
+		var end = self.end() === null ? null : cmUtils.formatTime(self.end(), false);
 		var retVal = '';
 		if (start !== null) {
 			retVal += start;
@@ -30,8 +32,11 @@ function Event(data) {
 		return self.id() + ': ' + self.summary();
 	});
 }
-Event.prototype.attributeRegex = /[\W\@]+/g;
+CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
 
+/**
+ * @constructor
+ */
 function EventsViewModel() {
 	var self = this;
 
@@ -103,7 +108,7 @@ function EventsViewModel() {
 					if (item.owner() != event.owner) { item.owner(event.owner); }
 					return item;
 				} else {
-					e = new Event(event);
+					e = new CalendarEvent(event);
 					e.favorite(isFavorite);
 
 					return e;
@@ -132,6 +137,9 @@ var matchEventText = function _matchEventText(event, filter) {
 	}
 };
 
+/**
+ * @constructor
+ */
 function OfficialEventsViewModel(parentModel) {
 	var self = this;
 
@@ -161,6 +169,9 @@ function OfficialEventsViewModel(parentModel) {
 	});
 }
 
+/**
+ * @constructor
+ */
 function MyEventsViewModel(parentModel) {
 	var self = this;
 	$.extend(self, parentModel);
@@ -185,6 +196,9 @@ function MyEventsViewModel(parentModel) {
 	});
 }
 
+/**
+ * @constructor
+ */
 function PublicEventsViewModel(parentModel) {
 	var self = this;
 	$.extend(self, parentModel);

@@ -1,9 +1,13 @@
+/**
+ * @constructor
+ */
 function HeightChecker(headerOffset, visibleWiggle) {
 	'use strict';
 	var m_headerOffset = headerOffset || 0,
-		m_visibleWiggle = visibleWiggle || 0;
+		m_visibleWiggle = visibleWiggle || 0,
+		self = this;
 
-	this.percentVisible = function _percentVisible(element) {
+	self.percentVisible = function _percentVisible(element) {
 		'use strict';
 		var w = $(window),
 			e = $(element),
@@ -36,6 +40,9 @@ function HeightChecker(headerOffset, visibleWiggle) {
 	};
 }
 
+/**
+ * @constructor
+ */
 function PageNavigator(defaultPage, elementCriteria) {
 	if (!defaultPage || !elementCriteria) {
 		throw new TypeError('You must specify a default page and an element criteria!');
