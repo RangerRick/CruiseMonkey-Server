@@ -35,6 +35,8 @@ function HeightChecker(headerOffset, visibleWiggle) {
 		} else {
 			visiblePercent = Math.max(0, visibleHeight / windowHeight * 100.0).toFixed(2);
 		}
+		
+		w = e = offset = windowTop = windowBottom = windowHeight = height = top = bottom = adjustedTop = adjustedBottom = lowestTop = highestBottom = visibleHeight = null;
 
 		return visiblePercent;
 	};
@@ -134,6 +136,8 @@ function PageNavigator(defaultPage, elementCriteria) {
 		page = $(pageId);
 		if (!page) {
 			console.log('unable to locate element for ' + pageId);
+			page = null;
+			pageId = null;
 			return false;
 		}
 
@@ -150,6 +154,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 
 		if (!topElement || topElement.getIndex() === 0) {
 			// console.log('scrolling to the top of the page');
+			topElement = null;
 			setTimeout(function _scrollTop() {
 				'use strict';
 
@@ -165,14 +170,17 @@ function PageNavigator(defaultPage, elementCriteria) {
 			}, 0);
 		} else {
 			// console.log('scrolling to ' + topElement.toString());
+			var id = '#' + topElement.getId();
+			topElement = null;
 			setTimeout(function _scrollToElement() {
 				'use strict';
 
-				$('#content').scrollTo('#' + topElement.getId(), 0,
+				$('#content').scrollTo(id, 0,
 					{
 						margin: false,
 						offset: {left: 0, top: -45},
 						onAfter: function _onAfter() {
+							id = null;
 							setTimeout(function _enableScrollManager() {
 								if (scrollManager) {
 									scrollManager.enabled = true;

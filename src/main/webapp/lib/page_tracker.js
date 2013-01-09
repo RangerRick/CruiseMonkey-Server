@@ -37,13 +37,14 @@ function PageTracker(elementCriteria) {
 		f_getElementForPageId;
 
 	/** public methods **/
-	self.getScrolledId = function _getScrolledId(page) {
+	self.getScrolledId = function _getScrolledId(pageId) {
 		'use strict';
-		console.log('PageTracker::getScrolledId(' + page + ')');
-		if (!page) {
-			throw new TypeError('You must specify a page!');
+		console.log('PageTracker::getScrolledId(' + pageId + ')');
+		if (!pageId) {
+			throw new TypeError('You must specify a page ID!');
 		}
-		return f_getPageCache()[page];
+
+		return f_getPageCache()[pageId];
 	};
 
 	self.setScrolledId = function _setScrolledId(page, id) {
@@ -55,6 +56,7 @@ function PageTracker(elementCriteria) {
 		var page_store_cache = f_getPageCache();
 		page_store_cache[page] = id;
 		f_setPageCache(page_store_cache);
+		page_store_cache = null;
 		return id;
 	};
 
@@ -89,6 +91,7 @@ function PageTracker(elementCriteria) {
 	f_setPageCache = function(new_page_store_cache) {
 		'use strict';
 		amplify.store('page_store_cache', new_page_store_cache);
+		new_page_store_cache = null;
 	};
 	f_getElementForPageId = function(pageId) {
 		'use strict';
@@ -110,6 +113,10 @@ function PageTracker(elementCriteria) {
 			}
 			return true;
 		});
+		
+		topElement = null;
+		page = null;
+		id = null;
 
 		return matched;
 	};

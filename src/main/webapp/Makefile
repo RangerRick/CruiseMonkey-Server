@@ -100,7 +100,7 @@ temp/%.min.css: %.css
 
 cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE) compile.sh
 	@#cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
-	@echo compile.sh $(CRUISEMONKEYJS)
+	@echo ./compile.sh $(CRUISEMONKEYJS)
 	@./compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null
 
 cruisemonkey.css: $(CRUISEMONKEYMINCSS)

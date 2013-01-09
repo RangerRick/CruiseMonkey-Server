@@ -82,13 +82,13 @@ function TemplateLoader(urls) {
 					url: url,
 					timeout: m_timeout,
 					cache: false,
-					success: function(template) {
-						f_onLoad(url, template);
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						f_onFail(url, textStatus, errorThrown);
-					},
 					dataType: 'text'
+				}).done(function _done(template, textStatus, jqXHR) {
+					f_onLoad(url, template);
+				}).fail(function _fail(jqXHR, textStatus, errorThrown) {
+					console.log('TemplateLoader::loadTemplate(): An error occurred while updating event JSON: ' + ko.toJSON(jqXHR));
+					console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+					f_onFail(url, textStatus, errorThrown);
 				});
 			}
 		})();

@@ -3,7 +3,7 @@ module("Locations", {
 
 test('testLocations', 4, function() {
 	"use strict";
-	var location = new Location(2, 'Shoe Store (Awesome!)', 'store');
+	var location = new Loc(2, 'Shoe Store (Awesome!)', 'store');
 
 	equal(location.deck(), 2);
 	equal(location.name(), 'Shoe Store (Awesome!)');
@@ -39,6 +39,7 @@ test('testDecks', 3, function() {
 	"use strict";
 	var deck = new Deck(2);
 	equal(deck.number(), 2);
+	deck.size(600);
 	equal(deck.image(), 'images/deck02-600.png');
 	
 	deck.size(300);

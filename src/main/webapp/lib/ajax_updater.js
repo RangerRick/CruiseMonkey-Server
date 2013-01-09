@@ -26,6 +26,9 @@ function AjaxUpdater() {
 				cache: false,
 				dataType: 'json',
 				statusCode: {
+					200: function two_hundred() {
+						console.log('200 OK');
+					},
 					401: function four_oh_one() {
 						console.log('401 not authorized');
 						navModel.authorized(false);
@@ -35,20 +38,20 @@ function AjaxUpdater() {
 				},
 				beforeSend: function beforeSend(xhr) {
 					serverModel.setBasicAuth(xhr);
-				},
-				success: function _success(data) {
-					console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
-					eventsModel.updateData(data);
-					m_inFlight = false;
 				}
-			}).error(function _error(data, textStatus, errorThrown) {
-				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
+			}).success(function _success(data) {
+				console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
+				eventsModel.updateData(data);
+				m_inFlight = false;
+			}).fail(function _error(jqXHR, textStatus, errorThrown) {
+				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(jqXHR));
 				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
 				m_inFlight = false;
 			});
 		} else {
 			console.log('Not authorized according to navModel, skipping update.');
 		}
+		//MemoryLeakChecker.checkLeaks(window);
 	};
 
 	self.pollNow = function _pollNow() {

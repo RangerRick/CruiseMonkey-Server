@@ -15,7 +15,7 @@ templateLoader.onFinished = function() {
 	'use strict';
 
 	scrollManager = new ScrollManager('#content');
-	scrollManager.delay = 100;
+	scrollManager.delay = 100; // ms
 
 	scrollManager.onScrollStop = function(enabled) {
 		'use strict';
@@ -27,7 +27,11 @@ templateLoader.onFinished = function() {
 
 	$.each(htmlInitialization, function(index, value) {
 		console.log('Initializing HTML for: ' + index);
-		value();
+		try {
+			value();
+		} catch(err) {
+			console.log('an error occurred initializing ' + index + ': ' + err.message);
+		}
 	});
 
 	createLoginView();
@@ -59,6 +63,9 @@ templateLoader.onFinished = function() {
 				dataType: 'json',
 				type: entry.favorite() ? 'PUT' : 'DELETE',
 				statusCode: {
+					200: function two_hundred() {
+						console.log('200 OK');
+					},
 					401: function four_oh_one() {
 						console.log('401 not authorized');
 						navModel.authorized(false);
@@ -69,6 +76,10 @@ templateLoader.onFinished = function() {
 				beforeSend: function beforeSend(xhr) {
 					serverModel.setBasicAuth(xhr);
 				}
+			}).fail(function _fail(jqXHR, textStatus, errorThrown) {
+				'use strict';
+				console.log('favorites: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
+				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
 			});
 		});
 	}, 50);
@@ -165,6 +176,9 @@ checkIfAuthorized = function(success, failure) {
 		dataType: 'json',
 		type: 'GET',
 		statusCode: {
+			200: function two_hundred() {
+				console.log('200 OK');
+			},
 			401: function four_oh_one() {
 				console.log('401 not authorized');
 				navModel.authorized(false);
@@ -174,24 +188,23 @@ checkIfAuthorized = function(success, failure) {
 		},
 		beforeSend: function beforeSend(xhr) {
 			serverModel.setBasicAuth(xhr);
-		},
-		success: function _success(data) {
-			'use strict';
-
-			if (data === true) {
-				console.log('checkIfAuthorized(): test returned OK');
-				success();
-				return;
-			} else {
-				console.log('checkIfAuthorized(): success function called, but data was not OK!');
-				failure();
-				return;
-			}
 		}
-	}).error(function _error(data) {
+	}).success(function _success(data) {
 		'use strict';
 
-		console.log('checkIfAuthorized(): An error occurred: ' + ko.toJSON(data, null, 2));
+		if (data === true) {
+			console.log('checkIfAuthorized(): test returned OK');
+			success();
+			return;
+		} else {
+			console.log('checkIfAuthorized(): success function called, but data was not OK!');
+			failure();
+			return;
+		}
+	}).fail(function _error(jqXHR, textStatus, errorThrown) {
+		'use strict';
+		console.log('checkIfAuthorized(): An error occurred: ' + errorThrown);
+		console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
 		failure();
 	});
 };

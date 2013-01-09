@@ -154,6 +154,7 @@
 		<!-- BROWSER --><!--<script src="lib/swiper.js"></script> -->
 		<!-- BROWSER --><script src="lib/template_loader.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>
+		<!-- BROWSER --><script src="3rdparty/memory_leak_checker.js"></script>
 	</head>
 	<body onload="onLoad()">
 		<div id="header"></div>

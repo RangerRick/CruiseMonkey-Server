@@ -65,7 +65,7 @@ asyncTest('testDisabled', 4, function() {
 		}
 	};
 	scrollManager.delay = 10;
-	scrollManager.disable();
+	scrollManager.enabled = false;
 
 	$('#500').scroll();
 	setTimeout(function() {
