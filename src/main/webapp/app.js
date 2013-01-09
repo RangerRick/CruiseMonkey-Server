@@ -388,7 +388,7 @@ createLoginView = function() {
 					ajaxUpdater.pollNow();
 				}, 0);
 			});
-		});
+		})();
 	}
 };
 
