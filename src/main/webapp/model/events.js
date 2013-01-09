@@ -101,6 +101,7 @@ function EventsViewModel() {
 				} else {
 					e = new Event(event);
 					e.favorite(isFavorite);
+
 					/*
 					e.favorite.subscribe(function(isFavorite) {
 						"use strict";
@@ -122,8 +123,17 @@ function EventsViewModel() {
 							cache: false,
 							dataType: 'json',
 							type: type,
-							statusCode: statusCode,
-							beforeSend: beforeSend
+							statusCode: {
+								401: function four_oh_one() {
+									console.log('401 not authorized');
+									navModel.authorized(false);
+									serverModel.password(null);
+									$('#login').reveal();
+								}
+							},
+							beforeSend: function beforeSend(xhr) {
+								serverModel.setBasicAuth(xhr);
+							}
 						});
 					});
 					*/
@@ -142,7 +152,7 @@ function EventsViewModel() {
 }
 
 /** used for filter/searching, match an event based on a filter **/
-var matchEventText = function(event, filter) {
+var matchEventText = function _matchEventText(event, filter) {
 	"use strict";
 
 	if (event.summary().toLowerCase().search(filter) != -1) {
@@ -160,11 +170,10 @@ function OfficialEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable("");
 
-	self.filteredEvents = ko.dependentObservable(function() {
-		var username = serverModel.username(),
-			filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
+		var filter = self.filter().toLowerCase(),
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
 			if (event === undefined) {
 				return false;
 			}
@@ -177,7 +186,7 @@ function OfficialEventsViewModel(parentModel) {
 		if (!filter) {
 			return matchesGroup;
 		} else {
-			return ko.utils.arrayFilter(matchesGroup, function(event) {
+			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
 				return matchEventText(event, filter);
 			});
 		}
@@ -189,20 +198,19 @@ function MyEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable("");
 	
-	self.filteredEvents = ko.dependentObservable(function() {
+	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
 		var filter = self.filter().toLowerCase(),
-			username = serverModel.username(),
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
+		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
 			if (event.favorite()) return true;
-			if (event.owner() == username) return true;
+			if (event.owner() == serverModel.username()) return true;
 			return false;
 		});
 
 		if (!filter) {
 			return matchesGroup;
 		} else {
-			return ko.utils.arrayFilter(matchesGroup, function(event) {
+			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
 				return matchEventText(event, filter);
 			});
 		}
@@ -214,12 +222,11 @@ function PublicEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable("");
 	
-	self.filteredEvents = ko.dependentObservable(function() {
+	self.filteredEvents = ko.dependentObservable (function _filteredEvents() {
 		var filter = self.filter().toLowerCase(),
-			username = serverModel.username(),
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function(event) {
-			if (event.owner() != username && event.isPublic()) {
+		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event.owner() != serverModel.username() && event.isPublic()) {
 				return true;
 			}
 			return false;
@@ -228,7 +235,7 @@ function PublicEventsViewModel(parentModel) {
 		if (!filter) {
 			return matchesGroup;
 		} else {
-			return ko.utils.arrayFilter(matchesGroup, function(event) {
+			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
 				return matchEventText(event, filter);
 			});
 		}

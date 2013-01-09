@@ -3,22 +3,22 @@ function NavModel() {
 
 	var self = this,
 
-	f_hasUsername = ko.computed(function() {
+	f_hasUsername = ko.computed(function _hasUsername() {
 		"use strict";
 		return serverModel.username() !== null && serverModel.username() !== undefined && serverModel.username().length > 0;
 	}),
 
-	f_hasPassword = ko.computed(function() {
+	f_hasPassword = ko.computed(function _hasPassword() {
 		"use strict";
 		return serverModel.password() !== null && serverModel.password() !== undefined && serverModel.password().length > 0;
 	});
 
-	self.isSignedIn = ko.computed(function() {
+	self.isSignedIn = ko.computed(function _isSignedIn() {
 		"use strict";
 		return f_hasUsername() && f_hasPassword();
 	});
 
-	self.showSignOut = ko.computed(function() {
+	self.showSignOut = ko.computed(function _showSignOut() {
 		"use strict";
 		return self.isSignedIn();
 	});

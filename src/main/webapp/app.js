@@ -6,8 +6,6 @@ _container,
 pages               = {},
 page_scroll_element = [],
 templates           = ['#header.html', '#events.html', '#amenities.html', '#decks.html'],
-statusCode,
-beforeSend,
 scrollManager,
 pageTracker,
 pageNavigator,
@@ -50,7 +48,7 @@ var htmlInitialization = {
 	'header': function createHeader() {
 		"use strict";
 
-		var header = pageTracker.getHeader(),
+		var header = $('#header'),
 			host = document.URL.replace(/\#$/, ''),
 			hostRegex = new RegExp('^' + CMUtils.escapeForRegExp(host));
 
@@ -124,12 +122,31 @@ checkIfAuthorized = function(success, failure) {
 	"use strict";
 
 	console.log('checkIfAuthorized()');
-	var username = serverModel.username(),
-		password = serverModel.password(),
-		m_beforeSend = function beforeSend(xhr) {
+
+	if (!navModel.isSignedIn()) {
+		console.log('checkIfAuthorized(): user not signed in');
+		failure();
+		return;
+	}
+
+	$.ajax({
+		url: serverModel.authUrl(),
+		timeout: m_timeout,
+		cache: false,
+		dataType: 'json',
+		type: 'GET',
+		statusCode: {
+			401: function four_oh_one() {
+				console.log('401 not authorized');
+				navModel.authorized(false);
+				serverModel.password(null);
+				$('#login').reveal();
+			}
+		},
+		beforeSend: function beforeSend(xhr) {
 			serverModel.setBasicAuth(xhr);
 		},
-		m_success = function(data) {
+		success: function _success(data) {
 			"use strict";
 
 			if (data === true) {
@@ -141,30 +158,13 @@ checkIfAuthorized = function(success, failure) {
 				failure();
 				return;
 			}
-		},
-		m_error = function error(data) {
-			"use strict";
+		}
+	}).error(function _error(data) {
+		"use strict";
 
-			console.log("checkIfAuthorized(): An error occurred: " + ko.toJSON(data, null, 2));
-			failure();
-		};
-
-	if (!username || username === null || !password || password === null) {
-		console.log('checkIfAuthorized(): username or password is null');
+		console.log("checkIfAuthorized(): An error occurred: " + ko.toJSON(data, null, 2));
 		failure();
-		return;
-	}
-
-	$.ajax({
-		url: serverModel.authUrl(),
-		timeout: m_timeout,
-		cache: false,
-		dataType: 'json',
-		type: 'GET',
-		statusCode: statusCode,
-		beforeSend: m_beforeSend,
-		success: m_success
-	}).error(m_error);
+	});
 },
 
 showLoginOrCurrent = function() {
@@ -238,15 +238,15 @@ createOfficialEventsView = function() {
 	if (!pages.officialEventsView) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "official" });
 
-		var div = document.createElement('div');
-		div.setAttribute('id', 'official-events');
-		$(div).css('display', 'none');
-		$(div).html(html);
-		var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = $('<div>');
+		div.attr('id', 'official-events');
+		div.css('display', 'none');
+		div.html(html);
+		$('#content').append(div);
 
 		pages.officialEventsView = div;
 
-		ko.applyBindings(officialEventsModel, appended);
+		ko.applyBindings(officialEventsModel, div[0]);
 	}
 },
 
@@ -257,15 +257,15 @@ createMyEventsView = function() {
 	if (!pages.myEventsView) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "my" });
 
-		var div = document.createElement('div');
-		div.setAttribute('id', 'my-events');
-		$(div).css('display', 'none');
-		$(div).html(html);
-		var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = $('<div>');
+		div.attr('id', 'my-events');
+		div.css('display', 'none');
+		div.html(html);
+		$('#content').append(div);
 
 		pages.myEventsView = div;
 
-		ko.applyBindings(myEventsModel, appended);
+		ko.applyBindings(myEventsModel, div[0]);
 	}
 },
 
@@ -276,15 +276,15 @@ createPublicEventsView = function() {
 	if (!pages.publicEventsView) {
 		var html = templateLoader.renderTemplate('#events.html', { eventType: "public" });
 
-		var div = document.createElement('div');
-		div.setAttribute('id', 'public-events');
-		$(div).css('display', 'none');
-		$(div).html(html);
-		var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = $('<div>');
+		div.attr('id', 'public-events');
+		div.css('display', 'none');
+		div.html(html);
+		$('#content').append(div);
 
 		pages.publicEventsView = div;
 
-		ko.applyBindings(publicEventsModel, appended);
+		ko.applyBindings(publicEventsModel, div[0]);
 	}
 },
 
@@ -293,18 +293,18 @@ createLoginView = function() {
 
 	console.log('createLoginView()');
 	if (!pages.loginView) {
-		var div = $('#login')[0];
+		var div = $('#login');
 
 		// enter doesn't submit for some reason, so handle it manually
 		console.log('trapping keydown');
-		$(div).find('input').keydown(function(e) {
+		div.find('input').keydown(function(e) {
 			var keyCode = e.keyCode || e.which;
 			if (keyCode == 13) save_button.click();
 		});
 
 		/*
 		console.log('handling href links');
-		$(div).find('a').each(function(index, element) {
+		div.find('a').each(function(index, element) {
 			"use strict";
 
 			var href = element.getAttribute('href');
@@ -347,7 +347,7 @@ createLoginView = function() {
 		console.log('done creating loginView');
 		pages.loginView = div;
 
-		ko.applyBindings(serverModel, div);
+		ko.applyBindings(serverModel, div[0]);
 	}
 },
 
@@ -358,16 +358,16 @@ createAmenitiesView = function() {
 	if (!pages.amenitiesView) {
 		var html = templateLoader.renderTemplate('#amenities.html');
 
-		var div = document.createElement('div');
-		div.setAttribute('id', 'amenities');
-		$(div).css('display', 'none');
-		$(div).html(html);
-		var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = $('<div>');
+		div.attr('id', 'amenities');
+		div.css('display', 'none');
+		div.html(html);
+		$('#content').append(div);
 
 		console.log("done creating amenitiesView");
 		pages.amenitiesView = div;
 		
-		ko.applyBindings(amenitiesModel, appended);
+		ko.applyBindings(amenitiesModel, div[0]);
 	}
 };
 
@@ -378,23 +378,23 @@ var createDecksView = function() {
 	if (!pages.decksView) {
 		var html = templateLoader.renderTemplate('#decks.html');
 
-		var div = document.createElement('div');
-		div.setAttribute('id', 'decks');
-		$(div).css('display', 'none');
-		$(div).html(html);
-		var appended = pageTracker.getContainer()[0].appendChild(div);
+		var div = $('<div>');
+		div.attr('id', 'decks');
+		div.css('display', 'none');
+		div.html(html);
+		$('#content').append(div);
 
 		console.log("done creating decksView");
 		pages.decksView = div;
 
-		ko.applyBindings(decksModel, appended);
+		ko.applyBindings(decksModel, div[0]);
 	}
 };
 
 (function() {
 	/** filter dates in Knockout data-bind **/
 	ko.bindingHandlers.dateString = {
-		update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
+		update: function _update(element, valueAccessor, allBindingsAccessor, viewModel) {
 			"use strict";
 
 			var value = valueAccessor(),
@@ -414,18 +414,5 @@ var ajaxUpdater = new AjaxUpdater();
 var officialEventsModel = new OfficialEventsViewModel(eventsModel);
 var myEventsModel = new MyEventsViewModel(eventsModel);
 var publicEventsModel = new PublicEventsViewModel(eventsModel);
-
-statusCode = {
-	401: function four_oh_one() {
-		console.log('401 not authorized');
-		navModel.authorized(false);
-		serverModel.password(null);
-		$('#login').reveal();
-	}
-};
-
-beforeSend = function beforeSend(xhr) {
-	serverModel.setBasicAuth(xhr);
-};
 
 console.log("app.js loaded");

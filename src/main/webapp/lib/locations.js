@@ -5,7 +5,7 @@ function Location(deck, name, type) {
 	self.deck = ko.observable(deck);
 	self.name = ko.observable(name);
 	self.type = ko.observable(type);
-	self.id = ko.computed(function() {
+	self.id = ko.computed(function _computedId() {
 		var retval = self.deck() + '-' + self.name();
 		return retval.replace(self.alnumRegex, '');
 	});
@@ -141,18 +141,18 @@ var locations = [
 	new Miscellaneous(15, 'Skylight Chapel', 'Our wedding chapel, which can accommodate 40 people, is located on top of the Viking Crown Lounge (the highest point on the ship), and is the perfect place to say "I do."')
 ];
 
-(function($){
+(function _uniqueEnclosure($){
 	"use strict";
 	var _old = $.unique;
 
-	$.unique = function(arr){
+	$.unique = function _unique(arr){
 		"use strict";
 		// do the default behavior only if we got an array of elements
 		if (!!arr[0].nodeType){
 			return _old.apply(this,arguments);
 		} else {
 			// reduce the array to contain no dupes via grep/inArray
-			return $.grep(arr,function(v,k){
+			return $.grep(arr,function _grep(v,k){
 				"use strict";
 				return $.inArray(v,arr) === k;
 			});
@@ -166,14 +166,14 @@ function AmenitiesModel() {
 	self.amenities = ko.observableArray(locations);
 	self.filter = ko.observable("");
 
-	self.filteredAmenities = ko.computed(function() {
+	self.filteredAmenities = ko.computed(function _computedFilteredAmenities() {
 		"use strict";
 		var filter = self.filter().toLowerCase();
 
 		if (!filter) {
 			return self.amenities();
 		} else {
-			return ko.utils.arrayFilter(self.amenities(), function(amenity) {
+			return ko.utils.arrayFilter(self.amenities(), function _amenitiesArrayFilter(amenity) {
 				if (amenity.name && amenity.name() && amenity.name().toLowerCase().search(filter) != -1) {
 					return true;
 				} else if (amenity.description && amenity.description() && amenity.description().toLowerCase().search(filter) != -1) {
@@ -184,24 +184,24 @@ function AmenitiesModel() {
 		}
 	});
 	
-	self.orderedAmenities = ko.computed(function() {
+	self.orderedAmenities = ko.computed(function _computedOrderedAmenities() {
 		"use strict";
 		var filteredAmenities = self.filteredAmenities(),
 		orderLeft, orderRight,
 		amenities;
 		/*
-		rawCategories = $.map(filteredAmenities, function(entry, index) {
+		rawCategories = $.map(filteredAmenities, function _rawCategories(entry, index) {
 			"use strict";
 			return entry.deck();
 		});
 
-		rawCategories = $.unique(rawCategories).sort(function(left, right) {
+		rawCategories = $.unique(rawCategories).sort(function _sortRawCategories(left, right) {
 			"use strict";
 			return (left == right)? 0 : (left < right ? -1 : 1);
 		});
 		*/
 		
-		amenities = self.filteredAmenities().sort(function(left, right) {
+		amenities = self.filteredAmenities().sort(function _sortedFilteredAmenities(left, right) {
 			"use strict";
 			// first, order by deck
 			orderLeft = left.deck();
@@ -243,7 +243,7 @@ function AmenitiesModel() {
 
 var amenitiesModel = new AmenitiesModel();
 
-Number.prototype.pad = function(size) {
+Number.prototype.pad = function _pad(size) {
 	"use strict";
 	return (1e15+this+"").slice(-size);
 };
@@ -253,11 +253,11 @@ function Deck(number) {
 	var self = this;
 	self.number = ko.observable(number);
 	self.size = ko.observable(300);
-	self.id = ko.computed(function() {
+	self.id = ko.computed(function _computedId() {
 		"use strict";
 		return 'deck-' + self.number();
 	});
-	self.image = ko.computed(function() {
+	self.image = ko.computed(function _computedImage() {
 		"use strict";
 		return 'images/deck' + self.number().pad(2) + '-' + self.size() + '.png';
 	});

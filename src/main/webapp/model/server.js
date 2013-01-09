@@ -37,10 +37,7 @@ function ServerModel() {
 
 	setTimeout(function() {
 		if (!self.cruisemonkey()) {
-			if (m_isPhoneGap) {
-				self.cruisemonkey('http://c4.amberwood.net');
-			}
-			self.cruisemonkey(document.URL);
+			self.cruisemonkey('http://c4.amberwood.net');
 		}
 	}, 0);
 }

@@ -1,11 +1,11 @@
 var CMUtils = {
 
-	getSummary: function(element) {
+	getSummary: function _getSummary(element) {
 		"use strict";
 		return $(element).find('div.summary').text();
 	},
 
-	isElementInViewport: function(element) {
+	isElementInViewport: function _isElementInViewport(element) {
 		"use strict";
 		var m_top    = element.offsetTop,
 			m_height = element.offsetHeight;
@@ -18,7 +18,7 @@ var CMUtils = {
 		return ( m_top >= window.pageYOffset && (m_top + m_height) <= (window.pageYOffset + window.innerHeight) );
 	},
 
-	isElementVisible: function(element) {
+	isElementVisible: function _isElementVisible(element) {
 		"use strict";
 		var m_top = element.offsetTop;
 
@@ -33,7 +33,7 @@ var CMUtils = {
 	days: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
 	months: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
 
-	formatTime: function(d, doSeconds) {
+	formatTime: function _formatTime(d, doSeconds) {
 		"use strict";
 		var hour, ret;
 
@@ -55,12 +55,12 @@ var CMUtils = {
 		return ret;
 	},
 
-	formatDate: function(d) {
+	formatDate: function _formatDate(d) {
 		"use strict";
 		return this.days[d.getDay()] + ', ' + this.months[d.getMonth()] + ' ' + d.getDate();
 	},
 
-	getDateFromString: function(dateTime) {
+	getDateFromString: function _getDateFromString(dateTime) {
 		"use strict";
 		if (dateTime instanceof Date) {
 			return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(), dateTime.getHours(), dateTime.getMinutes(), 0, 0);
@@ -75,7 +75,7 @@ var CMUtils = {
 		return new Date(dateParts[0], dateParts[1] - 1, dateParts[2], timeParts[0], timeParts[1], 0, 0);
 	},
 
-	padNumber: function(num) {
+	padNumber: function _padNumber(num) {
 		"use strict";
 		return (String('0' + num).slice(-2));
 	},
@@ -85,7 +85,7 @@ var CMUtils = {
 		return d.getFullYear() + '-' + this.padNumber(d.getMonth() + 1) + '-' + this.padNumber(d.getDate()) + 'T' + this.padNumber(d.getHours()) + ':' + this.padNumber(d.getMinutes()) + ':' + this.padNumber(d.getSeconds()) + '-00:00';
 	},
 	
-	openLink: function(url) {
+	openLink: function _openLink(url) {
 		"use strict";
 
 		if (window.plugins && window.plugins.childBrowser) {
@@ -98,7 +98,7 @@ var CMUtils = {
 	}
 };
 
-(function () {
+(function _escapeForRegExpEnclosure() {
 	"use strict";
 	// Referring to the table here:
 	// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/regexp
@@ -121,7 +121,7 @@ var CMUtils = {
 	// even though only some strictly require it when inside of []
 	regex = RegExp('[' + specials.join('\\') + ']', 'g');
 
-	CMUtils.escapeForRegExp = function (str) {
+	CMUtils.escapeForRegExp = function _escapeForRegExp(str) {
 		"use strict";
 		return str.replace(regex, "\\$&");
 	};

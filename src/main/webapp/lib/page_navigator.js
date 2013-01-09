@@ -1,15 +1,15 @@
 function HeightChecker(headerOffset, visibleWiggle) {
 	"use strict";
-	var m_window = $(window),
-		m_headerOffset = headerOffset || 0,
+	var m_headerOffset = headerOffset || 0,
 		m_visibleWiggle = visibleWiggle || 0;
 
-	this.percentVisible = function(element) {
+	this.percentVisible = function _percentVisible(element) {
 		"use strict";
-		var e = $(element),
+		var w = $(window),
+			e = $(element),
 			offset = e.offset(),
-			windowTop = m_window.scrollTop() + m_headerOffset,
-			windowBottom = m_window.innerHeight(),
+			windowTop = w.scrollTop() + m_headerOffset,
+			windowBottom = w.innerHeight(),
 			windowHeight = windowBottom - windowTop,
 			height = e.height(),
 			top = e.offset().top,
@@ -43,7 +43,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 
 	var self = this;
 
-	self.getCurrentPage = function() {
+	self.getCurrentPage = function _getCurrentPage() {
 		"use strict";
 		var current_page = amplify.store('current_page');
 		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
@@ -54,7 +54,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		return current_page;
 	};
 
-	self.updateTopVisibleElement = function() {
+	self.updateTopVisibleElement = function _updateTopVisibleElement() {
 		"use strict";
 		var current_page = self.getCurrentPage(),
 			id = null,
@@ -63,7 +63,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 			highestPercent = 0,
 			heightChecker = new HeightChecker(45, 15);
 
-		pageTracker.getElement('#' + current_page).find(elementCriteria).each(function(index, element) {
+		$('#' + current_page).find(elementCriteria).each(function _eachElement(index, element) {
 			"use strict";
 			id = element.getAttribute('id');
 			if (id) {
@@ -97,26 +97,26 @@ function PageNavigator(defaultPage, elementCriteria) {
 		current_page = id = el = elementPercent = highestPercent = null;
 	};
 
-	self.replaceCurrentPage = function(pageId) {
+	self.replaceCurrentPage = function _replaceCurrentPage(pageId) {
 		"use strict";
 
 		console.log('replaceCurrentPage(' + pageId + ')');
 
-		var page = pageTracker.getElement('#' + pageId);
+		var page = $('#' + pageId);
 
-		pageTracker.getContainer().children().css('display', 'none');
+		$('#content').children().css('display', 'none');
 		page.css('display', 'block');
 
 		if (!Modernizr.touch) {
 			// on non-mobile devices, focus the search input
-			var search = page.find('input[type=search]').first();
+			var search = page.children('input[type=search]').first();
 			if (search) {
 				search.focus();
 			}
 		}
 	};
 
-	self.navigateTo = function(pageId) {
+	self.navigateTo = function _navigateTo(pageId) {
 		"use strict";
 
 		console.log('----------------------------------------------------------------------------------');
@@ -135,7 +135,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		}
 
 		if (scrollManager) {
-			scrollManager.disable();
+			scrollManager.enabled = false;
 		}
 		self.replaceCurrentPage(pageId);
 
@@ -143,14 +143,14 @@ function PageNavigator(defaultPage, elementCriteria) {
 
 		if (!topElement || topElement.getIndex() === 0) {
 			// console.log('scrolling to the top of the page');
-			setTimeout(function() {
+			setTimeout(function _scrollTop() {
 				"use strict";
 
-				pageTracker.getElement('#content').scrollTo(0, 0, {
-					onAfter: function() {
-						setTimeout(function() {
+				$('#content').scrollTo(0, 0, {
+					onAfter: function _onAfter() {
+						setTimeout(function _enableScrollManager() {
 							if (scrollManager) {
-								scrollManager.enable();
+								scrollManager.enabled = true;
 							}
 						}, 50);
 					}
@@ -158,17 +158,17 @@ function PageNavigator(defaultPage, elementCriteria) {
 			}, 0);
 		} else {
 			// console.log("scrolling to " + topElement.toString());
-			setTimeout(function() {
+			setTimeout(function _scrollToElement() {
 				"use strict";
 
-				pageTracker.getElement('#content').scrollTo('#' + topElement.getId(), 0,
+				$('#content').scrollTo('#' + topElement.getId(), 0,
 					{
 						margin: false,
 						offset: {left:0, top:-45},
-						onAfter: function() {
-							setTimeout(function() {
+						onAfter: function _onAfter() {
+							setTimeout(function _enableScrollManager() {
 								if (scrollManager) {
-									scrollManager.enable();
+									scrollManager.enabled = true;
 								}
 							}, 50);
 						}

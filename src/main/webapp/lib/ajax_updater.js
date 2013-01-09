@@ -4,18 +4,8 @@ function AjaxUpdater() {
 	var self = this,
 		m_timer = null,
 		m_inFlight = false,
-		m_success = function success(data) {
-			console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
-			eventsModel.updateData(data);
-			m_inFlight = false;
-		},
-		m_error = function error(data, textStatus, errorThrown) {
-			console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
-			console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
-			m_inFlight = false;
-		},
 	
-	f_updateEventModel = function() {
+	f_updateEventModel = function _updateEventModel() {
 		"use strict";
 
 		if (m_inFlight) {
@@ -32,23 +22,40 @@ function AjaxUpdater() {
 				timeout: m_timeout,
 				cache: false,
 				dataType: 'json',
-				statusCode: statusCode,
-				beforeSend: beforeSend,
-				success: m_success
-			}).error(m_error);
+				statusCode: {
+					401: function four_oh_one() {
+						console.log('401 not authorized');
+						navModel.authorized(false);
+						serverModel.password(null);
+						$('#login').reveal();
+					}
+				},
+				beforeSend: function beforeSend(xhr) {
+					serverModel.setBasicAuth(xhr);
+				},
+				success: function _success(data) {
+					console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
+					eventsModel.updateData(data);
+					m_inFlight = false;
+				}
+			}).error(function _error(data, textStatus, errorThrown) {
+				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(data));
+				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+				m_inFlight = false;
+			});
 		} else {
 			console.log('Not authorized according to navModel, skipping update.');
 		}
 	};
 	
-	self.pollNow = function() {
+	self.pollNow = function _pollNow() {
 		f_updateEventModel();
 	};
-	self.start = function() {
+	self.start = function _start() {
 		f_updateEventModel();
 		m_timer = setInterval(f_updateEventModel, m_eventUpdateInterval);
 	};
-	self.stop = function() {
+	self.stop = function _stop() {
 		if (m_timer !== null) {
 			clearInterval(m_timer);
 			m_timer = null;

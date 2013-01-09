@@ -8,19 +8,19 @@ function PageElement(element, elementId, index) {
 		m_elementId    = elementId,
 		m_index        = index;
 	
-	this.getElement = function() {
+	this.getElement = function _getElement() {
 		"use strict";
 		return m_element;
 	};
-	this.getId = function() {
+	this.getId = function _getId() {
 		"use strict";
 		return m_elementId;
 	};
-	this.getIndex = function() {
+	this.getIndex = function _getIndex() {
 		"use strict";
 		return m_index;
 	};
-	this.toString = function() {
+	this.toString = function _toString() {
 		"use strict";
 		return m_elementId + ' (' + m_index + ')';
 	};
@@ -35,7 +35,7 @@ function PageTracker(elementCriteria) {
 	var self = this;
 
 	/** public methods **/
-	self.getScrolledId = function(page) {
+	self.getScrolledId = function _getScrolledId(page) {
 		"use strict";
 		console.log('PageTracker::getScrolledId(' + page + ')');
 		if (!page) {
@@ -44,7 +44,7 @@ function PageTracker(elementCriteria) {
 		return f_getPageCache()[page];
 	};
 	
-	self.setScrolledId = function(page, id) {
+	self.setScrolledId = function _setScrolledId(page, id) {
 		"use strict";
 		console.log('PageTracker::setScrolledId(' + page + ', ' + id + ')');
 		if (!page) {
@@ -56,32 +56,23 @@ function PageTracker(elementCriteria) {
 		return id;
 	};
 
-	self._getElement = function(criteria) {
+	self.__getElement = function ___getElement(criteria) {
 		"use strict";
 		return $(criteria);
 	};
-	self.getElement = function(criteria) {
+	self.getElement = function _getElement(criteria) {
 		"use strict";
 		self._memoize = self._memoize || {};
-		return (criteria in self._memoize) ? self._memoize[criteria] : self._memoize[criteria] = self._getElement(criteria);
+		return (criteria in self._memoize) ? self._memoize[criteria] : self._memoize[criteria] = self.__getElement(criteria);
 	};
 
-	self.getTopElement = function(pageId) {
+	self.getTopElement = function _getTopElement(pageId) {
 		"use strict";
 		var matched = f_getElementForPageId(pageId);
 		if (matched) {
 			return matched;
 		}
 		return null;
-	};
-
-	self.getHeader = function() {
-		"use strict";
-		return self.getElement('#header');
-	};
-	self.getContainer = function() {
-		"use strict";
-		return self.getElement('#content');
 	};
 
 	/** internal methods **/
