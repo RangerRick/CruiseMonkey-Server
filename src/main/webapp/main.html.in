@@ -125,7 +125,7 @@
 		<!-- PHONEGAP --><script src="phonegap.js"></script>
 		<!-- PHONEGAP --><script src="childbrowser.js"></script>
 		<!-- PHONEGAP --><script src="3rdparty.js"></script>
-		<!-- BROWSER --><script src="3rdparty/jquery/jquery-1.8.1.js"></script>
+		<!-- BROWSER --><script src="3rdparty/jquery/jquery-1.8.3.js"></script>
 		<!-- BROWSER --><script src="3rdparty/mustache/mustache.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout-2.2.0.debug.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout.mapping-latest.debug.js"></script>

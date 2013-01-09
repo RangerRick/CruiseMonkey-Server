@@ -1,5 +1,5 @@
 3RDPARTYJS = \
-	3rdparty/jquery/jquery-1.8.1.min.js \
+	3rdparty/jquery/jquery-1.8.3.min.js \
 	3rdparty/mustache/mustache.min.js \
 	3rdparty/knockout/knockout-2.2.0.js \
 	3rdparty/knockout/knockout.mapping-latest.js \
