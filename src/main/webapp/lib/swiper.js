@@ -1,5 +1,5 @@
 function Swiper() {
-"use strict";
+'use strict';
 
 	var self = this,
 		hasTouch = 'ontouchstart' in window,
@@ -12,9 +12,9 @@ function Swiper() {
 		w = $(window),
 
 	eventHandler = function(e) {
-		"use strict";
+		'use strict';
 		// console.log('e = ' + e.type);
-		switch(e.type) {
+		switch (e.type) {
 			case startEvent:
 				self.__start(e);
 				break;
@@ -32,8 +32,8 @@ function Swiper() {
 	};
 
 	self.__start = function(e) {
-		"use strict";
-		console.log("__start: " + e);
+		'use strict';
+		console.log('__start: ' + e);
 		//e.preventDefault();
 
 		if (self.initiated) return;
@@ -55,7 +55,7 @@ function Swiper() {
 		this.__event('touchstart');
 	};
 	self.__move = function(e) {
-		"use strict";
+		'use strict';
 		if (!self.initiated) return;
 
 		var point = hasTouch ? e.touches[0] : e,
@@ -105,16 +105,16 @@ function Swiper() {
 		// self.__pos(newX);
 	};
 	self.__end = function(e) {
-		"use strict";
-		console.log("__end: " + e);
+		'use strict';
+		console.log('__end: ' + e);
 
 		if (!self.initiated) return;
-		
+
 		var point = hasTouch ? e.changedTouches[0] : e,
 			dist = Math.abs(point.pageX - self.startX);
 
 		self.initiated = false;
-		
+
 		if (!self.moved) return;
 
 		if (self.x > 0 || self.x < self.maxX) {
@@ -131,21 +131,20 @@ function Swiper() {
 			return;
 		}
 
-
 		// self.__checkPosition();
 	};
 	self.__resize = function(e) {
-		"use strict";
-		console.log("__resize: " + e);
-		
-		self.snapThreshold = Math.round($(window).width() * 0.15);
-	}
+		'use strict';
+		console.log('__resize: ' + e);
 
-	self.__event = function (type) {
-		"use strict";
+		self.snapThreshold = Math.round($(window).width() * 0.15);
+	};
+
+	self.__event = function(type) {
+		'use strict';
 		console.log('event fired: ' + type);
 
-		var ev = document.createEvent("Event");
+		var ev = document.createEvent('Event');
 		ev.initEvent('swiper-' + type, true, true);
 		w.trigger(ev);
 	};
@@ -157,16 +156,16 @@ function Swiper() {
 		w.on(endEvent, eventHandler);
 		w.on(cancelEvent, eventHandler);
 	}
-};
+}
 
 var swiper = new Swiper();
 (function() {
-	"use strict";
+	'use strict';
 	var pageOrder = ['official-events', 'my-events', 'amenities', 'decks'];
 
 	var w = $(window);
 	w.on('swiper-moveout', function() {
-		"use strict";
+		'use strict';
 		var direction = swiper.directionX,
 			currentPage = pageNavigator.getCurrentPage(),
 			newPage,

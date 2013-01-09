@@ -1,19 +1,24 @@
 function Photos() {
-	"use strict";
+	'use strict';
 	var self = this,
+		uploadExisting,
+		takePhoto,
+		capture,
+		onCaptureSuccess,
+		onCaptureFail;
 
 	uploadExisting = function() {
-		"use strict";
-		console.log("Photos::uploadExisting()");
+		'use strict';
+		console.log('Photos::uploadExisting()');
 		self.capture(navigator.camera.PictureSourceType.SAVEDPHOTOALBUM);
-	},
+	};
 	takePhoto = function() {
-		"use strict";
-		console.log("Photos::takePhoto()");
+		'use strict';
+		console.log('Photos::takePhoto()');
 		self.capture(navigator.camera.PictureSourceType.CAMERA);
-	},
+	};
 	capture = function(sourceType) {
-		"use strict";
+		'use strict';
 		navigator.camera.getPicture(
 			self.onCaptureSuccess,
 			self.onCaptureFail,
@@ -23,21 +28,21 @@ function Photos() {
 				correctOrientation: true
 			}
 		);
-	},
+	};
 	onCaptureSuccess = function(imageData) {
-		"use strict";
+		'use strict';
 		var ft, options, params, win;
 		// callback for when the photo has been successfully uploaded:
 		var success = function(response) {
-			"use strict";
-			alert("Your photo has been uploaded!");
+			'use strict';
+			alert('Your photo has been uploaded!');
 		};
 		// callback if the photo fails to upload successfully.
 		var fail = function(error) {
-			"use strict";
-			alert("An error has occurred: Code = " + error.code);
+			'use strict';
+			alert('An error has occurred: Code = ' + error.code);
 		};
-		
+
 		$.ajax({
 			url: serverModel.cruisemonkey() + '/rest/cruisemonkey/photos',
 			timeout: m_timeout,
@@ -48,16 +53,16 @@ function Photos() {
 			contentType: 'multipart/form-data',
 			mimeType: 'multipart/form-data',
 			success: function(response) {
-				"use strict";
+				'use strict';
 				console.log('success! ' + response);
 			}
 		}).error(function(data) {
-			"use strict";
-			console.log("error: " + ko.toJSON(data, null, 2));
+			'use strict';
+			console.log('error: ' + ko.toJSON(data, null, 2));
 		});
-	},
+	};
 	onCaptureFail = function(message) {
-		"use strict";
-		alert("Failed because: " + message);
+		'use strict';
+		alert('Failed because: ' + message);
 	};
 }

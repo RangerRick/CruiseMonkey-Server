@@ -1,21 +1,23 @@
 function ScrollManager(selector) {
-	"use strict";
-	var m_activeTimeout  = null,
-		m_selector       = selector || window,
-		self             = this;
+	'use strict';
+	var m_activeTimeout = null,
+		m_selector = selector || window,
+		f_onScrollStart,
+		f_onScrollStop,
+		self = this;
 
 	/* User-configurable options */
-	self.delay         = 500; // ms
+	self.delay = 500; // ms
 	self.onScrollStart = function(enabled) {};
-	self.onScrollStop  = function(enabled) {};
-	self.onScroll      = function(enabled) {};
+	self.onScrollStop = function(enabled) {};
+	self.onScroll = function(enabled) {};
 
-	/* Public methods */
+	/* Public properties */
 	self.enabled = true;
 
 	/* Internal callbacks */
-	var f_onScrollStart = function() {
-		"use strict";
+	f_onScrollStart = function() {
+		'use strict';
 
 		if (m_activeTimeout === null) {
 			console.log('ScrollManager::onScrollStart(): scrolling started: enabled = ' + self.enabled);
@@ -26,9 +28,9 @@ function ScrollManager(selector) {
 			m_activeTimeout = setTimeout(f_onScrollStop, self.delay);
 		}
 		self.onScroll(self.enabled);
-	},
+	};
 	f_onScrollStop = function(callback) {
-		"use strict";
+		'use strict';
 
 		console.log('ScrollManager::onScrollStop(): scrolling stopped: enabled = ' + self.enabled);
 		clearTimeout(m_activeTimeout);

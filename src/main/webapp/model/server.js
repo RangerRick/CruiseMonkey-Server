@@ -1,12 +1,12 @@
 function ServerModel() {
-	"use strict";
+	'use strict';
 
 	var self = this;
 
 	self.cruisemonkey = ko.observable(amplify.store('cruisemonkey_url'));
-	self.username     = ko.observable(amplify.store('username'));
-	self.password     = ko.observable(amplify.store('password'));
-	
+	self.username = ko.observable(amplify.store('username'));
+	self.password = ko.observable(amplify.store('password'));
+
 	self.authUrl = ko.computed(function() {
 		return self.cruisemonkey() + '/rest/auth';
 	});
@@ -14,13 +14,13 @@ function ServerModel() {
 	self.eventUrl = ko.computed(function() {
 		return self.cruisemonkey() + '/rest/cruisemonkey/events';
 	});
-	
+
 	self.favoritesUrl = function(id) {
 		return self.cruisemonkey() + '/rest/favorites?event=' + encodeURI(id);
 	};
 
 	self.setBasicAuth = function(xhr) {
-		xhr.setRequestHeader("Authorization", "Basic " + window.btoa(self.username() + ":" + self.password()));
+		xhr.setRequestHeader('Authorization', 'Basic ' + window.btoa(self.username() + ':' + self.password()));
 	};
 
 	self.reset = function() {
@@ -28,11 +28,11 @@ function ServerModel() {
 		self.username(amplify.store('username'));
 		self.password(amplify.store('password'));
 	};
-	
+
 	self.persist = ko.computed(function() {
 		amplify.store('cruisemonkey_url', self.cruisemonkey());
-		amplify.store('username',         self.username());
-		amplify.store('password',         self.password());
+		amplify.store('username', self.username());
+		amplify.store('password', self.password());
 	});
 
 	setTimeout(function() {
