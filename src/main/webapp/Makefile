@@ -100,6 +100,7 @@ temp/%.min.css: %.css
 
 cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE)
 	@#cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
+	@echo "$(CRUISEMONKEYJS) -> $@ (closure compiled)"
 	@closure-compiler/compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null
 
 cruisemonkey.css: $(CRUISEMONKEYMINCSS)
