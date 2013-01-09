@@ -25,6 +25,10 @@ function Event(data) {
 		return retVal;
 	}, self);
 	self.favorite = ko.observable(false);
+	
+	self.toString = ko.computed(function() {
+		return self.id() + ': ' + self.summary();
+	});
 }
 Event.prototype.attributeRegex = /[\W\@]+/g;
 
@@ -101,42 +105,6 @@ function EventsViewModel() {
 				} else {
 					e = new Event(event);
 					e.favorite(isFavorite);
-
-					/*
-					e.favorite.subscribe(function(isFavorite) {
-						"use strict";
-
-						if (self.updating()) {
-							// console.log("skipping ajax update for " + e.id() + ", we are in the middle of a server update");
-							return;
-						}
-						console.log(e.id() + " favorite has changed to: " + isFavorite);
-						var type = "PUT";
-						if (isFavorite) {
-							type = 'PUT';
-						} else {
-							type = 'DELETE';
-						}
-						$.ajax({
-							url: serverModel.favoritesUrl(e.id()),
-							timeout: m_timeout,
-							cache: false,
-							dataType: 'json',
-							type: type,
-							statusCode: {
-								401: function four_oh_one() {
-									console.log('401 not authorized');
-									navModel.authorized(false);
-									serverModel.password(null);
-									$('#login').reveal();
-								}
-							},
-							beforeSend: function beforeSend(xhr) {
-								serverModel.setBasicAuth(xhr);
-							}
-						});
-					});
-					*/
 
 					return e;
 				}

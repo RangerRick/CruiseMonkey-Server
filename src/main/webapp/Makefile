@@ -98,8 +98,9 @@ temp/%.min.css: %.css
 		echo "" >> 3rdparty.js; \
 	done
 
-cruisemonkey.js: $(CRUISEMONKEYMINJS)
-	@cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
+cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE)
+	@#cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
+	@closure-compiler/compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null
 
 cruisemonkey.css: $(CRUISEMONKEYMINCSS)
 	@cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css

@@ -42,6 +42,40 @@ templateLoader.onFinished = function() {
 	createDecksView();
 
 	setupDefaultView();
+
+	setTimeout(function _favoriteHandler() {
+		$('.favorite-checkbox').on('click.cm touchstart.cm', function(e) {
+			"use strict";
+
+			e.stopPropagation();
+			var entry = ko.contextFor(this).$data;
+
+			if (eventsModel.updating()) {
+				// console.log("skipping ajax update for " + e.id() + ", we are in the middle of a server update");
+				return;
+			}
+
+			console.log(entry.id() + " favorite has changed to: " + entry.favorite());
+			$.ajax({
+				url: serverModel.favoritesUrl(entry.id()),
+				timeout: m_timeout,
+				cache: false,
+				dataType: 'json',
+				type: entry.favorite()? 'PUT' : 'DELETE',
+				statusCode: {
+					401: function four_oh_one() {
+						console.log('401 not authorized');
+						navModel.authorized(false);
+						serverModel.password(null);
+						$('#login').reveal();
+					}
+				},
+				beforeSend: function beforeSend(xhr) {
+					serverModel.setBasicAuth(xhr);
+				}
+			});
+		});
+	}, 50);
 };
 
 var htmlInitialization = {
