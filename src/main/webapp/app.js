@@ -285,6 +285,11 @@ showLoginOrCurrent = function() {
 			navModel.authorized(true);
 			$('#login').trigger('reveal:close');
 			pageNavigator.navigateTo(current_page);
+
+			if (window.isPhoneGap) {
+				console.log('hiding splashscreen');
+				navigator.splashscreen.hide();
+			}
 		},
 		// failure
 		function() {
@@ -293,6 +298,11 @@ showLoginOrCurrent = function() {
 			console.log('checkIfAuthorized: failure');
 			navModel.authorized(false);
 			$('#login').reveal();
+
+			if (window.isPhoneGap) {
+				console.log('hiding splashscreen');
+				navigator.splashscreen.hide();
+			}
 		}
 	);
 };
