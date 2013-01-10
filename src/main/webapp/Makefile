@@ -1,5 +1,6 @@
 3RDPARTYJS = \
 	3rdparty/jquery/jquery-1.8.3.min.js \
+	3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js \
 	3rdparty/mustache/mustache.min.js \
 	3rdparty/knockout/knockout-2.2.0.js \
 	3rdparty/knockout/knockout.mapping-latest.js \
@@ -9,7 +10,14 @@
 	3rdparty/datejs/date.min.js \
 	3rdparty/amplifyjs/amplify.min.js \
 	3rdparty/jquery-url-parser/purl.js \
-	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js
+	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js \
+	3rdparty/jquery-ui-timepicker-addon.js \
+	3rdparty/uuid.js
+
+3RDPARTYCSS = \
+	3rdparty/jquery-ui/css/no-theme/jquery-ui-1.9.2.custom.min.css \
+	3rdparty/jquery-ui-timepicker-addon.css
+
 
 CRUISEMONKEYJS = \
 	lib/cm_utils.js \
@@ -98,13 +106,13 @@ temp/%.min.css: %.css
 		echo "" >> 3rdparty.js; \
 	done
 
-cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE) compile.sh
+cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE) compile.sh $(wildcard externs/*.js)
 	@#cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
 	@echo ./compile.sh $(CRUISEMONKEYJS)
 	@./compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null
 
-cruisemonkey.css: $(CRUISEMONKEYMINCSS)
-	@cat $(CRUISEMONKEYMINCSS) > cruisemonkey.css
+cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(3RDPARTYCSS)
+	@cat $(CRUISEMONKEYMINCSS) $(3RDPARTYCSS) > cruisemonkey.css
 
 $(DESTDIR)/foundation/%: foundation/%
 	@DIR="$(DESTDIR)/`dirname $<`"; \

@@ -56,7 +56,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		'use strict';
 		var current_page = amplify.store('current_page');
 		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
-		if (!current_page || current_page == 'login') {
+		if (!current_page || current_page == 'login' || current_page == 'add-event') {
 			current_page = defaultPage;
 			amplify.store('current_page', current_page);
 		}
@@ -113,6 +113,9 @@ function PageNavigator(defaultPage, elementCriteria) {
 
 		var page = $('#' + pageId);
 
+		$('#header').find('.icon').removeClass('selected');
+		$('#header').find('.icon-' + pageId).addClass('selected');
+
 		$('#content').children().css('display', 'none');
 		page.css('display', 'block');
 
@@ -142,7 +145,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 			return false;
 		}
 
-		if (pageId != 'login') {
+		if (pageId != 'login' && pageId != 'add-event') {
 			amplify.store('current_page', pageId);
 		}
 

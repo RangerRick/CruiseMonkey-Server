@@ -15,3 +15,5 @@ Mustache.to_html = function(html, template) {};
 jQuery.scrollTo = function(target, var_args) {}
 
 var MemoryLeakChecker;
+var uuid;
+uuid.v1 = function() {}

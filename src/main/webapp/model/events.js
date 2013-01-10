@@ -1,19 +1,22 @@
 /**
  * @constructor
+ * @param {Object=} data
  */
 function CalendarEvent(data) {
 	var self = this;
 
-	self.id = ko.observable(data['@id']);
-	self.cleanId = ko.observable(data['@id'].replace(self.attributeRegex, ''));
-	self.summary = ko.observable(data.summary);
-	self.description = ko.observable(data.description);
-	self.start = ko.observable(new Date(data.start));
-	self.end = ko.observable(new Date(data.end));
-	self.location = ko.observable(data.location);
-	self.createdBy = ko.observable(data['created-by']);
-	self.owner = ko.observable(data.owner);
-	self.isPublic = ko.observable(data.isPublic);
+	self.id = ko.observable(data && data['@id'] ? data['@id'] : uuid.v1());
+	self.cleanId = ko.computed(function() {
+		return self.id().replace(self.attributeRegex, '');
+	});
+	self.summary = ko.observable(data && data.summary ? data.summary : "");
+	self.description = ko.observable(data && data.description ? data.description : "");
+	self.start = ko.observable(data && data.start ? new Date(data.start) : new Date());
+	self.end = ko.observable(data && data.end ? new Date(data.end) : new Date());
+	self.location = ko.observable(data && data.location ? data.location : "");
+	self.createdBy = ko.observable(data && data['created-by'] ? data['created-by'] : "");
+	self.owner = ko.observable(data && data.owner ? data.owner : "");
+	self.isPublic = ko.observable(data && data.isPublic ? data.isPublic : false);
 	self.timespan = ko.computed(function() {
 		var start = self.start() === null ? null : cmUtils.formatTime(self.start(), false);
 		var end = self.end() === null ? null : cmUtils.formatTime(self.end(), false);
@@ -33,6 +36,39 @@ function CalendarEvent(data) {
 	});
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
+
+/**
+ * @constructor
+ */
+function AddEventModel() {
+	var self = this,
+		m_pattern = 'MM/dd/yyyy hh:mm';
+
+	self.addedEvent = ko.observable(new CalendarEvent());
+
+	self.startDate = ko.computed({
+		read: function() {
+			return self.addedEvent().start().toString(m_pattern);
+		},
+		write: function(value) {
+			self.addedEvent().start(Date.parse(value));
+		}
+	});
+	self.endDate = ko.computed({
+		read: function() {
+			return self.addedEvent().end().toString(m_pattern);
+		},
+		write: function(value) {
+			self.addedEvent().end(Date.parse(value));
+		}
+	});
+	self.onSubmit = function(formElement) {
+		console.log('submitted:');
+		console.log(formElement);
+		console.log('start = ' + self.addedEvent().start());
+		console.log('end = ' + self.addedEvent().end());
+	};
+}
 
 /**
  * @constructor

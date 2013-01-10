@@ -1,6 +1,6 @@
 console.log('app.js loading');
 
-var m_eventUpdateInterval = 10000,
+var m_eventUpdateInterval = 60000,
 _header, _container, scrollManager, pageTracker, pageNavigator, templateLoader, htmlInitialization, checkIfAuthorized,
 showLoginOrCurrent, setupDefaultView,
 pages = {},
@@ -10,6 +10,7 @@ var serverModel = new ServerModel();
 var navModel = new NavModel();
 var eventsModel = new EventsViewModel();
 var ajaxUpdater = new AjaxUpdater();
+var addEventModel = new AddEventModel();
 
 var officialEventsModel = new OfficialEventsViewModel(eventsModel);
 var myEventsModel = new MyEventsViewModel(eventsModel);
@@ -141,7 +142,14 @@ htmlInitialization = {
 			}
 			// console.log('a = ' + $(element).html() + ', href = ' + href + ', hash = ' + hash);
 			if (hash !== undefined) {
-				if (hash !== '') {
+				if (hash == 'add-event') {
+					$(element).on('click.cm touchstart.cm', function(e) {
+						e.preventDefault();
+						console.log('add-event clicked');
+						addEventModel.addedEvent(new CalendarEvent());
+						$('#add-event').reveal();
+					})
+				} else if (hash !== '') {
 					// $(element).off('click');
 					$(element).on('click.cm touchstart.cm', function(e) {
 						'use strict';
@@ -217,6 +225,11 @@ htmlInitialization = {
 	"decks": {
 		"templateSource": "#decks.html",
 		"model": decksModel
+	},
+	"add-event": function addEvent() {
+		$('#start-datepicker').datetimepicker();
+		$('#end-datepicker').datetimepicker();
+		ko.applyBindings(addEventModel, $('#add-event')[0]);
 	}
 };
 
@@ -355,7 +368,7 @@ setupDefaultView = function() {
 			var value = valueAccessor(),
 				allBindings = allBindingsAccessor(),
 				valueUnwrapped = ko.utils.unwrapObservable(value),
-				pattern = allBindings.datePattern || 'MM/dd/yyyy hh:mm:ss';
+				pattern = allBindings.datePattern || 'MM/dd/yyyy hh:mm';
 			$(element).text(valueUnwrapped.toString(pattern));
 		}
 	};
