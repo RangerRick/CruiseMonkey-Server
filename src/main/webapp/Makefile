@@ -83,12 +83,12 @@ $(DESTDIR)/cruisemonkey.manifest: cruisemonkey.manifest.in $(RUNTIME) $(MAKEFILE
 
 main.html: main.html.in
 	@echo "$< -> $@"
-	@cat "$<" | grep -v '<!-- PHONEGAP -->' | sed -e 's,<!-- BROWSER -->,,g' > "$@" 2>/dev/null
+	@cat "$<" | grep -v -E '(<!--|//) *PHONEGAP *(-->|//)' | sed -e 's,<!-- *BROWSER *--> *,,g' -e 's,// *BROWSER *// *,,g' > "$@" 2>/dev/null
 
 $(DESTDIR)/main.html: main.html.in
 	@echo "$< -> $@"
 	@install -d -m 755 "$(DESTDIR)"
-	@cat "$<" | grep -v '<!-- BROWSER -->' | sed -e 's,<!-- PHONEGAP -->,,g' > "$@" 2>/dev/null
+	@cat "$<" | grep -v -E '(<!--|//) *BROWSER *(-->|//)' | sed -e 's,<!-- *PHONEGAP *--> *,,g' -e 's,// *PHONEGAP *// *,,g' > "$@" 2>/dev/null
 
 temp/%.min.js: %.js
 	@install -d $(shell dirname $@)

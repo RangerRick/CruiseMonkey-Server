@@ -119,53 +119,6 @@
 				<!-- /ko -->
 			</ul>
 		</script>
-		<!-- PHONEGAP --><script>window.isPhoneGap = true;</script>
-		<!-- BROWSER --><script>window.isPhoneGap = false;</script>
-		<script>
-			"use strict";
-			var m_timeout = 10000;
-			var m_deviceReady = false,
-			initializeApp = function(event) {
-				console.log('Initializing Cruise Monkey.');
-				if (m_deviceReady) {
-					console.log("Already initialized!");
-					return;
-				}
-
-				$('#login').trigger('reveal:close');
-
-				m_deviceReady = true;
-				templateLoader.load();
-			},
-			onLoad = function() {
-				if (window.applicationCache) {
-					if (window.applicationCache.status == window.applicationCache.IDLE) {
-						console.log("application cache is up-to-date");
-					} else {
-						window.applicationCache.addEventListener('updateready', function(e) {
-							if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-								console.log("application cache has changed");
-								// Browser downloaded a new app cache.
-								// Swap it in and reload the page to get the new hotness.
-								window.applicationCache.swapCache();
-								window.location.reload();
-							} else {
-								// Manifest didn't change. Nothing new to server.
-								console.log("application cache is up-to-date");
-							}
-						}, false);
-					}
-				}
-
-				if (window.isPhoneGap) {
-					console.log("running under phonegap, waiting for device ready");
-					document.addEventListener("deviceready", initializeApp, false);
-				} else {
-					console.log("running in a browser, initializing");
-					initializeApp();
-				}
-			};
-		</script>
 
 		<!-- PHONEGAP --><script src="phonegap.js"></script>
 		<!-- PHONEGAP --><script src="childbrowser.js"></script>
@@ -203,6 +156,46 @@
 		<!-- BROWSER --><script src="lib/template_loader.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>
 		<!-- BROWSER --><script src="3rdparty/memory_leak_checker.js"></script>
+		
+		<script>
+			'use strict';
+			var m_timeout = 10000;
+			var m_deviceReady = false,
+			initializeApp = function(event) {
+				console.log('Initializing Cruise Monkey.');
+				if (m_deviceReady) {
+					console.log('Already initialized!');
+					return;
+				}
+
+				$('#login').trigger('reveal:close');
+
+				m_deviceReady = true;
+				templateLoader.load();
+			},
+			onLoad = function() {
+				if (window.applicationCache) {
+					if (window.applicationCache.status == window.applicationCache.IDLE) {
+						console.log('application cache is up-to-date');
+					} else {
+						window.applicationCache.addEventListener('updateready', function(e) {
+							if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+								console.log('application cache has changed');
+								// Browser downloaded a new app cache.
+								// Swap it in and reload the page to get the new hotness.
+								window.applicationCache.swapCache();
+								window.location.reload();
+							} else {
+								// Manifest didn't change. Nothing new to server.
+								console.log('application cache is up-to-date');
+							}
+						}, false);
+					}
+				}
+				// PHONEGAP // window.isPhoneGap = true; console.log('running under phonegap, waiting for device ready'); document.addEventListener('deviceready', initializeApp, false);
+				// BROWSER  // window.isPhoneGap = false; console.log('running in a browser, initializing'); initializeApp();
+			};
+		</script>
 	</head>
 	<body onload="onLoad()">
 		<div id="header"></div>
