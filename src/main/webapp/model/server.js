@@ -11,23 +11,23 @@ function ServerModel() {
 	self.password = ko.observable(amplify.store('password'));
 
 	self._cruisemonkey = ko.computed(function() {
-		return self.cruisemonkey().replace(/\/$/, '');
+		return self.cruisemonkey() ? self.cruisemonkey().replace(/\/$/, '') : null;
 	});
 
 	self.authUrl = ko.computed(function() {
-		return self._cruisemonkey() + '/rest/auth';
+		return self._cruisemonkey() ? self._cruisemonkey() + '/rest/auth' : null;
 	});
 
 	self.eventUrl = ko.computed(function() {
-		return self._cruisemonkey() + '/rest/cruisemonkey/events';
+		return self._cruisemonkey() ? self._cruisemonkey() + '/rest/cruisemonkey/events' : null;
 	});
 
 	self.eventEditUrl = ko.computed(function() {
-		return self._cruisemonkey() + '/rest/events';
+		return self._cruisemonkey() ? self._cruisemonkey() + '/rest/events' : null;
 	});
 
 	self.favoritesUrl = ko.computed(function() {
-		return self._cruisemonkey() + '/rest/favorites';
+		return self._cruisemonkey() ? self._cruisemonkey() + '/rest/favorites' : null;
 	});
 
 	self.setBasicAuth = function(xhr) {
@@ -53,7 +53,7 @@ function ServerModel() {
 
 	setTimeout(function() {
 		if (!self.cruisemonkey()) {
-			self.cruisemonkey('http://server3.befunk.com:8088');
+			self.cruisemonkey('http://cm.raccoonfink.com');
 		}
 	}, 0);
 }
