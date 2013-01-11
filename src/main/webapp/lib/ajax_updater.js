@@ -34,6 +34,7 @@ function AjaxUpdater() {
 						navModel.authorized(false);
 						serverModel.password(null);
 						$('#login').reveal();
+						self.onUpdate();
 					}
 				},
 				beforeSend: function beforeSend(xhr) {
@@ -43,16 +44,20 @@ function AjaxUpdater() {
 				console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
 				eventsModel.updateData(data);
 				m_inFlight = false;
+				self.onUpdate();
 			}).fail(function _error(jqXHR, textStatus, errorThrown) {
 				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(jqXHR));
 				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
 				m_inFlight = false;
+				self.onUpdate();
 			});
 		} else {
 			console.log('Not authorized according to navModel, skipping update.');
 		}
 		//MemoryLeakChecker.checkLeaks(window);
 	};
+
+	self.onUpdate = function() {}
 
 	self.pollNow = function _pollNow() {
 		f_updateEventModel();
