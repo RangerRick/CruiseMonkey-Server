@@ -260,6 +260,16 @@ input[type="search"] {
 	top: 2px;
 }
 
+.calendar-event .public {
+	position: absolute;
+	display: inline-block;
+	float: right;
+	width: 32px;
+	height: 32px;
+	right: 2px;
+	top: 34px;
+}
+
 .calendar-event .favorite input[type=checkbox] {
 	display:none;
 }
@@ -268,8 +278,12 @@ input[type="search"] {
 	display:none;
 }
 
+.calendar-event .public input[type=checkbox] {
+	display:none;
+}
+
 .calendar-event .favorite input[type=checkbox] + label {
-	background:url(images/star-white.png) no-repeat;
+	background:url(images/star-unchecked.png) no-repeat;
 	background-position: center center;
 	background-size: 26px 26px;
 	width: 32px;
@@ -277,7 +291,7 @@ input[type="search"] {
 }
 
 .calendar-event .favorite input[type=checkbox]:checked + label {
-	background:url(images/star-yellow.png) no-repeat;
+	background:url(images/star-checked.png) no-repeat;
 	background-position: center center;
 	background-size: 26px 26px;
 	width: 32px;
@@ -292,17 +306,39 @@ input[type="search"] {
 	height: 32px;
 }
 
+.calendar-event .public input[type=checkbox] + label {
+	background:url(images/eye-unchecked.png) no-repeat;
+	background-position: center center;
+	background-size: 24px 16px;
+	width: 32px;
+	height: 32px;
+}
+
+.calendar-event .public input[type=checkbox]:checked + label {
+	background:url(images/eye-checked.png) no-repeat;
+	background-position: center center;
+	background-size: 24px 16px;
+	width: 32px;
+	height: 32px;
+}
+
 @media 
 (-webkit-min-device-pixel-ratio: 2), 
 (min-resolution: 192dpi) { 
 	.calendar-event .favorite input[type=checkbox] + label {
-		background-image:url(images/star-white@2x.png);
+		background-image:url(images/star-unchecked@2x.png);
 	}
 	.calendar-event .favorite input[type=checkbox]:checked + label {
-		background-image:url(images/star-yellow@2x.png);
+		background-image:url(images/star-checked@2x.png);
 	}
 	.calendar-event .trash input[type=button] + label {
 		background-image:url(images/trash@2x.png);
+	}
+	.calendar-event .public input[type=checkbox] + label {
+		background-image:url(images/eye-unchecked@2x.png);
+	}
+	.calendar-event .public input[type=checkbox]:checked + label {
+		background-image:url(images/eye-checked@2x.png);
 	}
 
 	.icon-official-events:before           { content: url(images/icons/gray/83-calendar@2.png);     background-size: 23px 25px; }

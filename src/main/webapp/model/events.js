@@ -5,6 +5,8 @@
 function CalendarEvent(data) {
 	var self = this;
 
+	console.log('importing data: ' + ko.toJSON(data));
+
 	self.id = ko.observable(data && data['@id'] ? data['@id'] : uuid.v1());
 	self.cleanId = ko.computed(function() {
 		return self.id().replace(self.attributeRegex, '');
@@ -16,7 +18,7 @@ function CalendarEvent(data) {
 	self.location = ko.observable(data && data.location ? data.location : "");
 	self.createdBy = ko.observable(data && data['created-by'] ? data['created-by'] : "");
 	self.owner = ko.observable(data && data.owner ? data.owner : "");
-	self.isPublic = ko.observable(data && data.isPublic ? data.isPublic : false);
+	self.isPublic = ko.observable(data && data.isPublic && data.isPublic == 'true' ? true : false);
 	self.timespan = ko.computed(function() {
 		var start = self.startDate() === null ? null : cmUtils.formatTime(self.startDate(), false);
 		var end = self.endDate() === null ? null : cmUtils.formatTime(self.endDate(), false);
@@ -32,7 +34,7 @@ function CalendarEvent(data) {
 	self.isMine = ko.computed(function() {
 		return self.createdBy() == serverModel.username();
 	});
-	self.favorite = ko.observable(false);
+	self.favorite = ko.observable(data && data.favorite && data.favorite == 'true' ? true : false);
 	self.toString = ko.computed(function() {
 		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	});
@@ -263,7 +265,7 @@ function EventsViewModel() {
 
 		if (eventsModel.updating()) {
 			console.log('EventsViewModel::toggleFavorite: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
-			return;
+			return false;
 		}
 
 		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.favorite());
@@ -291,6 +293,42 @@ function EventsViewModel() {
 			'use strict';
 			console.log('EventsViewModel::toggleFavorite: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
 			console.log('EventsViewModel::toggleFavorite: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+		});
+		return true;
+	};
+	self.togglePublic = function _togglePublic(entry) {
+		'use strict';
+
+		if (eventsModel.updating()) {
+			console.log('EventsViewModel::togglePublic: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
+			return false;
+		}
+
+		console.log('EventsViewModel::togglePublic: ' + entry.id() + ' isPublic has changed to: ' + entry.isPublic());
+		$.ajax({
+			url: serverModel.eventEditUrl() + '/' + encodeURI(entry.id()) + '?isPublic=' + entry.isPublic(),
+			timeout: m_timeout,
+			cache: false,
+			dataType: 'json',
+			type: 'PUT',
+			statusCode: {
+				200: function two_hundred() {
+					console.log('EventsViewModel::togglePublic: 200 OK');
+				},
+				401: function four_oh_one() {
+					console.log('EventsViewModel::togglePublic: 401 not authorized');
+					navModel.authorized(false);
+					serverModel.password(null);
+					$('#login').reveal();
+				}
+			},
+			beforeSend: function beforeSend(xhr) {
+				serverModel.setBasicAuth(xhr);
+			}
+		}).fail(function _fail(jqXHR, textStatus, errorThrown) {
+			'use strict';
+			console.log('EventsViewModel::togglePublic: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
+			console.log('EventsViewModel::togglePublic: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
 		});
 		return true;
 	};
@@ -414,7 +452,7 @@ function PublicEventsViewModel(parentModel) {
 		var filter = self.filter().toLowerCase(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.owner() != serverModel.username() && event.isPublic()) {
+			if (event.owner() != 'google' && event.owner() != serverModel.username() && event.isPublic()) {
 				return true;
 			}
 			return false;

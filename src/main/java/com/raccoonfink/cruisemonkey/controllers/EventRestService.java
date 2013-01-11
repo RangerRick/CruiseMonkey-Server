@@ -7,6 +7,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.model.Event;
+import com.raccoonfink.cruisemonkey.model.Favorite;
 import com.raccoonfink.cruisemonkey.server.EventService;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
@@ -79,6 +81,31 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	public Event getEvent(@PathParam("id") final String id) {
 		m_logger.debug("id = {}", id);
 		return m_eventService.getEvent(id);
+	}
+
+	@PUT
+	@Path("/{id}")
+	@Transactional
+	public Response putEvent(@PathParam("id") final String eventId, @QueryParam("isPublic") final Boolean isPublic) {
+		final String userName = getCurrentUser();
+
+		m_logger.debug("user = {}, event = {}, isPublic = {}", userName, eventId, isPublic);
+		if (userName == null || eventId == null || isPublic == null) {
+			return Response.serverError().build();
+		}
+
+		final Event event = m_eventService.getEvent(eventId);
+		if (event == null) {
+			m_logger.debug("Trying to modify an event that's not in the database!");
+			return Response.notModified().build();
+		} else {
+			if (event.getOwner().getUsername() != userName) {
+				throw new WebApplicationException(401);
+			}
+			event.setIsPublic(isPublic);
+			m_eventService.putEvent(event);
+			return Response.seeOther(getRedirectUri(m_uriInfo)).build();
+		}
 	}
 
 	@DELETE
