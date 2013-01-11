@@ -16,10 +16,14 @@ import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
+import com.raccoonfink.cruisemonkey.model.User;
 
 public class EventServiceImpl implements EventService, InitializingBean {
 	@Autowired
 	private EventDao m_eventDao;
+
+	@Autowired
+	private UserService m_userService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -44,6 +48,26 @@ public class EventServiceImpl implements EventService, InitializingBean {
 	@Override
 	public void putEvent(final Event event) {
 		m_eventDao.save(event);
+	}
+
+	@Override
+	public void putEvent(final Event event, final String userName) {
+		final User user = m_userService.getUser(userName);
+
+		final Session session = m_eventDao.createSession();
+		final Transaction tx = session.beginTransaction();
+
+		try {
+			if (event.getCreatedBy() == null) {
+				event.setCreatedBy(userName);
+			}
+			if (event.getOwner() == null) {
+				event.setOwner(user);
+			}
+			m_eventDao.save(event, session);
+		} finally {
+			tx.commit();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -76,6 +100,7 @@ public class EventServiceImpl implements EventService, InitializingBean {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Event> getPublicEventsInRange(final Date start, final Date end, final String userName) {
 		if (userName == null) throw new IllegalArgumentException("You must provide a username!");
@@ -103,6 +128,20 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				.addOrder(Order.asc("summary"));
 
 			return (List<Event>)criteria.list();
+		} finally {
+			tx.commit();
+		}
+	}
+	
+	@Override
+	public void deleteEvent(final Event event) {
+		if (event == null) throw new IllegalArgumentException("You must provide an event to delete!");
+		
+		final Session session = m_eventDao.createSession();
+		final Transaction tx = session.beginTransaction();
+		
+		try {
+			m_eventDao.delete(event, session);
 		} finally {
 			tx.commit();
 		}

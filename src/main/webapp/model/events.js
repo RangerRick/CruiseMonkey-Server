@@ -11,15 +11,15 @@ function CalendarEvent(data) {
 	});
 	self.summary = ko.observable(data && data.summary ? data.summary : "");
 	self.description = ko.observable(data && data.description ? data.description : "");
-	self.start = ko.observable(data && data.start ? new Date(data.start) : new Date());
-	self.end = ko.observable(data && data.end ? new Date(data.end) : new Date());
+	self.startDate = ko.observable(data && data.start ? new Date(data.start) : new Date());
+	self.endDate = ko.observable(data && data.end ? new Date(data.end) : new Date());
 	self.location = ko.observable(data && data.location ? data.location : "");
 	self.createdBy = ko.observable(data && data['created-by'] ? data['created-by'] : "");
 	self.owner = ko.observable(data && data.owner ? data.owner : "");
 	self.isPublic = ko.observable(data && data.isPublic ? data.isPublic : false);
 	self.timespan = ko.computed(function() {
-		var start = self.start() === null ? null : cmUtils.formatTime(self.start(), false);
-		var end = self.end() === null ? null : cmUtils.formatTime(self.end(), false);
+		var start = self.startDate() === null ? null : cmUtils.formatTime(self.startDate(), false);
+		var end = self.endDate() === null ? null : cmUtils.formatTime(self.endDate(), false);
 		var retVal = '';
 		if (start !== null) {
 			retVal += start;
@@ -29,10 +29,12 @@ function CalendarEvent(data) {
 		}
 		return retVal;
 	}, self);
+	self.isMine = ko.computed(function() {
+		return self.createdBy() == serverModel.username();
+	});
 	self.favorite = ko.observable(false);
-
 	self.toString = ko.computed(function() {
-		return self.id() + ': ' + self.summary();
+		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	});
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
@@ -44,29 +46,126 @@ function AddEventModel() {
 	var self = this,
 		m_pattern = 'MM/dd/yyyy hh:mm';
 
-	self.addedEvent = ko.observable(new CalendarEvent());
+	self.addedEvent = ko.observable();
 
-	self.startDate = ko.computed({
+	self.resetEvent = function() {
+		var e = new CalendarEvent();
+		self.addedEvent(e);
+		e = null;
+	};
+
+	self.summary = ko.computed({
 		read: function() {
-			return self.addedEvent().start().toString(m_pattern);
+			return self.addedEvent() ? self.addedEvent().summary() : "";
 		},
 		write: function(value) {
-			self.addedEvent().start(Date.parse(value));
+			if (self.addedEvent()) self.addedEvent().summary(value);
+		}
+	});
+	self.description = ko.computed({
+		read: function() {
+			return self.addedEvent() ? self.addedEvent().description() : "";
+		},
+		write: function(value) {
+			if (self.addedEvent()) self.addedEvent().description(value);
+		}
+	});
+	self.startDate = ko.computed({
+		read: function() {
+			return self.addedEvent() ? self.addedEvent().startDate().toString(m_pattern) : "";
+		},
+		write: function(value) {
+			if (self.addedEvent()) self.addedEvent().startDate(Date.parse(value));
 		}
 	});
 	self.endDate = ko.computed({
 		read: function() {
-			return self.addedEvent().end().toString(m_pattern);
+			return self.addedEvent() ? self.addedEvent().endDate().toString(m_pattern) : "";
 		},
 		write: function(value) {
-			self.addedEvent().end(Date.parse(value));
+			if (self.addedEvent()) self.addedEvent().endDate(Date.parse(value));
+		}
+	});
+	self.location = ko.computed({
+		read: function() {
+			return self.addedEvent() ? self.addedEvent().location() : "";
+		},
+		write: function(value) {
+			if (self.addedEvent()) self.addedEvent().location(value);
+		}
+	});
+	self.isPublic = ko.computed({
+		read: function() {
+			return self.addedEvent() ? self.addedEvent().isPublic() : "";
+		},
+		write: function(value) {
+			if (self.addedEvent()) self.addedEvent().isPublic(value);
+		}
+	});
+	self.createdBy = ko.computed({
+		read: function() {
+			return self.addedEvent() ? self.addedEvent().createdBy() : "";
+		},
+		write: function(value) {
+			if (self.addedEvent()) self.addedEvent().createdBy(value);
+		}
+	});
+	self.owner = ko.computed({
+		read: function() {
+			return self.addedEvent() ? self.addedEvent().owner() : "";
+		},
+		write: function(value) {
+			if (self.addedEvent()) self.addedEvent().owner(value);
 		}
 	});
 	self.onSubmit = function(formElement) {
-		console.log('submitted:');
-		console.log(formElement);
-		console.log('start = ' + self.addedEvent().start());
-		console.log('end = ' + self.addedEvent().end());
+		if (self.addedEvent()) {
+			var postme = ko.toJS(self.addedEvent());
+			postme.start = postme.startDate;
+			postme.end = postme.endDate;
+			delete postme.cleanId;
+			delete postme.timespan;
+			delete postme.startDate;
+			delete postme.endDate;
+			delete postme.toString;
+			delete postme.createdBy;
+			delete postme.owner;
+			delete postme.attributeRegex;
+			console.log('POSTing JSON: ' + ko.toJSON(postme, null, 2));
+			$.ajax({
+				url: serverModel.eventEditUrl(),
+				timeout: m_timeout,
+				type: 'POST',
+				data: ko.toJSON(postme),
+				dataType: 'json',
+				contentType:"application/json; charset=utf-8",
+				statusCode: {
+					200: function two_hundred() {
+						console.log('200 OK');
+					},
+					401: function four_oh_one() {
+						console.log('401 not authorized');
+						navModel.authorized(false);
+						serverModel.password(null);
+						$('#login').reveal();
+					}
+				},
+				beforeSend: function beforeSend(xhr) {
+					serverModel.setBasicAuth(xhr);
+				}
+			}).success(function _success(data) {
+				console.log('success!');
+				self.createdBy(serverModel.username());
+				self.owner(serverModel.username());
+				eventsModel.events.push(self.addedEvent());
+				$('#add-event').trigger('reveal:close');
+			}).fail(function _error(jqXHR, textStatus, errorThrown) {
+				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
+				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			});
+		} else {
+			console.log('wtf?!? no event?!');
+		}
 	};
 }
 
@@ -138,8 +237,8 @@ function EventsViewModel() {
 					if (item.favorite() != isFavorite) { item.favorite(isFavorite); }
 					if (item.summary() != event.summary) { item.summary(event.summary); }
 					if (item.description() != event.description) { item.description(event.description); }
-					if (item.start().getTime() != startDate.getTime()) { item.start(startDate); }
-					if (item.end().getTime() != endDate.getTime()) { item.end(endDate); }
+					if (item.startDate().getTime() != startDate.getTime()) { item.startDate(startDate); }
+					if (item.endDate().getTime() != endDate.getTime()) { item.endDate(endDate); }
 					if (item.createdBy() != createdBy) { item.createdBy(createdBy); }
 					if (item.owner() != event.owner) { item.owner(event.owner); }
 					return item;
@@ -157,6 +256,77 @@ function EventsViewModel() {
 		}
 		// console.log("saving ReST events");
 		self.updating(false);
+	};
+	
+	self.toggleFavorite = function _toggleFavorite(entry) {
+		'use strict';
+
+		if (eventsModel.updating()) {
+			console.log('EventsViewModel::toggleFavorite: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
+			return;
+		}
+
+		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.favorite());
+		$.ajax({
+			url: serverModel.favoritesUrl() + '?event=' + encodeURI(entry.id()),
+			timeout: m_timeout,
+			cache: false,
+			dataType: 'json',
+			type: entry.favorite() ? 'PUT' : 'DELETE',
+			statusCode: {
+				200: function two_hundred() {
+					console.log('EventsViewModel::toggleFavorite: 200 OK');
+				},
+				401: function four_oh_one() {
+					console.log('EventsViewModel::toggleFavorite: 401 not authorized');
+					navModel.authorized(false);
+					serverModel.password(null);
+					$('#login').reveal();
+				}
+			},
+			beforeSend: function beforeSend(xhr) {
+				serverModel.setBasicAuth(xhr);
+			}
+		}).fail(function _fail(jqXHR, textStatus, errorThrown) {
+			'use strict';
+			console.log('EventsViewModel::toggleFavorite: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
+			console.log('EventsViewModel::toggleFavorite: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+		});
+		return true;
+	};
+	self.deleteEvent = function _deleteEvent(entry) {
+		'use strict';
+
+		console.log('EventsViewModel::deleteEvent: ' + entry.id());
+		$.ajax({
+			url: serverModel.eventEditUrl() + '/' + encodeURI(entry.id()),
+			timeout: m_timeout,
+			cache: false,
+			dataType: 'json',
+			type: 'DELETE',
+			statusCode: {
+				200: function two_hundred() {
+					console.log('EventsViewModel::deleteEvent: 200 OK');
+				},
+				401: function four_oh_one() {
+					console.log('EventsViewModel::deleteEvent: 401 not authorized');
+					navModel.authorized(false);
+					serverModel.password(null);
+					$('#login').reveal();
+				}
+			},
+			beforeSend: function beforeSend(xhr) {
+				serverModel.setBasicAuth(xhr);
+			}
+		}).done(function _done() {
+			console.log('EventsViewModel::deleteEvent: finished, removing from view');
+			self.events.remove(entry);
+		}).fail(function _fail(jqXHR, textStatus, errorThrown) {
+			'use strict';
+			console.log('EventsViewModel::deleteEvent: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
+			console.log('EventsViewModel::deleteEvent: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+		});
+		return true;
 	};
 }
 

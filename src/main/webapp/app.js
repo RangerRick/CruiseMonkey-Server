@@ -70,47 +70,6 @@ templateLoader.onFinished = function() {
 	});
 
 	setupDefaultView();
-
-	setTimeout(function _favoriteHandler() {
-		$('.favorite-checkbox').on('click.cm touchstart.cm', function(e) {
-			'use strict';
-
-			e.stopPropagation();
-			var entry = ko.contextFor(this).$data;
-
-			if (eventsModel.updating()) {
-				// console.log('skipping ajax update for ' + e.id() + ', we are in the middle of a server update');
-				return;
-			}
-
-			console.log(entry.id() + ' favorite has changed to: ' + entry.favorite());
-			$.ajax({
-				url: serverModel.favoritesUrl(entry.id()),
-				timeout: m_timeout,
-				cache: false,
-				dataType: 'json',
-				type: entry.favorite() ? 'PUT' : 'DELETE',
-				statusCode: {
-					200: function two_hundred() {
-						console.log('200 OK');
-					},
-					401: function four_oh_one() {
-						console.log('401 not authorized');
-						navModel.authorized(false);
-						serverModel.password(null);
-						$('#login').reveal();
-					}
-				},
-				beforeSend: function beforeSend(xhr) {
-					serverModel.setBasicAuth(xhr);
-				}
-			}).fail(function _fail(jqXHR, textStatus, errorThrown) {
-				'use strict';
-				console.log('favorites: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
-				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
-			});
-		});
-	}, 50);
 };
 
 window['templateLoader'] = templateLoader;
@@ -146,7 +105,7 @@ htmlInitialization = {
 					$(element).on('click.cm touchstart.cm', function(e) {
 						e.preventDefault();
 						console.log('add-event clicked');
-						addEventModel.addedEvent(new CalendarEvent());
+						addEventModel.resetEvent();
 						$('#add-event').reveal();
 					})
 				} else if (hash !== '') {

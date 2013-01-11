@@ -22,9 +22,13 @@ function ServerModel() {
 		return self._cruisemonkey() + '/rest/cruisemonkey/events';
 	});
 
-	self.favoritesUrl = function(id) {
-		return self._cruisemonkey() + '/rest/favorites?event=' + encodeURI(id);
-	};
+	self.eventEditUrl = ko.computed(function() {
+		return self._cruisemonkey() + '/rest/events';
+	});
+
+	self.favoritesUrl = ko.computed(function() {
+		return self._cruisemonkey() + '/rest/favorites';
+	});
 
 	self.setBasicAuth = function(xhr) {
 		xhr.setRequestHeader('Authorization', 'Basic ' + window.btoa(self.username() + ':' + self.password()));

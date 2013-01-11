@@ -54,7 +54,7 @@ public class Event extends AbstractRecord implements Serializable {
 	@XmlElement(name="end")
 	private Date m_endDate;
 
-	@XmlAttribute(name="isPublic")
+	@XmlElement(name="isPublic")
 	private Boolean m_isPublic = false;
 
 	@XmlElement(name="owner")

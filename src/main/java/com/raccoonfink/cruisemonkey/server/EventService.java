@@ -17,4 +17,8 @@ public interface EventService {
 	public List<Event> getPublicEventsInRange(final Date start, final Date end, String userName);
 
 	public void putEvent(final Event event);
+
+	public void putEvent(final Event event, final String user);
+
+	public void deleteEvent(final Event event);
 }

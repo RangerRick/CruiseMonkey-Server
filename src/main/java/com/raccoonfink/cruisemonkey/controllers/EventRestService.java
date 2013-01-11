@@ -4,12 +4,14 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -79,12 +81,30 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 		return m_eventService.getEvent(id);
 	}
 
+	@DELETE
+	@Path("/{id}")
+	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Transactional(readOnly=true)
+	public void deleteEvent(@PathParam("id") final String id) {
+		m_logger.debug("id = {}", id);
+		final String user = getCurrentUser();
+		final Event event = m_eventService.getEvent(id);
+		if (event == null) {
+			m_logger.debug("Trying to delete an event that's not in the database!");
+		} else {
+			if (event.getOwner().getUsername() != user) {
+				throw new WebApplicationException(401);
+			}
+			m_eventService.deleteEvent(event);
+		}
+	}
+
 	@POST
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional
 	public Response putEvent(final Event event) {
 		m_logger.debug("event = {}", event);
-		m_eventService.putEvent(event);
+		m_eventService.putEvent(event, getCurrentUser());
 		return Response.seeOther(getRedirectUri(m_uriInfo, event.getId())).build();
 	}
 }
