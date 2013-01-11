@@ -46,7 +46,7 @@ function ServerModel() {
 	};
 
 	self.persist = ko.computed(function() {
-		amplify.store('cruisemonkey_url', self.cruisemonkey().replace(/\/$/, ''));
+		amplify.store('cruisemonkey_url', self.cruisemonkey() ? self.cruisemonkey().replace(/\/$/, '') : null);
 		amplify.store('username', self.username());
 		amplify.store('password', self.password());
 	});
