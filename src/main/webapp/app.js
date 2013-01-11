@@ -301,10 +301,7 @@ setupDefaultView = function() {
 
 	setTimeout(function() {
 		ajaxUpdater.start();
-		setTimeout(function() {
-			ajaxUpdater.pollNow();
-		}, 1000);
-	}, 0);
+	}, 1000);
 
 	// Hide address bar on mobile devices
 	/*
