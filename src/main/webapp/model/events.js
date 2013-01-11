@@ -5,7 +5,7 @@
 function CalendarEvent(data) {
 	var self = this;
 
-	console.log('importing data: ' + ko.toJSON(data));
+	// console.log('importing data: ' + ko.toJSON(data));
 
 	self.id = ko.observable(data && data['@id'] ? data['@id'] : uuid.v1());
 	self.cleanId = ko.computed(function() {
