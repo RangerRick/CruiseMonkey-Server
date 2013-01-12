@@ -1,6 +1,5 @@
 3RDPARTYJS = \
 	3rdparty/jquery/jquery-1.8.3.min.js \
-	3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js \
 	3rdparty/mustache/mustache.min.js \
 	3rdparty/knockout/knockout-2.2.0.js \
 	3rdparty/knockout/knockout.mapping-latest.js \
@@ -11,7 +10,6 @@
 	3rdparty/amplifyjs/amplify.min.js \
 	3rdparty/jquery-url-parser/purl.js \
 	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js \
-	3rdparty/jquery-ui-timepicker-addon.js \
 	3rdparty/uuid.js
 
 3RDPARTYCSS = \
@@ -45,7 +43,15 @@ FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
 RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js
 
-PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml cruisemonkey.manifest cruisemonkey.css)
+PHONEGAPFILES = \
+	$(RUNTIME) \
+	config.xml \
+	cruisemonkey.manifest \
+	cruisemonkey.css \
+	3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js \
+	3rdparty/jquery-ui-timepicker-addon.js
+
+PHONEGAPDESTFILES = $(patsubst %,$(DESTDIR)/%,$(PHONEGAPFILES))
 
 MAKEFILE=Makefile
 
@@ -134,4 +140,4 @@ $(DESTDIR)/%: % $(MAKEFILE)
 		install -d -m 755 "$$DIR"; \
 		install -c -m 644 "$<" "$@"
 
-install: $(PHONEGAPFILES) all
+install: $(PHONEGAPDESTFILES) all
