@@ -26,9 +26,6 @@ function AjaxUpdater() {
 				cache: false,
 				dataType: 'json',
 				statusCode: {
-					200: function two_hundred() {
-						console.log('200 OK');
-					},
 					401: function four_oh_one() {
 						console.log('401 not authorized');
 						navModel.authorized(false);

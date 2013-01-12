@@ -196,29 +196,28 @@ function EventsViewModel() {
 	self.updateData = function(allData) {
 		m_updateCount++;
 		self.updating(true);
-		var favorites = [], dataFavorites = [], dataEvents = [];
+
 		if (!allData) {
 			console.log('EventsViewModel::updateData() called, but missing event data!');
 			return;
 		}
+
+		var favorites = [];
 		if (allData.favorites && allData.favorites.favorite) {
-			if (allData.favorites.favorite instanceof Array) {
-				dataFavorites = allData.favorites.favorite;
-			} else {
-				dataFavorites.push(allData.favorites.favorite);
-			}
-			favorites = $.map(dataFavorites, function(favorite) {
+			var processFavorite = function(favorite) {
 				return favorite['@event'];
-			});
-		}
-		if (allData.events && allData.events.event) {
-			if (allData.events.event instanceof Array) {
-				dataEvents = allData.events.event;
+			};
+			if (allData.favorites.favorite instanceof Array) {
+				favorites = $.map(allData.favorites.favorite, processFavorite);
 			} else {
-				dataEvents.push(allData.events.event);
+				favorites = [ processFavorite(allData.favorites.favorite) ];
 			}
-			console.log('EventsViewModel::updateData(): parsing ' + dataEvents.length + ' events (' + m_updateCount + ')');
-			var mappedTasks = $.map(dataEvents, function(event) {
+			allData.favorites.favorite = null;
+			allData.favorites = null;
+		}
+
+		if (allData.events && allData.events.event) {
+			var mappedTasks, processEvent = function(event) {
 				'use strict';
 
 				var item = ko.utils.arrayFirst(self.events(), function(entry) {
@@ -246,19 +245,24 @@ function EventsViewModel() {
 				} else {
 					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': creating new item');
 					var e = new CalendarEvent(event);
-
 					e.favorite((event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)));
-
 					return e;
 				}
-			});
+			};
+			
+			if (allData.events.event instanceof Array) {
+				mappedTasks = $.map(allData.events.event, processEvent);
+			} else {
+				mappedTasks = [ processEvent(allData.events.event) ];
+			}
 			self.events(mappedTasks);
+
 			amplify.store('events', allData);
-			mappedTasks = allData = null;
+			processEvent = mappedTasks = allData = allData.events = allData.events.event = null;
 		} else {
 			console.log('no proper event data found');
 		}
-		favorites = dataFavorites = dataEvents = null;
+		favorites = null;
 		self.updating(false);
 	};
 	
