@@ -17,84 +17,12 @@ var publicEventsModel = new PublicEventsViewModel(eventsModel);
 
 pageTracker = new PageTracker('.scrollable');
 pageNavigator = new PageNavigator('official-events', '.scrollable');
-templateLoader = new TemplateLoader(['#header.html', '#login.html', '#events.html', '#amenities.html', '#decks.html']);
+templateLoader = new TemplateLoader(['#header.html', '#login.html', '#events.html', '#amenities.html', '#decks.html', '#edit-event.html']);
 
 htmlInitialization = {
-	"header": function createHeader() {
-		'use strict';
-
-		var header = $('#header'),
-			host = document.URL.replace(/\#$/, ''),
-			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host));
-
-		header.html(templateLoader.renderTemplate('#header.html'));
-
-		header.find('a').each(function(index, element) {
-			'use strict';
-
-			// console.log('url host = ' + host);
-			var hash, href;
-			if (element.href !== undefined) {
-				href = element.href.replace(hostRegex, '');
-				if (href && href !== '') {
-					if (href.indexOf('#') >= 0) {
-						hash = element.href.split('#')[1];
-					}
-				} else {
-					href = undefined;
-				}
-			}
-			// console.log('a = ' + $(element).html() + ', href = ' + href + ', hash = ' + hash);
-			if (hash !== undefined) {
-				if (hash == 'add-event') {
-					$(element).on('click.cm touchstart.cm', function(e) {
-						e.preventDefault();
-						console.log('add-event clicked');
-						addEventModel.resetEvent();
-						$('#add-event').reveal();
-					})
-				} else if (hash !== '') {
-					// $(element).off('click');
-					$(element).on('click.cm touchstart.cm', function(e) {
-						'use strict';
-
-						e.preventDefault();
-						// console.log('navigation event: ' + hash);
-						pageNavigator.navigateTo(hash);
-					});
-				}
-			} else if (href !== undefined && href !== '') {
-				$(element).on('click.cm touchstart.cm', function(e) {
-					'use strict';
-
-					e.preventDefault();
-					cmUtils.openLink(href);
-				});
-			}
-		});
-
-		$(header).find('.signin a').each(function(index, element) {
-			$(element).on('click.cm touchstart.cm', function(e) {
-				'use strict';
-
-				e.preventDefault();
-				console.log('signin clicked');
-				$('#login').reveal();
-			});
-		});
-		$(header).find('.signout a').each(function(index, element) {
-			$(element).on('click.cm touchstart.cm', function(e) {
-				'use strict';
-
-				e.preventDefault();
-				console.log('signout clicked');
-				navModel.logOut();
-				$('#login').reveal();
-			});
-		});
-
-		ko.applyBindings(navModel, header[0]);
-		header = null;
+	"header": {
+		"templateSource": "#header.html",
+		"model": navModel
 	},
 	"login": {
 		"templateSource": "#login.html",
@@ -130,10 +58,13 @@ htmlInitialization = {
 		"templateSource": "#decks.html",
 		"model": decksModel
 	},
-	"add-event": function addEvent() {
-		$('#start-datepicker').datetimepicker();
-		$('#end-datepicker').datetimepicker();
-		ko.applyBindings(addEventModel, $('#add-event')[0]);
+	"edit-event": {
+		"templateSource": "edit-event.html",
+		"model": addEventModel,
+		"afterAttach": function _afterAttach() {
+			$('#start-datepicker').datetimepicker();
+			$('#end-datepicker').datetimepicker();
+		}
 	}
 };
 
@@ -289,18 +220,36 @@ templateLoader.onFinished = function() {
 			if (typeof data === 'function') {
 				data();
 			} else {
-				var div = $('<div>');
+				var div;
+				// TODO: HACK!!
+				if (index == 'header') {
+					div = $('#header');
+				} else {
+					div = $('<div>');
+				}
 				div.attr('id', index);
 				if (data.divClasses) {
 					for (var i = 0; i < data.divClasses.length; i++) {
 						div.addClass(data.divClasses[i]);
 					}
 				}
-				div.css('display', 'none');
+
+				// TODO: HACK!!
+				if (index != 'header') {
+					div.css('display', 'none');
+				}
 				var renderedHtml = templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {});
 				div.html(renderedHtml);
-				$('#content').append(div);
 
+				// TODO: HACK!!
+				if (index != 'header') {
+					$('#content').append(div);
+				}
+
+				if (data.afterAttach) {
+					console.log('calling afterAttach for ' + index);
+					data.afterAttach(div);
+				}
 				if (data.model) {
 					console.log('applying ' + data.model + ' to ' + index);
 					ko.applyBindings(data.model, div[0]);

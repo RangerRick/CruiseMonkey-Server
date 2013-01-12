@@ -124,7 +124,11 @@ function TemplateLoader(urls) {
 			replacements = {};
 		}
 		var template = m_templates[url];
-		return Mustache.to_html(template, replacements);
+		if (template) {
+			return Mustache.to_html(template, replacements);
+		} else {
+			return null;
+		}
 	};
 
 	self.load = function() {

@@ -44,9 +44,9 @@ FOUNDATION = $(shell find 3rdparty/foundation -type f)
 RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js
 
 PHONEGAPFILES = \
+	cruisemonkey.manifest \
 	$(RUNTIME) \
 	config.xml \
-	cruisemonkey.manifest \
 	cruisemonkey.css \
 	3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js \
 	3rdparty/jquery-ui-timepicker-addon.js
@@ -57,7 +57,7 @@ MAKEFILE=Makefile
 
 DESTDIR=/tmp/foo
 
-all: $(RUNTIME) cruisemonkey.manifest
+all: cruisemonkey.manifest $(RUNTIME)
 
 DATE=$(shell date '+%s')
 GITHASH=$(shell git log -1 | grep -E '^commit' | cut -d' ' -f2)

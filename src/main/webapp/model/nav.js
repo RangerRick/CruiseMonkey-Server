@@ -56,4 +56,50 @@ function NavModel() {
 		serverModel.password(null);
 		serverModel.persist();
 	};
+	
+	self.navigate = function(item, event) {
+		var target = event.target,
+			host = document.URL.replace(/\#$/, ''),
+			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host)),
+			hash,
+			href;
+
+		console.log('NavModel::navigate(): href = ' + target.href);
+		if (target.href !== undefined) {
+			href = target.href.replace(hostRegex, '');
+			if (href && href !== '') {
+				if (href.indexOf('#') >= 0) {
+					hash = target.href.split('#')[1];
+				}
+			} else {
+				href = undefined;
+			}
+		}
+		console.log('a = ' + $(target).html() + ', href = ' + href + ', hash = ' + hash);
+
+		if (hash == 'edit-event') {
+			addEventModel.resetEvent();
+		}
+
+		if (hash == 'sign-in') {
+			console.log('signin clicked');
+			event.stopPropagation();
+			$('#login').reveal();
+		} else if (hash == 'sign-out') {
+			console.log('signout clicked');
+			event.stopPropagation();
+			navModel.logOut();
+			$('#login').reveal();
+		} else if (hash !== undefined) {
+			if (hash !== '') {
+				console.log('navigating to ' + hash);
+				pageNavigator.navigateTo(hash);
+			}
+		} else if (href !== undefined && href !== '') {
+			cmUtils.openLink(href);
+		}
+
+		item = event = target = hash = href = null;
+		return true;
+	}
 }
