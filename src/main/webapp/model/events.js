@@ -152,9 +152,11 @@ function AddEventModel() {
 				dataType: 'json',
 				contentType:"application/json; charset=utf-8",
 				statusCode: {
+					/*
 					200: function two_hundred() {
 						console.log('200 OK');
 					},
+					*/
 					401: function four_oh_one() {
 						console.log('401 not authorized');
 						navModel.authorized(false);
@@ -282,9 +284,11 @@ function EventsViewModel() {
 			dataType: 'json',
 			type: entry.favorite() ? 'PUT' : 'DELETE',
 			statusCode: {
+				/*
 				200: function two_hundred() {
 					console.log('EventsViewModel::toggleFavorite: 200 OK');
 				},
+				*/
 				401: function four_oh_one() {
 					console.log('EventsViewModel::toggleFavorite: 401 not authorized');
 					navModel.authorized(false);
@@ -318,9 +322,11 @@ function EventsViewModel() {
 			dataType: 'json',
 			type: 'PUT',
 			statusCode: {
+				/*
 				200: function two_hundred() {
 					console.log('EventsViewModel::togglePublic: 200 OK');
 				},
+				*/
 				401: function four_oh_one() {
 					console.log('EventsViewModel::togglePublic: 401 not authorized');
 					navModel.authorized(false);
@@ -349,9 +355,11 @@ function EventsViewModel() {
 			dataType: 'json',
 			type: 'DELETE',
 			statusCode: {
+				/*
 				200: function two_hundred() {
 					console.log('EventsViewModel::deleteEvent: 200 OK');
 				},
+				*/
 				401: function four_oh_one() {
 					console.log('EventsViewModel::deleteEvent: 401 not authorized');
 					navModel.authorized(false);

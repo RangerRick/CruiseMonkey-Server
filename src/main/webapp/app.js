@@ -155,9 +155,6 @@ checkIfAuthorized = function(success, failure) {
 		dataType: 'json',
 		type: 'GET',
 		statusCode: {
-			200: function two_hundred() {
-				console.log('200 OK');
-			},
 			401: function four_oh_one() {
 				console.log('401 not authorized');
 				navModel.authorized(false);
@@ -242,9 +239,11 @@ setupDefaultView = function() {
 		}
 	};
 
+	/*
 	setTimeout(function() {
 		ajaxUpdater.start();
 	}, 1000);
+	*/
 
 	showLoginOrCurrent();
 };
