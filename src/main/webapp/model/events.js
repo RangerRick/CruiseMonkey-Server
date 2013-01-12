@@ -38,6 +38,17 @@ function CalendarEvent(data) {
 	self.toString = ko.computed(function() {
 		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	});
+	
+	self.updateUsing = function(d) {
+		if (self.favorite()            != d.isFavorite)          { self.favorite(d.isFavorite);     }
+		if (self.summary()             != d.summary)             { self.summary(d.summary);         }
+		if (self.description()         != d.description)         { self.description(d.description); }
+		if (self.startDate().getTime() != d.startDate.getTime()) { self.startDate(d.startDate);     }
+		if (self.endDate().getTime()   != d.endDate.getTime())   { self.endDate(d.endDate);         }
+		if (self.createdBy()           != d.createdBy)           { self.createdBy(d.createdBy);     }
+		if (self.owner()               != d.owner)               { self.owner(d.owner);             }
+	};
+	data = null;
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
 
@@ -133,7 +144,6 @@ function AddEventModel() {
 			delete postme.createdBy;
 			delete postme.owner;
 			delete postme.attributeRegex;
-			console.log('POSTing JSON: ' + ko.toJSON(postme, null, 2));
 			$.ajax({
 				url: serverModel.eventEditUrl(),
 				timeout: m_timeout,
@@ -164,6 +174,8 @@ function AddEventModel() {
 			}).fail(function _error(jqXHR, textStatus, errorThrown) {
 				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
 				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			}).done(function _done() {
+				postme = null;
 			});
 		} else {
 			console.log('wtf?!? no event?!');
@@ -175,12 +187,14 @@ function AddEventModel() {
  * @constructor
  */
 function EventsViewModel() {
-	var self = this;
+	var self = this,
+		m_updateCount = 0;
 
 	self.events = ko.observableArray();
 	self.updating = ko.observable(false);
 
 	self.updateData = function(allData) {
+		m_updateCount++;
 		self.updating(true);
 		var favorites = [], dataFavorites = [], dataEvents = [];
 		if (!allData) {
@@ -203,60 +217,48 @@ function EventsViewModel() {
 			} else {
 				dataEvents.push(allData.events.event);
 			}
-			console.log('EventsViewModel::updateData(): parsing ' + dataEvents.length + ' events');
-			var startDate,
-				endDate,
-				createdBy,
-				e,
-				mappedTasks = $.map(dataEvents, function(event) {
+			console.log('EventsViewModel::updateData(): parsing ' + dataEvents.length + ' events (' + m_updateCount + ')');
+			var mappedTasks = $.map(dataEvents, function(event) {
 				'use strict';
 
-				var isFavorite, item;
-				if (event.favorite !== undefined) {
-					isFavorite = event.favorite;
-				} else {
-					isFavorite = (favorites.indexOf(event['@id']) != -1);
-				}
-				// console.log("loading event: " + event['@id'] + ' (favorite = ' + isFavorite + ')');
-				item = ko.utils.arrayFirst(self.events(), function(entry) {
+				var item = ko.utils.arrayFirst(self.events(), function(entry) {
 					'use strict';
-
-					if (entry) {
-						if (entry.id() == event['@id']) {
-							return true;
-						} else {
-							return false;
-						}
+					if (entry && entry.id() == event['@id']) {
+						return true;
 					} else {
-						console.log('no entry');
+						return false;
 					}
 				});
 				if (item) {
-					startDate = new Date(event.start);
-					endDate = new Date(event.end);
-					createdBy = event['created-by'];
+					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': reusing existing item');
 
-					if (item.favorite() != isFavorite) { item.favorite(isFavorite); }
-					if (item.summary() != event.summary) { item.summary(event.summary); }
-					if (item.description() != event.description) { item.description(event.description); }
-					if (item.startDate().getTime() != startDate.getTime()) { item.startDate(startDate); }
-					if (item.endDate().getTime() != endDate.getTime()) { item.endDate(endDate); }
-					if (item.createdBy() != createdBy) { item.createdBy(createdBy); }
-					if (item.owner() != event.owner) { item.owner(event.owner); }
+					item.updateUsing({
+						"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)),
+						"summary": event.summary,
+						"description": event.description,
+						"startDate": new Date(event.start),
+						"endDate": new Date(event.end),
+						"createdBy": event['created-by'],
+						"owner": event.owner
+					});
+
 					return item;
 				} else {
-					e = new CalendarEvent(event);
-					e.favorite(isFavorite);
+					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': creating new item');
+					var e = new CalendarEvent(event);
+
+					e.favorite((event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)));
 
 					return e;
 				}
 			});
 			self.events(mappedTasks);
 			amplify.store('events', allData);
+			mappedTasks = allData = null;
 		} else {
 			console.log('no proper event data found');
 		}
-		// console.log("saving ReST events");
+		favorites = dataFavorites = dataEvents = null;
 		self.updating(false);
 	};
 	

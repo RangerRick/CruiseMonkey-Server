@@ -1,6 +1,6 @@
 console.log('app.js loading');
 
-var m_eventUpdateInterval = 60000,
+var m_eventUpdateInterval = 30000,
 _header, _container, scrollManager, pageTracker, pageNavigator, templateLoader, htmlInitialization, checkIfAuthorized, showLoginOrCurrent, setupDefaultView,
 pages = {},
 page_scroll_element = [];

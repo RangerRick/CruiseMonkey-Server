@@ -179,20 +179,25 @@ function PageNavigator(defaultPage, elementCriteria) {
 			setTimeout(function _scrollToElement() {
 				'use strict';
 
-				$('#content').scrollTo(id, 0,
-					{
-						margin: false,
-						offset: {left: 0, top: -45},
-						onAfter: function _onAfter() {
-							id = null;
-							setTimeout(function _enableScrollManager() {
-								if (scrollManager) {
-									scrollManager.enabled = true;
-								}
-							}, 50);
+				var content = $('#content');
+				if (content && content.scrollTo) {
+					content.scrollTo(id, 0,
+						{
+							margin: false,
+							offset: {left: 0, top: -45},
+							onAfter: function _onAfter() {
+								content = null;
+								id = null;
+								setTimeout(function _enableScrollManager() {
+									if (scrollManager) {
+										scrollManager.enabled = true;
+									}
+								}, 50);
+							}
 						}
-					}
-				);
+					);
+				}
+				content = null;
 			}, 0);
 		}
 
