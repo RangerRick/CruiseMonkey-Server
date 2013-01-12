@@ -15,6 +15,7 @@
 	3rdparty/uuid.js
 
 3RDPARTYCSS = \
+	3rdparty/foundation/stylesheets/foundation.min.css \
 	3rdparty/jquery-ui/css/no-theme/jquery-ui-1.9.2.custom.min.css \
 	3rdparty/jquery-ui-timepicker-addon.css
 
@@ -44,7 +45,7 @@ FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
 RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js
 
-PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml cruisemonkey.manifest)
+PHONEGAPFILES = $(patsubst %,$(DESTDIR)/%,$(RUNTIME) config.xml cruisemonkey.manifest cruisemonkey.css)
 
 MAKEFILE=Makefile
 
@@ -102,6 +103,7 @@ temp/%.min.css: %.css
 
 3rdparty.js: $(3RDPARTYJS)
 	@echo > 3rdparty.js; for FILE in $(3RDPARTYJS); do \
+		echo "- $$FILE"; \
 		cat $$FILE >> 3rdparty.js; \
 		echo "" >> 3rdparty.js; \
 	done
@@ -111,8 +113,8 @@ cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE) compile.sh $(wildcard externs/*.j
 	@echo ./compile.sh $(CRUISEMONKEYJS)
 	@./compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null
 
-cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(3RDPARTYCSS)
-	@cat $(CRUISEMONKEYMINCSS) $(3RDPARTYCSS) > cruisemonkey.css
+cruisemonkey.css: $(CRUISEMONKEYCSS) $(3RDPARTYCSS) $(MAKEFILE)
+	@cat $(3RDPARTYCSS) $(CRUISEMONKEYCSS) > "$@"
 
 $(DESTDIR)/foundation/%: foundation/%
 	@DIR="$(DESTDIR)/`dirname $<`"; \
