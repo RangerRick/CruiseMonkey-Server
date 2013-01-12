@@ -19,60 +19,6 @@ pageTracker = new PageTracker('.scrollable');
 pageNavigator = new PageNavigator('official-events', '.scrollable');
 templateLoader = new TemplateLoader(['#header.html', '#login.html', '#events.html', '#amenities.html', '#decks.html']);
 
-templateLoader.onFinished = function() {
-	'use strict';
-
-	if (window.Modernizr.touch) {
-		$('#content').addClass('hide-scrollbar');
-	}
-
-	scrollManager = new ScrollManager('#content');
-	scrollManager.delay = 100; // ms
-
-	scrollManager.onScrollStop = function(enabled) {
-		'use strict';
-
-		if (enabled) {
-			pageNavigator.updateTopVisibleElement();
-		}
-	};
-
-	$.each(htmlInitialization, function(index, data) {
-		if (pages[index]) {
-			console.log(index + ' has already been initialized');
-		} else {
-			console.log('initializing HTML for ' + index);
-			if (typeof data === 'function') {
-				data();
-			} else {
-				var div = $('<div>');
-				div.attr('id', index);
-				if (data.divClasses) {
-					for (var i = 0; i < data.divClasses.length; i++) {
-						div.addClass(data.divClasses[i]);
-					}
-				}
-				div.css('display', 'none');
-				var renderedHtml = templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {});
-				div.html(renderedHtml);
-				$('#content').append(div);
-
-				if (data.model) {
-					console.log('applying ' + data.model + ' to ' + index);
-					ko.applyBindings(data.model, div[0]);
-				}
-				div = null;
-			}
-			pages[index] = true;
-		}
-		index = data = null;
-	});
-
-	setupDefaultView();
-};
-
-window['templateLoader'] = templateLoader;
-
 htmlInitialization = {
 	"header": function createHeader() {
 		'use strict';
@@ -317,5 +263,59 @@ setupDefaultView = function() {
 		}
 	};
 })();
+
+templateLoader.onFinished = function() {
+	'use strict';
+
+	if (window.Modernizr.touch) {
+		$('#content').addClass('hide-scrollbar');
+	}
+
+	scrollManager = new ScrollManager('#content');
+	scrollManager.delay = 100; // ms
+
+	scrollManager.onScrollStop = function(enabled) {
+		'use strict';
+
+		if (enabled) {
+			pageNavigator.updateTopVisibleElement();
+		}
+	};
+
+	$.each(htmlInitialization, function(index, data) {
+		if (pages[index]) {
+			console.log(index + ' has already been initialized');
+		} else {
+			console.log('initializing HTML for ' + index);
+			if (typeof data === 'function') {
+				data();
+			} else {
+				var div = $('<div>');
+				div.attr('id', index);
+				if (data.divClasses) {
+					for (var i = 0; i < data.divClasses.length; i++) {
+						div.addClass(data.divClasses[i]);
+					}
+				}
+				div.css('display', 'none');
+				var renderedHtml = templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {});
+				div.html(renderedHtml);
+				$('#content').append(div);
+
+				if (data.model) {
+					console.log('applying ' + data.model + ' to ' + index);
+					ko.applyBindings(data.model, div[0]);
+				}
+				div = null;
+			}
+			pages[index] = true;
+		}
+		index = data = null;
+	});
+
+	setupDefaultView();
+};
+
+window['templateLoader'] = templateLoader;
 
 console.log('app.js loaded');
