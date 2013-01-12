@@ -8,12 +8,26 @@ function NavModel() {
 
 	f_hasUsername = ko.computed(function _hasUsername() {
 		'use strict';
-		return serverModel.username() !== null && serverModel.username() !== undefined && serverModel.username().length > 0;
+		var username = app.server.serverModel.username();
+		if (username !== null && username !== undefined && username.length > 0) {
+			username = null;
+			return true;
+		} else {
+			username = null;
+			return false;
+		}
 	}),
 
 	f_hasPassword = ko.computed(function _hasPassword() {
 		'use strict';
-		return serverModel.password() !== null && serverModel.password() !== undefined && serverModel.password().length > 0;
+		var password = app.server.serverModel.password();
+		if (password !== null && password !== undefined && password.length > 0) {
+			password = null;
+			return true;
+		} else {
+			password = null;
+			return false;
+		}
 	});
 
 	self.isSignedIn = ko.computed(function _isSignedIn() {
@@ -53,8 +67,8 @@ function NavModel() {
 
 	self.logOut = function() {
 		'use strict';
-		serverModel.password(null);
-		serverModel.persist();
+		app.server.serverModel.password(null);
+		app.server.serverModel.persist();
 	};
 	
 	self.navigate = function(item, event) {
@@ -75,25 +89,17 @@ function NavModel() {
 				href = undefined;
 			}
 		}
-		console.log('a = ' + $(target).html() + ', href = ' + href + ', hash = ' + hash);
 
 		if (hash == 'edit-event') {
-			addEventModel.resetEvent();
+			app.events.editEventModel.resetEvent();
+		} else if (hash == 'sign-out') {
+			self.logOut();
 		}
 
-		if (hash == 'sign-in') {
-			console.log('signin clicked');
-			event.stopPropagation();
-			$('#login').reveal();
-		} else if (hash == 'sign-out') {
-			console.log('signout clicked');
-			event.stopPropagation();
-			navModel.logOut();
-			$('#login').reveal();
-		} else if (hash !== undefined) {
+		if (hash !== undefined) {
 			if (hash !== '') {
 				console.log('navigating to ' + hash);
-				pageNavigator.navigateTo(hash);
+				app.navigation.pageNavigator.navigateTo(hash);
 			}
 		} else if (href !== undefined && href !== '') {
 			cmUtils.openLink(href);

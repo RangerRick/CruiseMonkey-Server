@@ -15,8 +15,8 @@ function AjaxUpdater() {
 			console.log('AjaxUpdater::f_updateEventModel(): An update is already in-progress, skipping update.');
 		}
 
-		if (navModel.isAuthorized()) {
-			var url = serverModel.eventUrl();
+		if (app.navigation.model.isAuthorized()) {
+			var url = app.server.serverModel.eventUrl();
 
 			console.log('updating event data from ' + url);
 			m_inFlight = true;
@@ -28,28 +28,31 @@ function AjaxUpdater() {
 				statusCode: {
 					401: function four_oh_one() {
 						console.log('401 not authorized');
-						navModel.authorized(false);
-						serverModel.password(null);
+						app.navigation.model.authorized(false);
+						app.server.serverModel.password(null);
 						$('#login').reveal();
 						self.onUpdate();
 					}
 				},
 				beforeSend: function beforeSend(xhr) {
-					serverModel.setBasicAuth(xhr);
+					app.server.serverModel.setBasicAuth(xhr);
+					xhr = null;
 				}
 			}).success(function _success(data) {
 				console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
-				eventsModel.updateData(data);
+				app.events.eventsViewModel.updateData(data);
+				data = null;
 				m_inFlight = false;
 				self.onUpdate();
 			}).fail(function _error(jqXHR, textStatus, errorThrown) {
 				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(jqXHR));
 				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+				jqXHR = textStatus = errorThrown = null;
 				m_inFlight = false;
 				self.onUpdate();
 			});
 		} else {
-			console.log('Not authorized according to navModel, skipping update.');
+			console.log('Not authorized according to navigation model, skipping update.');
 		}
 		//MemoryLeakChecker.checkLeaks(window);
 	};
@@ -61,7 +64,7 @@ function AjaxUpdater() {
 	};
 	self.start = function _start() {
 		self.pollNow();
-		m_timer = setInterval(f_updateEventModel, m_eventUpdateInterval);
+		m_timer = setInterval(f_updateEventModel, app.settings.eventUpdateInterval);
 	};
 	self.stop = function _stop() {
 		if (m_timer !== null) {

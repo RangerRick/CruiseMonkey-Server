@@ -170,7 +170,7 @@ var swiper = new Swiper();
 	w.on('swiper-moveout', function() {
 		'use strict';
 		var direction = swiper.directionX,
-			currentPage = pageNavigator.getCurrentPage(),
+			currentPage = app.navigation.pageNavigator.getCurrentPage(),
 			newPage,
 			pageIndex,
 			newPageIndex;

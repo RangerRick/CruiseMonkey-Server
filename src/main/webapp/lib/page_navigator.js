@@ -56,7 +56,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		'use strict';
 		var current_page = amplify.store('current_page');
 		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
-		if (!current_page || current_page == 'login' || current_page == 'add-event') {
+		if (!current_page || current_page == 'login' || current_page == 'edit-event') {
 			current_page = defaultPage;
 			amplify.store('current_page', current_page);
 		}
@@ -98,7 +98,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		if (el && highestPercent > 0) {
 			var elementId = el.getAttribute('id');
 			console.log('PageNavigator::findTopVisibleElement(): first visible element on ' + current_page + ': ' + elementId);
-			pageTracker.setScrolledId(current_page, elementId);
+			app.navigation.pageTracker.setScrolledId(current_page, elementId);
 		} else {
 			console.log('no top visible element found!');
 		}
@@ -106,29 +106,30 @@ function PageNavigator(defaultPage, elementCriteria) {
 		current_page = id = el = elementPercent = highestPercent = null;
 	};
 
-	self.replaceCurrentPage = function _replaceCurrentPage(pageId) {
+	self.replaceCurrentPage = function _replaceCurrentPage(newPageId) {
 		'use strict';
 
-		console.log('replaceCurrentPage(' + pageId + ')');
+		console.log('replaceCurrentPage(' + newPageId + ')');
 
-		var page = $('#' + pageId);
+		var currentPageId = self.getCurrentPage(),
+			newPage = $('#' + newPageId);
 
-		$('#header').find('.icon').removeClass('selected');
-		$('#header').find('.icon-' + pageId).addClass('selected');
+		$('#header').find('.icon-' + currentPageId).removeClass('selected');
+		$('#header').find('.icon-' + newPageId).addClass('selected');
 
-		$('#content').children().css('display', 'none');
-		page.css('display', 'block');
+		newPage.css('display', 'block');
+		$('#' + currentPageId).css('display', 'none');
 
 		if (!Modernizr.touch) {
 			// on non-mobile devices, focus the search input
-			var search = page.children('input[type=search]').first();
+			var search = newPage.children('input[type=search]').first();
 			if (search) {
 				search.focus();
 			}
 			search = null;
 		}
 		
-		page = null;
+		currentPageId = newPageId = newPage = null;
 	};
 
 	self.navigateTo = function _navigateTo(pageId) {
@@ -145,16 +146,16 @@ function PageNavigator(defaultPage, elementCriteria) {
 			return false;
 		}
 
-		if (pageId != 'login' && pageId != 'add-event') {
-			amplify.store('current_page', pageId);
-		}
-
 		if (scrollManager) {
 			scrollManager.enabled = false;
 		}
 		self.replaceCurrentPage(pageId);
 
-		topElement = pageTracker.getTopElement(pageId);
+		if (pageId != 'login' && pageId != 'edit-event') {
+			amplify.store('current_page', pageId);
+		}
+
+		topElement = app.navigation.pageTracker.getTopElement(pageId);
 
 		if (!topElement || topElement.getIndex() === 0) {
 			// console.log('scrolling to the top of the page');

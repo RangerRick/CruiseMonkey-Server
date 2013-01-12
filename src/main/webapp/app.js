@@ -1,66 +1,91 @@
 console.log('app.js loading');
 
-var m_eventUpdateInterval = 30000,
-_header, _container, scrollManager, pageTracker, pageNavigator, templateLoader, htmlInitialization, checkIfAuthorized, showLoginOrCurrent, setupDefaultView,
+var app = {
+	settings: {
+		eventUpdateInterval: 15000
+	},
+	events: {},
+	views: {},
+	server: {},
+	navigation: {}
+};
+
+
+var scrollManager, templateLoader, htmlInitialization, checkIfAuthorized, showLoginOrCurrent, setupDefaultView,
 pages = {},
 page_scroll_element = [];
 
-var serverModel = new ServerModel();
-var navModel = new NavModel();
-var eventsModel = new EventsViewModel();
-var ajaxUpdater = new AjaxUpdater();
-var addEventModel = new AddEventModel();
+// server
+(function() {
+	app.server.serverModel = new ServerModel();
+})();
 
-var officialEventsModel = new OfficialEventsViewModel(eventsModel);
-var myEventsModel = new MyEventsViewModel(eventsModel);
-var publicEventsModel = new PublicEventsViewModel(eventsModel);
+// events
+(function() {
+	app.events.eventsViewModel        = new EventsViewModel();
+	app.views.officialEventsViewModel = new OfficialEventsViewModel(app.events.eventsViewModel);
+	app.views.myEventsViewModel       = new MyEventsViewModel(app.events.eventsViewModel);
+	app.views.publicEventsViewModel   = new PublicEventsViewModel(app.events.eventsViewModel);
+	app.events.editEventModel         = new EditEventModel();
+})();
 
-pageTracker = new PageTracker('.scrollable');
-pageNavigator = new PageNavigator('official-events', '.scrollable');
-templateLoader = new TemplateLoader(['#header.html', '#login.html', '#events.html', '#amenities.html', '#decks.html', '#edit-event.html']);
+// navigation
+(function() {
+	app.navigation.model = new NavModel();
+	app.navigation.pageTracker = new PageTracker('.scrollable');
+	app.navigation.pageNavigator = new PageNavigator('official-events', '.scrollable');
+})();
+
+// live updating
+(function() {
+	app.events.ajaxUpdater = new AjaxUpdater();
+})();
+
+templateLoader = new TemplateLoader(['#events.html', '#edit-event.html']);
 
 htmlInitialization = {
 	"header": {
-		"templateSource": "#header.html",
-		"model": navModel
+		"model": app.navigation.model
 	},
 	"login": {
-		"templateSource": "#login.html",
-		"divClasses": ["reveal-modal", "full"],
-		"model": serverModel
+		"model": app.server.serverModel
 	},
 	"official-events": {
 		"templateSource": "#events.html",
 		"templateAttributes": {
 			"eventType": "official"
 		},
-		"model": officialEventsModel
+		"hide": true,
+		"model": app.views.officialEventsViewModel
 	},
 	"my-events": {
 		"templateSource": "#events.html",
 		"templateAttributes": {
 			"eventType": "my"
 		},
-		"model": myEventsModel
+		"hide": true,
+		"model": app.views.myEventsViewModel
 	},
 	"public-events": {
 		"templateSource": "#events.html",
 		"templateAttributes": {
 			"eventType": "public"
 		},
-		"model": publicEventsModel
+		"hide": true,
+		"model": app.views.publicEventsViewModel
 	},
 	"amenities": {
-		"templateSource": "#amenities.html",
+		"hide": true,
 		"model": amenitiesModel
 	},
 	"decks": {
-		"templateSource": "#decks.html",
+		"hide": true,
 		"model": decksModel
 	},
 	"edit-event": {
 		"templateSource": "edit-event.html",
-		"model": addEventModel,
+		"model": app.events.editEventModel,
+		"hide": true,
 		"afterAttach": function _afterAttach() {
 			$('#start-datepicker').datetimepicker();
 			$('#end-datepicker').datetimepicker();
@@ -73,14 +98,14 @@ checkIfAuthorized = function(success, failure) {
 
 	console.log('checkIfAuthorized()');
 
-	if (!navModel.isSignedIn()) {
+	if (!app.navigation.model.isSignedIn()) {
 		console.log('checkIfAuthorized(): user not signed in');
 		failure();
 		return;
 	}
 
 	$.ajax({
-		url: serverModel.authUrl(),
+		url: app.server.serverModel.authUrl(),
 		timeout: m_timeout,
 		cache: false,
 		dataType: 'json',
@@ -88,30 +113,33 @@ checkIfAuthorized = function(success, failure) {
 		statusCode: {
 			401: function four_oh_one() {
 				console.log('401 not authorized');
-				navModel.authorized(false);
-				serverModel.password(null);
-				$('#login').reveal();
+				app.navigation.model.authorized(false);
+				app.server.serverModel.password(null);
+				app.navigation.pageNavigator.navigateTo('login');
 			}
 		},
 		beforeSend: function beforeSend(xhr) {
-			serverModel.setBasicAuth(xhr);
+			app.server.serverModel.setBasicAuth(xhr);
+			xhr = null;
 		}
 	}).success(function _success(data) {
 		'use strict';
 
 		if (data === true) {
 			console.log('checkIfAuthorized(): test returned OK');
+			data = null;
 			success();
 			return;
 		} else {
 			console.log('checkIfAuthorized(): success function called, but data was not OK!');
+			data = null;
 			failure();
 			return;
 		}
 	}).fail(function _error(jqXHR, textStatus, errorThrown) {
 		'use strict';
-		console.log('checkIfAuthorized(): An error occurred: ' + errorThrown);
-		console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+		console.log('checkIfAuthorized(): An error occurred: ' + errorThrown + ' (' + textStatus + ')');
+		jqXHR = textStatus = errorThrown = null;
 		failure();
 	});
 };
@@ -119,7 +147,7 @@ checkIfAuthorized = function(success, failure) {
 showLoginOrCurrent = function() {
 	'use strict';
 
-	var current_page = pageNavigator.getCurrentPage();
+	var current_page = app.navigation.pageNavigator.getCurrentPage();
 
 	checkIfAuthorized(
 		// success
@@ -127,17 +155,16 @@ showLoginOrCurrent = function() {
 			'use strict';
 
 			console.log('checkIfAuthorized: success');
-			navModel.authorized(true);
-			$('#login').trigger('reveal:close');
-			pageNavigator.navigateTo(current_page);
+			app.navigation.model.authorized(true);
+			app.navigation.pageNavigator.navigateTo(current_page);
 		},
 		// failure
 		function() {
 			'use strict';
 
 			console.log('checkIfAuthorized: failure');
-			navModel.authorized(false);
-			$('#login').reveal();
+			app.navigation.model.authorized(false);
+			app.navigation.pageNavigator.navigateTo('login');
 		}
 	);
 };
@@ -153,7 +180,7 @@ setupDefaultView = function() {
 	if (events) {
 		console.log('loading stored ReST events');
 		try {
-			eventsModel.updateData(events);
+			app.events.eventsViewModel.updateData(events);
 		} catch (err) {
 			console.log('an error occurred restoring events from storage: ' + err.message);
 		}
@@ -164,17 +191,15 @@ setupDefaultView = function() {
 
 	if (window.isPhoneGap) {
 		console.log('configuring ajaxUpdater.onUpdate');
-		ajaxUpdater.onUpdate = function _onUpdate() {
+		app.events.ajaxUpdater.onUpdate = function _onUpdate() {
 			console.log('hiding splashscreen');
 			navigator.splashscreen.hide();
 		}
 	};
 
-	/*
 	setTimeout(function() {
-		ajaxUpdater.start();
+		app.events.ajaxUpdater.start();
 	}, 1000);
-	*/
 
 	showLoginOrCurrent();
 };
@@ -208,7 +233,7 @@ templateLoader.onFinished = function() {
 		'use strict';
 
 		if (enabled) {
-			pageNavigator.updateTopVisibleElement();
+			app.navigation.pageNavigator.updateTopVisibleElement();
 		}
 	};
 
@@ -221,29 +246,21 @@ templateLoader.onFinished = function() {
 				data();
 			} else {
 				var div;
-				// TODO: HACK!!
-				if (index == 'header') {
-					div = $('#header');
-				} else {
+				if (data.templateSource) {
 					div = $('<div>');
+					div.attr('id', index);
+					div.html(templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {}));
+					$('#content').append(div);
+				} else {
+					div = $('#' + index);
 				}
-				div.attr('id', index);
 				if (data.divClasses) {
 					for (var i = 0; i < data.divClasses.length; i++) {
 						div.addClass(data.divClasses[i]);
 					}
 				}
-
-				// TODO: HACK!!
-				if (index != 'header') {
+				if (data.hide) {
 					div.css('display', 'none');
-				}
-				var renderedHtml = templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {});
-				div.html(renderedHtml);
-
-				// TODO: HACK!!
-				if (index != 'header') {
-					$('#content').append(div);
 				}
 
 				if (data.afterAttach) {

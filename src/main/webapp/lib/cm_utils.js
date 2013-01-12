@@ -46,6 +46,9 @@ function CMUtils() {
 	self.formatTime = function _formatTime(d, doSeconds) {
 		'use strict';
 		var hour, ret;
+		if (!d) {
+			return '';
+		}
 
 		hour = String('0' + (d.getHours() % 12)).slice(-2);
 		if (hour == '00') {

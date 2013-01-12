@@ -42,7 +42,7 @@ function ServerModel() {
 
 	self.onSubmit = function(formElement) {
 		self.persist();
-		ajaxUpdater.pollNow();
+		app.events.ajaxUpdater.pollNow();
 		showLoginOrCurrent();
 	};
 

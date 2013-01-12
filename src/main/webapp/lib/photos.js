@@ -47,7 +47,7 @@ function Photos() {
 		};
 
 		$.ajax({
-			url: serverModel.cruisemonkey() + '/rest/cruisemonkey/photos',
+			url: app.server.serverModel.cruisemonkey() + '/rest/cruisemonkey/photos',
 			timeout: m_timeout,
 			cache: false,
 			data: imageData,

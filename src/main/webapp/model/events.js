@@ -6,22 +6,23 @@ function CalendarEvent(data) {
 	var self = this;
 
 	// console.log('importing data: ' + ko.toJSON(data));
-
-	self.id = ko.observable(data && data['@id'] ? data['@id'] : uuid.v1());
+	self.id = ko.observable(data && data['id'] ? data['id'] : uuid.v1());
 	self.cleanId = ko.computed(function() {
 		return self.id().replace(self.attributeRegex, '');
 	});
-	self.summary = ko.observable(data && data.summary ? data.summary : "");
-	self.description = ko.observable(data && data.description ? data.description : "");
-	self.startDate = ko.observable(data && data.start ? new Date(data.start) : new Date());
-	self.endDate = ko.observable(data && data.end ? new Date(data.end) : new Date());
-	self.location = ko.observable(data && data.location ? data.location : "");
-	self.createdBy = ko.observable(data && data['created-by'] ? data['created-by'] : "");
-	self.owner = ko.observable(data && data.owner ? data.owner : "");
-	self.isPublic = ko.observable(data && data.isPublic && data.isPublic == 'true' ? true : false);
+	self.summary = ko.observable();
+	self.description = ko.observable();
+	self.startDate = ko.observable(new Date());
+	self.endDate = ko.observable(new Date());
+	self.location = ko.observable();
+	self.createdBy = ko.observable();
+	self.owner = ko.observable();
+	self.isPublic = ko.observable();
+	self.favorite = ko.observable();
+
 	self.timespan = ko.computed(function() {
-		var start = self.startDate() === null ? null : cmUtils.formatTime(self.startDate(), false);
-		var end = self.endDate() === null ? null : cmUtils.formatTime(self.endDate(), false);
+		var start = (self.startDate() === null || self.startDate() === undefined) ? null : cmUtils.formatTime(self.startDate(), false);
+		var end = (self.endDate() === null || self.endDate() === undefined) ? null : cmUtils.formatTime(self.endDate(), false);
 		var retVal = '';
 		if (start !== null) {
 			retVal += start;
@@ -32,22 +33,25 @@ function CalendarEvent(data) {
 		return retVal;
 	}, self);
 	self.isMine = ko.computed(function() {
-		return self.createdBy() == serverModel.username();
+		return self.createdBy() == app.server.serverModel.username();
 	});
-	self.favorite = ko.observable(data && data.favorite && data.favorite == 'true' ? true : false);
 	self.toString = ko.computed(function() {
 		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	});
 	
 	self.updateUsing = function(d) {
-		if (self.favorite()            != d.isFavorite)          { self.favorite(d.isFavorite);     }
-		if (self.summary()             != d.summary)             { self.summary(d.summary);         }
-		if (self.description()         != d.description)         { self.description(d.description); }
-		if (self.startDate().getTime() != d.startDate.getTime()) { self.startDate(d.startDate);     }
-		if (self.endDate().getTime()   != d.endDate.getTime())   { self.endDate(d.endDate);         }
-		if (self.createdBy()           != d.createdBy)           { self.createdBy(d.createdBy);     }
-		if (self.owner()               != d.owner)               { self.owner(d.owner);             }
+		if (d.hasOwnProperty('summary')     && (self.summary()             != d.summary))             { self.summary(d.summary);         }
+		if (d.hasOwnProperty('description') && (self.description()         != d.description))         { self.description(d.description); }
+		if (d.hasOwnProperty('startDate')   && (self.startDate().getTime() != d.startDate.getTime())) { self.startDate(d.startDate);     }
+		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }
+		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }
+		if (d.hasOwnProperty('createdBy')   && (self.createdBy()           != d.createdBy))           { self.createdBy(d.createdBy);     }
+		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }
+		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }
+		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }
 	};
+	
+	self.updateUsing(data);
 	data = null;
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
@@ -55,14 +59,14 @@ CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
 /**
  * @constructor
  */
-function AddEventModel() {
+function EditEventModel() {
 	var self = this,
 		m_pattern = 'MM/dd/yyyy hh:mm';
 
 	self.addedEvent = ko.observable();
 
 	self.resetEvent = function() {
-		var e = new CalendarEvent();
+		var e = new CalendarEvent({});
 		self.addedEvent(e);
 		e = null;
 	};
@@ -145,7 +149,7 @@ function AddEventModel() {
 			delete postme.owner;
 			delete postme.attributeRegex;
 			$.ajax({
-				url: serverModel.eventEditUrl(),
+				url: app.server.serverModel.eventEditUrl(),
 				timeout: m_timeout,
 				type: 'POST',
 				data: ko.toJSON(postme),
@@ -159,23 +163,25 @@ function AddEventModel() {
 					*/
 					401: function four_oh_one() {
 						console.log('401 not authorized');
-						navModel.authorized(false);
-						serverModel.password(null);
+						app.navigation.model.authorized(false);
+						app.server.serverModel.password(null);
 						$('#login').reveal();
 					}
 				},
 				beforeSend: function beforeSend(xhr) {
-					serverModel.setBasicAuth(xhr);
+					app.server.serverModel.setBasicAuth(xhr);
+					xhr = null;
 				}
-			}).success(function _success(data) {
+			}).success(function _success() {
 				console.log('success!');
-				self.createdBy(serverModel.username());
-				self.owner(serverModel.username());
-				eventsModel.events.push(self.addedEvent());
-				$('#add-event').trigger('reveal:close');
+				self.createdBy(app.server.serverModel.username());
+				self.owner(app.server.serverModel.username());
+				app.events.eventsViewModel.events.push(self.addedEvent());
+				$('#edit-event').trigger('reveal:close');
 			}).fail(function _error(jqXHR, textStatus, errorThrown) {
-				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
+				console.log('EditEventModel::onSubmit(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
 				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+				jqXHR = textStatus = errorThrown = null;
 			}).done(function _done() {
 				postme = null;
 			});
@@ -232,22 +238,36 @@ function EventsViewModel() {
 				});
 				if (item) {
 					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': reusing existing item');
-
 					item.updateUsing({
-						"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)),
 						"summary": event.summary,
 						"description": event.description,
 						"startDate": new Date(event.start),
 						"endDate": new Date(event.end),
+						"location": event.location,
 						"createdBy": event['created-by'],
-						"owner": event.owner
+						"owner": event.owner,
+						"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
+						"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
 					});
 
+					event = null;
 					return item;
 				} else {
 					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': creating new item');
-					var e = new CalendarEvent(event);
-					e.favorite((event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)));
+					var e = new CalendarEvent({
+						"id": event['@id'],
+						"summary": event.summary,
+						"description": event.description,
+						"startDate": new Date(event.start),
+						"endDate": new Date(event.end),
+						"location": event.location,
+						"createdBy": event['created-by'],
+						"owner": event.owner,
+						"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
+						"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
+					});
+
+					event = item = null;
 					return e;
 				}
 			};
@@ -271,14 +291,14 @@ function EventsViewModel() {
 	self.toggleFavorite = function _toggleFavorite(entry) {
 		'use strict';
 
-		if (eventsModel.updating()) {
+		if (app.events.eventsViewModel.updating()) {
 			console.log('EventsViewModel::toggleFavorite: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
 			return false;
 		}
 
 		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.favorite());
 		$.ajax({
-			url: serverModel.favoritesUrl() + '?event=' + encodeURI(entry.id()),
+			url: app.server.serverModel.favoritesUrl() + '?event=' + encodeURI(entry.id()),
 			timeout: m_timeout,
 			cache: false,
 			dataType: 'json',
@@ -291,32 +311,34 @@ function EventsViewModel() {
 				*/
 				401: function four_oh_one() {
 					console.log('EventsViewModel::toggleFavorite: 401 not authorized');
-					navModel.authorized(false);
-					serverModel.password(null);
+					app.navigation.model.authorized(false);
+					app.server.serverModel.password(null);
 					$('#login').reveal();
 				}
 			},
 			beforeSend: function beforeSend(xhr) {
-				serverModel.setBasicAuth(xhr);
+				app.server.serverModel.setBasicAuth(xhr);
+				xhr = null;
 			}
 		}).fail(function _fail(jqXHR, textStatus, errorThrown) {
 			'use strict';
 			console.log('EventsViewModel::toggleFavorite: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
 			console.log('EventsViewModel::toggleFavorite: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			jqXHR = textStatus = errorThrown = null;
 		});
 		return true;
 	};
 	self.togglePublic = function _togglePublic(entry) {
 		'use strict';
 
-		if (eventsModel.updating()) {
+		if (app.events.eventsViewModel.updating()) {
 			console.log('EventsViewModel::togglePublic: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
 			return false;
 		}
 
 		console.log('EventsViewModel::togglePublic: ' + entry.id() + ' isPublic has changed to: ' + entry.isPublic());
 		$.ajax({
-			url: serverModel.eventEditUrl() + '/' + encodeURI(entry.id()) + '?isPublic=' + entry.isPublic(),
+			url: app.server.serverModel.eventEditUrl() + '/' + encodeURI(entry.id()) + '?isPublic=' + entry.isPublic(),
 			timeout: m_timeout,
 			cache: false,
 			dataType: 'json',
@@ -329,18 +351,20 @@ function EventsViewModel() {
 				*/
 				401: function four_oh_one() {
 					console.log('EventsViewModel::togglePublic: 401 not authorized');
-					navModel.authorized(false);
-					serverModel.password(null);
+					app.navigation.model.authorized(false);
+					app.server.serverModel.password(null);
 					$('#login').reveal();
 				}
 			},
 			beforeSend: function beforeSend(xhr) {
-				serverModel.setBasicAuth(xhr);
+				app.server.serverModel.setBasicAuth(xhr);
+				xhr = null;
 			}
 		}).fail(function _fail(jqXHR, textStatus, errorThrown) {
 			'use strict';
 			console.log('EventsViewModel::togglePublic: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
 			console.log('EventsViewModel::togglePublic: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			jqXHR = textStatus = errorThrown = null;
 		});
 		return true;
 	};
@@ -349,7 +373,7 @@ function EventsViewModel() {
 
 		console.log('EventsViewModel::deleteEvent: ' + entry.id());
 		$.ajax({
-			url: serverModel.eventEditUrl() + '/' + encodeURI(entry.id()),
+			url: app.server.serverModel.eventEditUrl() + '/' + encodeURI(entry.id()),
 			timeout: m_timeout,
 			cache: false,
 			dataType: 'json',
@@ -362,13 +386,14 @@ function EventsViewModel() {
 				*/
 				401: function four_oh_one() {
 					console.log('EventsViewModel::deleteEvent: 401 not authorized');
-					navModel.authorized(false);
-					serverModel.password(null);
+					app.navigation.model.authorized(false);
+					app.server.serverModel.password(null);
 					$('#login').reveal();
 				}
 			},
 			beforeSend: function beforeSend(xhr) {
-				serverModel.setBasicAuth(xhr);
+				app.server.serverModel.setBasicAuth(xhr);
+				xhr = null;
 			}
 		}).done(function _done() {
 			console.log('EventsViewModel::deleteEvent: finished, removing from view');
@@ -377,6 +402,7 @@ function EventsViewModel() {
 			'use strict';
 			console.log('EventsViewModel::deleteEvent: An error occurred: ' + ko.toJSON(jqXHR, null, 2));
 			console.log('EventsViewModel::deleteEvent: textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			jqXHR = textStatus = errorThrown = null;
 		});
 		return true;
 	};
@@ -440,7 +466,7 @@ function MyEventsViewModel(parentModel) {
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
 			if (event.favorite()) return true;
-			if (event.owner() == serverModel.username()) return true;
+			if (event.owner() == app.server.serverModel.username()) return true;
 			return false;
 		});
 
@@ -466,7 +492,7 @@ function PublicEventsViewModel(parentModel) {
 		var filter = self.filter().toLowerCase(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.owner() != 'google' && event.owner() != serverModel.username() && event.isPublic()) {
+			if (event.owner() != 'google' && event.owner() != app.server.serverModel.username() && event.isPublic()) {
 				return true;
 			}
 			return false;
