@@ -98,7 +98,6 @@ function NavModel() {
 
 		if (hash !== undefined) {
 			if (hash !== '') {
-				console.log('navigating to ' + hash);
 				app.navigation.pageNavigator.navigateTo(hash);
 			}
 		} else if (href !== undefined && href !== '') {
