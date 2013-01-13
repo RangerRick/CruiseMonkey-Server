@@ -132,7 +132,7 @@
 				<li><a href="#edit-event"      class="icon icon-add"             data-bind="click: navigate">Add Event</a></li>
 			</ul>
 			<ul class="right">
-				<li class="signin"  data-bind="visible: showSignIn" ><a href="#sign-in"  class="icon icon-login" data-bind="click: navigate">Sign In</a></li>
+				<li class="signin" style="display:none" data-bind="visible: showSignIn" ><a href="#sign-in"  class="icon icon-login" data-bind="click: navigate">Sign In</a></li>
 				<li class="signout" data-bind="visible: showSignOut"><a href="#sign-out" class="icon icon-login" data-bind="click: navigate">Sign Out</a></li>
 			</ul>
 		</div>

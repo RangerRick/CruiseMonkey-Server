@@ -124,8 +124,8 @@ function PageNavigator(defaultPage, elementCriteria) {
 		$('#header').find('.icon-' + currentPageId).removeClass('selected');
 		$('#header').find('.icon-' + newPageId).addClass('selected');
 
-		$('#' + currentPageId).css('display', 'none');
 		newPage.css('display', 'block');
+		$('#content').children(':not(#' + newPageId + ')').css('display', 'none');
 
 		if (!Modernizr.touch) {
 			// on non-mobile devices, focus the search input
