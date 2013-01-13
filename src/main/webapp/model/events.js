@@ -210,6 +210,48 @@ function EventsViewModel() {
 	self.events = ko.observableArray();
 	self.updating = ko.observable(false);
 
+	(function _processEvent() {
+		app.cache.functions.processEvent = function(event, favorites) {
+			'use strict';
+
+			var item = ko.utils.arrayFirst(self.events(), function(entry) {
+				'use strict';
+				if (entry && entry.id() == event['@id']) {
+					return true;
+				} else {
+					return false;
+				}
+			});
+
+			var update = {
+				"summary": event.summary,
+				"description": event.description,
+				"startDate": new Date(event.start),
+				"endDate": new Date(event.end),
+				"location": event.location,
+				"createdBy": event['created-by'],
+				"owner": event.owner,
+				"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
+				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
+			};
+
+			if (item) {
+				// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': reusing existing item');
+				event = null;
+				item.updateUsing(update);
+				update = null;
+				return item;
+			} else {
+				// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': creating new item');
+				update.id = event['@id'];
+				event = null;
+				var e = new CalendarEvent(update);
+				update = item = null;
+				return e;
+			}
+		};
+	})();
+
 	self.updateData = function(allData) {
 		m_updateCount++;
 		self.updating(true);
@@ -218,6 +260,8 @@ function EventsViewModel() {
 			console.log('EventsViewModel::updateData() called, but missing event data!');
 			return;
 		}
+
+		amplify.store('events', allData);
 
 		var favorites = [];
 		if (allData.favorites && allData.favorites.favorite) {
@@ -234,61 +278,17 @@ function EventsViewModel() {
 		}
 
 		if (allData.events && allData.events.event) {
-			var mappedTasks, processEvent = function(event) {
-				'use strict';
+			var mappedTasks, processEvent = app.cache.functions.processEvent;
 
-				var item = ko.utils.arrayFirst(self.events(), function(entry) {
-					'use strict';
-					if (entry && entry.id() == event['@id']) {
-						return true;
-					} else {
-						return false;
-					}
-				});
-				if (item) {
-					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': reusing existing item');
-					item.updateUsing({
-						"summary": event.summary,
-						"description": event.description,
-						"startDate": new Date(event.start),
-						"endDate": new Date(event.end),
-						"location": event.location,
-						"createdBy": event['created-by'],
-						"owner": event.owner,
-						"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
-						"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
-					});
-
-					event = null;
-					return item;
-				} else {
-					// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': creating new item');
-					var e = new CalendarEvent({
-						"id": event['@id'],
-						"summary": event.summary,
-						"description": event.description,
-						"startDate": new Date(event.start),
-						"endDate": new Date(event.end),
-						"location": event.location,
-						"createdBy": event['created-by'],
-						"owner": event.owner,
-						"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
-						"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
-					});
-
-					event = item = null;
-					return e;
-				}
-			};
-			
 			if (allData.events.event instanceof Array) {
-				mappedTasks = $.map(allData.events.event, processEvent);
+				mappedTasks = $.map(allData.events.event, function(event) {
+					return processEvent(event, favorites);
+				});
 			} else {
-				mappedTasks = [ processEvent(allData.events.event) ];
+				mappedTasks = [ processEvent(allData.events.event, favorites) ];
 			}
 			self.events(mappedTasks);
 
-			amplify.store('events', allData);
 			processEvent = null;
 			mappedTasks = null;
 			allData.events.event = null;

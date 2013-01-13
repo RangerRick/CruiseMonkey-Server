@@ -6,7 +6,8 @@ var app = {
 		clickTimeout: 50
 	},
 	cache: {
-		elements: {}
+		elements: {},
+		functions: {}
 	},
 	events: {},
 	views: {},
