@@ -5,6 +5,9 @@ var app = {
 		eventUpdateInterval: 15000,
 		clickTimeout: 50
 	},
+	cache: {
+		elements: {}
+	},
 	events: {},
 	views: {},
 	server: {},
@@ -242,7 +245,7 @@ templateLoader.onFinished = function() {
 	'use strict';
 
 	if (window.Modernizr.touch) {
-		$('#content').addClass('hide-scrollbar');
+		$(app.cache.elements.content).addClass('hide-scrollbar');
 	}
 
 	(function() {
@@ -259,6 +262,8 @@ templateLoader.onFinished = function() {
 		};
 	})();
 
+	app.cache.elements['content'] = $('#content');
+
 	$.each(htmlInitialization, function(index, data) {
 		if (pages[index]) {
 			console.log(index + ' has already been initialized');
@@ -272,7 +277,7 @@ templateLoader.onFinished = function() {
 					div = $('<div>');
 					div.attr('id', index);
 					div.html(templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {}));
-					$('#content').append(div);
+					app.cache.elements.content.append(div);
 				} else {
 					div = $('#' + index);
 				}
@@ -293,6 +298,8 @@ templateLoader.onFinished = function() {
 					console.log('applying ' + data.model + ' to ' + index);
 					ko.applyBindings(data.model, div[0]);
 				}
+				
+				app.cache.elements[index] = div;
 				div = null;
 			}
 			pages[index] = true;

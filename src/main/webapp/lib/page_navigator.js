@@ -121,11 +121,11 @@ function PageNavigator(defaultPage, elementCriteria) {
 		var currentPageId = self.getCurrentPage(),
 			newPage = $('#' + newPageId);
 
-		$('#header').find('.icon-' + currentPageId).removeClass('selected');
-		$('#header').find('.icon-' + newPageId).addClass('selected');
+		$(app.cache.elements.header).find('.icon-' + currentPageId).removeClass('selected');
+		$(app.cache.elements.header).find('.icon-' + newPageId).addClass('selected');
 
 		newPage.css('display', 'block');
-		$('#content').children(':not(#' + newPageId + ')').css('display', 'none');
+		$(app.cache.elements.content).children(':not(#' + newPageId + ')').css('display', 'none');
 
 		if (!Modernizr.touch) {
 			// on non-mobile devices, focus the search input

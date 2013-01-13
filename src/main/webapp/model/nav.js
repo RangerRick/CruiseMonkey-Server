@@ -72,16 +72,7 @@ function NavModel() {
 		app.server.serverModel.persist();
 	};
 
-	// self._navigateActive = false;
-	self.navigate = function(item, event) {
-		/*
-		if (self._navigateActive) { return; }
-		self._navigateActive = true;
-		setTimeout(function _toggleActive() {
-			self._navigateActive = false;
-		}, app.settings.clickTimeout);
-		*/
-
+	self.navigate = function _navigate(item, event) {
 		var host = document.URL.replace(/\??\#.*?$/, ''),
 			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host) + '\\??'),
 			hash,
@@ -106,10 +97,11 @@ function NavModel() {
 		console.log('NavModel::navigate(): href = ' + href + ', hash = ' + hash);
 		if (hash == 'edit-event') {
 			var currentPage = app.navigation.pageNavigator.getCurrentPage();
-			if (currentPage != 'edit-event') {
+			if (currentPage && currentPage != 'edit-event') {
 				app.navigation.model.preEdit(currentPage);
 			}
 			app.events.editEventModel.resetEvent();
+			currentPage = null;
 		} else if (hash == 'sign-out') {
 			self.logOut();
 			hash = 'login';
