@@ -258,7 +258,7 @@
 					<div class="row">
 						<div class="twelve mobile-four columns">
 							<ul class="button-group even two-up">
-								<li><input type="button" class="round secondary button" value="Cancel" data-bind="event { click: onCancel, touchstart: onCancel }" /></li>
+								<li><input type="button" class="round secondary button" value="Cancel" data-bind="event: { click: onCancel, touchstart: onCancel }" /></li>
 								<li><input type="submit" class="round button" value="Save" /></li>
 							</ul>
 						</div>
