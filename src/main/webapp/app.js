@@ -176,25 +176,29 @@ showLoginOrCurrent = function() {
 	);
 };
 
+(function() {
+	app.cache.functions.loadDefaultEvents = function _loadDefaultEvents() {
+		var events = amplify.store('events');
+		// console.log('read events:');
+		// console.log(events);
+		if (events) {
+			console.log('loading stored ReST events');
+			try {
+				app.events.eventsViewModel.updateData(events);
+			} catch (err) {
+				console.log('an error occurred restoring events from storage: ' + err.message);
+			}
+		} else {
+			console.log('no stored ReST events');
+		}
+		events = null;
+	};
+})();
+
 setupDefaultView = function() {
 	'use strict';
 
 	console.log('setupDefaultView()');
-
-	var events = amplify.store('events');
-	// console.log('read events:');
-	// console.log(events);
-	if (events) {
-		console.log('loading stored ReST events');
-		try {
-			app.events.eventsViewModel.updateData(events);
-		} catch (err) {
-			console.log('an error occurred restoring events from storage: ' + err.message);
-		}
-	} else {
-		console.log('no stored ReST events');
-	}
-	events = null;
 
 	if (window.isPhoneGap) {
 		console.log('configuring ajaxUpdater.onUpdate');
@@ -205,7 +209,14 @@ setupDefaultView = function() {
 	};
 
 	setTimeout(function() {
-		app.events.ajaxUpdater.start();
+		// first, load default events
+		app.cache.functions.loadDefaultEvents();
+
+		setTimeout(function() {
+			// then, start the background event-sync
+			app.events.ajaxUpdater.start();
+		}, 2000);
+
 	}, 2000);
 
 	showLoginOrCurrent();
