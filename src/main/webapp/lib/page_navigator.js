@@ -52,6 +52,8 @@ function PageNavigator(defaultPage, elementCriteria) {
 
 	var self = this;
 
+	app.navigation.model.preEdit(defaultPage);
+
 	self.getCurrentPage = function _getCurrentPage() {
 		'use strict';
 		var current_page = amplify.store('current_page');
@@ -117,8 +119,8 @@ function PageNavigator(defaultPage, elementCriteria) {
 		$('#header').find('.icon-' + currentPageId).removeClass('selected');
 		$('#header').find('.icon-' + newPageId).addClass('selected');
 
-		newPage.css('display', 'block');
 		$('#' + currentPageId).css('display', 'none');
+		newPage.css('display', 'block');
 
 		if (!Modernizr.touch) {
 			// on non-mobile devices, focus the search input
@@ -138,55 +140,60 @@ function PageNavigator(defaultPage, elementCriteria) {
 		console.log('----------------------------------------------------------------------------------');
 		console.log('navigateTo(' + pageId + ')');
 
-		var topElement;
+		var topElement = app.navigation.pageTracker.getTopElement(pageId),
+			content = $('#content'),
+			topId = topElement ? '#' + topElement.getId() : null,
+			scrollManager = (app && app.navigation && app.navigation.scrollManager ? app.navigation.scrollManager : null);
 
 		if (!$(pageId)) {
 			console.log('unable to locate element for ' + pageId);
-			pageId = null;
+			pageId = content = topId = scrollManager = null;
 			return false;
 		}
 
 		if (scrollManager) {
 			scrollManager.enabled = false;
 		}
+
 		self.replaceCurrentPage(pageId);
-
 		amplify.store('current_page', pageId);
-
-		topElement = app.navigation.pageTracker.getTopElement(pageId);
+		pageId = null;
 
 		if (!topElement || topElement.getIndex() === 0) {
-			// console.log('scrolling to the top of the page');
-			topElement = null;
+			topElement = topId = null;
 			setTimeout(function _scrollTop() {
 				'use strict';
 
-				$('#content').scrollTo(0, 0, {
-					onAfter: function _onAfter() {
-						setTimeout(function _enableScrollManager() {
-							if (scrollManager) {
-								scrollManager.enabled = true;
-							}
-						}, 50);
+				if (content && content.scrollTo) {
+					content.scrollTo(0, 0, {
+						onAfter: function _onAfter() {
+							setTimeout(function _enableScrollManager() {
+								if (scrollManager) {
+									scrollManager.enabled = true;
+								}
+							}, 50);
+							content = null;
+						}
+					});
+				} else {
+					console.log('no content!');
+					if (scrollManager) {
+						scrollManager.enabled = true;
 					}
-				});
+				}
 			}, 0);
 		} else {
-			// console.log('scrolling to ' + topElement.toString());
-			var id = '#' + topElement.getId();
 			topElement = null;
 			setTimeout(function _scrollToElement() {
 				'use strict';
 
-				var content = $('#content');
 				if (content && content.scrollTo) {
-					content.scrollTo(id, 0,
+					content.scrollTo(topId, 0,
 						{
 							margin: false,
 							offset: {left: 0, top: -45},
 							onAfter: function _onAfter() {
-								content = null;
-								id = null;
+								content = topId = null;
 								setTimeout(function _enableScrollManager() {
 									if (scrollManager) {
 										scrollManager.enabled = true;
@@ -195,8 +202,12 @@ function PageNavigator(defaultPage, elementCriteria) {
 							}
 						}
 					);
+				} else {
+					console.log('no content!');
+					if (scrollManager) {
+						scrollManager.enabled = true;
+					}
 				}
-				content = null;
 			}, 0);
 		}
 

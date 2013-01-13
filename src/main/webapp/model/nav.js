@@ -56,6 +56,7 @@ function NavModel() {
 		}
 	};
 
+	self.preEdit = ko.observable();
 	self.authorized = ko.observable(false);
 
 	self.isAuthorized = ko.computed(function() {
@@ -91,9 +92,13 @@ function NavModel() {
 		}
 
 		if (hash == 'edit-event') {
+			app.navigation.model.preEdit(app.navigation.pageNavigator.getCurrentPage());
 			app.events.editEventModel.resetEvent();
 		} else if (hash == 'sign-out') {
 			self.logOut();
+			hash = 'login';
+		} else if (hash == 'sign-in') {
+			hash = 'login';
 		}
 
 		if (hash !== undefined) {

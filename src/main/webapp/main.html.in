@@ -31,66 +31,6 @@
 				<!-- /ko -->
 			</ul>
 		</script>
-		<script id="edit-event.html" type="text/html">
-			<form data-bind="submit: onSubmit">
-				<div class="row">
-					<div class="three mobile-one columns">
-						<label class="right inline">Summary:</label>
-					</div>
-					<div class="nine mobile-three columns">
-						<input type="text" placeholder="" data-bind="value: summary" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="three mobile-one columns">
-						<label class="right inline">Description:</label>
-					</div>
-					<div class="nine mobile-three columns">
-						<textarea data-bind="value: description"></textarea>
-					</div>
-				</div>
-				<div class="row">
-					<div class="three mobile-one columns">
-						<label class="right inline">Start:</label>
-					</div>
-					<div class="nine mobile-three columns">
-						<input type="text" id="start-datepicker" placeholder="" data-bind="value: startDate" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="three mobile-one columns">
-						<label class="right inline">End:</label>
-					</div>
-					<div class="nine mobile-three columns">
-						<input type="text" id="end-datepicker" placeholder="" data-bind="value: endDate" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="three mobile-one columns">
-						<label class="right inline">Location:</label>
-					</div>
-					<div class="nine mobile-three columns">
-						<input type="text" placeholder="" data-bind="value: location" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="three mobile-one columns">
-						<label class="right inline">Public?</label>
-					</div>
-					<div class="nine mobile-three columns">
-						<input type="checkbox" placeholder="" data-bind="checked: isPublic" />
-					</div>
-				</div>
-				<div class="row">
-					<div class="twelve mobile-four columns">
-						<ul class="button-group even two-up">
-							<li><input type="reset" class="round secondary button" value="Reset" /></li>
-							<li><input type="submit" class="round button" value="Save" /></li>
-						</ul>
-					</div>
-				</div>
-			</form>
-		</script>
 		
 		<script src="3rdparty/foundation/javascripts/modernizr.foundation.js"></script>
 
@@ -192,8 +132,8 @@
 				<li><a href="#edit-event"      class="icon icon-add"             data-bind="click: navigate">Add Event</a></li>
 			</ul>
 			<ul class="right">
-				<li class="signin" ><span data-bind="visible: showSignIn" ><a href="#sign-in"  class="icon icon-login" data-bind="click: navigate">Sign In</a></span></li>
-				<li class="signout"><span data-bind="visible: showSignOut"><a href="#sign-out" class="icon icon-login" data-bind="click: navigate">Sign Out</a></span></li>
+				<li class="signin"  data-bind="visible: showSignIn" ><a href="#sign-in"  class="icon icon-login" data-bind="click: navigate">Sign In</a></li>
+				<li class="signout" data-bind="visible: showSignOut"><a href="#sign-out" class="icon icon-login" data-bind="click: navigate">Sign Out</a></li>
 			</ul>
 		</div>
 		<div id="content">
@@ -259,6 +199,66 @@
 						<div class="twelve mobile-four columns">
 							<ul class="button-group even two-up">
 								<li><input type="reset" class="round secondary button" value="Reset" /></li>
+								<li><input type="submit" class="round button" value="Save" /></li>
+							</ul>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div id="edit-event" style="display:none">
+				<form data-bind="submit: onSubmit">
+					<div class="row">
+						<div class="three mobile-one columns">
+							<label class="right inline">Summary:</label>
+						</div>
+						<div class="nine mobile-three columns">
+							<input type="text" placeholder="" data-bind="value: summary" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="three mobile-one columns">
+							<label class="right inline">Description:</label>
+						</div>
+						<div class="nine mobile-three columns">
+							<textarea data-bind="value: description"></textarea>
+						</div>
+					</div>
+					<div class="row">
+						<div class="three mobile-one columns">
+							<label class="right inline">Start:</label>
+						</div>
+						<div class="nine mobile-three columns">
+							<input type="text" id="start-datepicker" placeholder="" data-bind="value: startDate" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="three mobile-one columns">
+							<label class="right inline">End:</label>
+						</div>
+						<div class="nine mobile-three columns">
+							<input type="text" id="end-datepicker" placeholder="" data-bind="value: endDate" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="three mobile-one columns">
+							<label class="right inline">Location:</label>
+						</div>
+						<div class="nine mobile-three columns">
+							<input type="text" placeholder="" data-bind="value: location" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="three mobile-one columns">
+							<label class="right inline">Public?</label>
+						</div>
+						<div class="nine mobile-three columns">
+							<input type="checkbox" placeholder="" data-bind="checked: isPublic" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="twelve mobile-four columns">
+							<ul class="button-group even two-up">
+								<li><input type="button" class="round secondary button" value="Cancel" data-bind="click: onCancel" /></li>
 								<li><input type="submit" class="round button" value="Save" /></li>
 							</ul>
 						</div>

@@ -11,7 +11,7 @@ var app = {
 };
 
 
-var scrollManager, templateLoader, htmlInitialization, checkIfAuthorized, showLoginOrCurrent, setupDefaultView,
+var templateLoader, htmlInitialization, checkIfAuthorized, showLoginOrCurrent, setupDefaultView,
 pages = {},
 page_scroll_element = [];
 
@@ -41,7 +41,7 @@ page_scroll_element = [];
 	app.events.ajaxUpdater = new AjaxUpdater();
 })();
 
-templateLoader = new TemplateLoader(['#events.html', '#edit-event.html']);
+templateLoader = new TemplateLoader(['#events.html']);
 
 htmlInitialization = {
 	"header": {
@@ -83,7 +83,6 @@ htmlInitialization = {
 		"model": decksModel
 	},
 	"edit-event": {
-		"templateSource": "edit-event.html",
 		"model": app.events.editEventModel,
 		"hide": true,
 		"afterAttach": function _afterAttach() {
@@ -229,16 +228,19 @@ templateLoader.onFinished = function() {
 		$('#content').addClass('hide-scrollbar');
 	}
 
-	scrollManager = new ScrollManager('#content');
-	scrollManager.delay = 100; // ms
+	(function() {
+		app.navigation.scrollManager = new ScrollManager('#content');
+		app.navigation.scrollManager.delay = 100; // ms
 
-	scrollManager.onScrollStop = function(enabled) {
-		'use strict';
+		app.navigation.scrollManager.onScrollStop = function(enabled) {
+			'use strict';
 
-		if (enabled) {
-			app.navigation.pageNavigator.updateTopVisibleElement();
-		}
-	};
+			console.log('onScrollStop: enabled = ' + enabled);
+			if (enabled) {
+				app.navigation.pageNavigator.updateTopVisibleElement();
+			}
+		};
+	})();
 
 	$.each(htmlInitialization, function(index, data) {
 		if (pages[index]) {

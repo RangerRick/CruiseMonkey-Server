@@ -135,6 +135,10 @@ function EditEventModel() {
 			if (self.addedEvent()) self.addedEvent().owner(value);
 		}
 	});
+	self.onCancel = function(formElement) {
+		app.navigation.pageNavigator.navigateTo(app.navigation.model.preEdit());
+		return false;
+	};
 	self.onSubmit = function(formElement) {
 		if (self.addedEvent()) {
 			var postme = ko.toJS(self.addedEvent());
@@ -177,6 +181,7 @@ function EditEventModel() {
 				self.createdBy(app.server.serverModel.username());
 				self.owner(app.server.serverModel.username());
 				app.events.eventsViewModel.events.push(self.addedEvent());
+				app.navigation.pageNavigator.navigateTo(app.navigation.model.preEdit());
 				$('#edit-event').trigger('reveal:close');
 			}).fail(function _error(jqXHR, textStatus, errorThrown) {
 				console.log('EditEventModel::onSubmit(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
@@ -188,6 +193,7 @@ function EditEventModel() {
 		} else {
 			console.log('wtf?!? no event?!');
 		}
+		return true;
 	};
 }
 
@@ -280,7 +286,11 @@ function EventsViewModel() {
 			self.events(mappedTasks);
 
 			amplify.store('events', allData);
-			processEvent = mappedTasks = allData = allData.events = allData.events.event = null;
+			processEvent = null;
+			mappedTasks = null;
+			allData.events.event = null;
+			allData.events = null;
+			allData = null;
 		} else {
 			console.log('no proper event data found');
 		}
