@@ -113,11 +113,13 @@ function NavModel() {
 
 		if (hash !== undefined) {
 			if (hash !== '') {
+				event.preventDefault();
 				app.navigation.pageNavigator.navigateTo(hash);
 			} else {
 				console.log('Error: empty hash.');
 			}
 		} else if (href !== undefined && href !== '') {
+			event.preventDefault();
 			cmUtils.openLink(href);
 		} else {
 			console.log('Error: empty href.');
