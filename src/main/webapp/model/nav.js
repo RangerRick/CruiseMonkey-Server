@@ -73,24 +73,27 @@ function NavModel() {
 	};
 	
 	self.navigate = function(item, event) {
-		var target = event.target,
-			host = document.URL.replace(/\??\#.*?$/, ''),
+		var host = document.URL.replace(/\??\#.*?$/, ''),
 			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host) + '\\??'),
 			hash,
-			href;
+			href = event.target.href;
 
-		console.log('NavModel::navigate(): href = ' + target.href);
-		if (target.href !== undefined) {
-			href = target.href.replace(hostRegex, '');
+		var target = $(event.target);
+		if (target.is('div') && target.hasClass('icon')) {
+			href = target.parent().attr('href');
+		}
+		console.log('NavModel::navigate(): href = ' + href);
+		if (href !== undefined) {
+			href = href.replace(hostRegex, '');
 			if (href && href !== '') {
 				if (href.indexOf('#') >= 0) {
-					hash = target.href.split('#')[1];
+					hash = href.split('#')[1];
 				}
 			} else {
 				href = undefined;
 			}
 		}
-		item = event = target = host = hostRegex = null;
+		item = target = event = host = hostRegex = null;
 
 		if (hash == 'edit-event') {
 			var currentPage = app.navigation.pageNavigator.getCurrentPage();
