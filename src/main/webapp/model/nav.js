@@ -91,7 +91,6 @@ function NavModel() {
 		if (target.is('div') && target.hasClass('icon')) {
 			href = target.parent().attr('href');
 		}
-		console.log('NavModel::navigate(): href = ' + href);
 		if (href !== undefined) {
 			href = href.replace(hostRegex, '');
 			if (href && href !== '') {
@@ -104,6 +103,7 @@ function NavModel() {
 		}
 		item = target = event = host = hostRegex = null;
 
+		console.log('NavModel::navigate(): href = ' + href + ', hash = ' + hash);
 		if (hash == 'edit-event') {
 			var currentPage = app.navigation.pageNavigator.getCurrentPage();
 			if (currentPage != 'edit-event') {

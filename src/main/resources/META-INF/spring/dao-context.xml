@@ -45,6 +45,15 @@
 		<property name="sessionFactory" ref="sessionFactory"/>
 	</bean>
 
+	<bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
     <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateUserDao" />
     <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao" />
     <bean id="favoriteDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateFavoriteDao" />
