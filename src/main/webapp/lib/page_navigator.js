@@ -64,6 +64,11 @@ function PageNavigator(defaultPage, elementCriteria) {
 		}
 		return current_page;
 	};
+	
+	self.setCurrentPage = function(pageId) {
+		amplify.store('current_page', pageId);
+		return pageId;
+	};
 
 	self.updateTopVisibleElement = function _updateTopVisibleElement() {
 		'use strict';

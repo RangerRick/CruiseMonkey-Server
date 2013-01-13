@@ -136,8 +136,13 @@ function EditEventModel() {
 		}
 	});
 	self.onCancel = function(formElement) {
-		app.navigation.pageNavigator.navigateTo(app.navigation.model.preEdit());
-		return false;
+		var preEdit = app.navigation.model.preEdit();
+		if (preEdit && preEdit != 'login' && preEdit != 'edit-event') {
+			app.navigation.pageNavigator.navigateTo(preEdit);
+		} else {
+			app.navigation.pageNavigator.navigateTo('official-events');
+		}
+		return true;
 	};
 	self.onSubmit = function(formElement) {
 		if (self.addedEvent()) {
@@ -181,8 +186,13 @@ function EditEventModel() {
 				self.createdBy(app.server.serverModel.username());
 				self.owner(app.server.serverModel.username());
 				app.events.eventsViewModel.events.push(self.addedEvent());
-				app.navigation.pageNavigator.navigateTo(app.navigation.model.preEdit());
-				$('#edit-event').trigger('reveal:close');
+				
+				var preEdit = app.navigation.model.preEdit();
+				if (preEdit && preEdit != 'edit-event' && preEdit != 'login') {
+					app.navigation.pageNavigator.navigateTo(preEdit);
+				} else {
+					app.navigation.pageNavigator.navigateTo('official-events');
+				}
 			}).fail(function _error(jqXHR, textStatus, errorThrown) {
 				console.log('EditEventModel::onSubmit(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
 				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);

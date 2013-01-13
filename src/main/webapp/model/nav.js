@@ -74,8 +74,8 @@ function NavModel() {
 	
 	self.navigate = function(item, event) {
 		var target = event.target,
-			host = document.URL.replace(/\#$/, ''),
-			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host)),
+			host = document.URL.replace(/\??\#.*?$/, ''),
+			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host) + '\\??'),
 			hash,
 			href;
 
@@ -90,9 +90,13 @@ function NavModel() {
 				href = undefined;
 			}
 		}
+		item = event = target = host = hostRegex = null;
 
 		if (hash == 'edit-event') {
-			app.navigation.model.preEdit(app.navigation.pageNavigator.getCurrentPage());
+			var currentPage = app.navigation.pageNavigator.getCurrentPage();
+			if (currentPage != 'edit-event') {
+				app.navigation.model.preEdit(currentPage);
+			}
 			app.events.editEventModel.resetEvent();
 		} else if (hash == 'sign-out') {
 			self.logOut();
@@ -104,12 +108,16 @@ function NavModel() {
 		if (hash !== undefined) {
 			if (hash !== '') {
 				app.navigation.pageNavigator.navigateTo(hash);
+			} else {
+				console.log('Error: empty hash.');
 			}
 		} else if (href !== undefined && href !== '') {
 			cmUtils.openLink(href);
+		} else {
+			console.log('Error: empty href.');
 		}
 
-		item = event = target = hash = href = null;
+		hash = href = null;
 		return true;
 	}
 }
