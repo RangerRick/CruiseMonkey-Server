@@ -87,10 +87,15 @@ function PageTracker(elementCriteria) {
 		'use strict';
 		// console.log('f_getElementForPageId(' + pageId + ', criteria = ' + elementCriteria + ')');
 		var topElement = self.getScrolledId(pageId),
-			page = $('#' + pageId),
+			page,
 			matched = null,
 			id = null;
 
+		if (app.cache.elements[pageId]) {
+			page = $(app.cache.elements[pageId]);
+		} else {
+			page = $('#' + pageId);
+		}
 		page.find(elementCriteria).each(function(index, element) {
 			'use strict';
 			id = element.getAttribute('id');

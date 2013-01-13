@@ -77,9 +77,15 @@ function PageNavigator(defaultPage, elementCriteria) {
 			el = null,
 			elementPercent = 0,
 			highestPercent = 0,
-			heightChecker = new HeightChecker(45, 15);
+			heightChecker = new HeightChecker(45, 15),
+			currentPageElement;
 
-		$('#' + current_page).find(elementCriteria).each(function _eachElement(index, element) {
+		if (app.cache.elements[current_page]) {
+			currentPageElement = $(app.cache.elements[current_page]);
+		} else {
+			currentPageElement = $('#' + current_page);
+		}
+		currentPageElement.find(elementCriteria).each(function _eachElement(index, element) {
 			'use strict';
 			id = element.getAttribute('id');
 			if (id) {
@@ -119,7 +125,13 @@ function PageNavigator(defaultPage, elementCriteria) {
 		console.log('replaceCurrentPage(' + newPageId + ')');
 
 		var currentPageId = self.getCurrentPage(),
+			newPage;
+
+		if (app.cache.elements[newPageId]) {
+			newPage = $(app.cache.elements[newPageId]);
+		} else {
 			newPage = $('#' + newPageId);
+		}
 
 		$(app.cache.elements.header).find('.icon-' + currentPageId).removeClass('selected');
 		$(app.cache.elements.header).find('.icon-' + newPageId).addClass('selected');
@@ -146,15 +158,8 @@ function PageNavigator(defaultPage, elementCriteria) {
 		console.log('navigateTo(' + pageId + ')');
 
 		var topElement = app.navigation.pageTracker.getTopElement(pageId),
-			content = $('#content'),
 			topId = topElement ? '#' + topElement.getId() : null,
 			scrollManager = (app && app.navigation && app.navigation.scrollManager ? app.navigation.scrollManager : null);
-
-		if (!$(pageId)) {
-			console.log('unable to locate element for ' + pageId);
-			pageId = content = topId = scrollManager = null;
-			return false;
-		}
 
 		if (scrollManager) {
 			scrollManager.enabled = false;
@@ -169,6 +174,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 			setTimeout(function _scrollTop() {
 				'use strict';
 
+				var content = $(app.cache.elements.content);
 				if (content && content.scrollTo) {
 					content.scrollTo(0, 0, {
 						onAfter: function _onAfter() {
@@ -192,6 +198,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 			setTimeout(function _scrollToElement() {
 				'use strict';
 
+				var content = $(app.cache.elements.content);
 				if (content && content.scrollTo) {
 					content.scrollTo(topId, 0,
 						{
