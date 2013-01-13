@@ -101,7 +101,11 @@ function NavModel() {
 				app.navigation.model.preEdit(currentPage);
 			}
 			console.log('resetting event model');
-			app.events.editEventModel.resetEvent();
+			if (app.events.editEventModel) {
+				app.events.editEventModel.currentEvent(new CalendarEvent({}));
+			} else {
+				console.log("err, can't find editEventModel");
+			}
 			currentPage = null;
 		} else if (hash == 'sign-out') {
 			self.logOut();

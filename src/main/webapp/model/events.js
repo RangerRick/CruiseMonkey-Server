@@ -5,8 +5,12 @@
 function CalendarEvent(data) {
 	var self = this;
 
+	if (!data) {
+		data = {};
+	}
+
 	// console.log('importing data: ' + ko.toJSON(data));
-	self.id = ko.observable(data && data['id'] ? data['id'] : uuid.v1());
+	self.id = ko.observable(data['id'] ? data['id'] : uuid.v1());
 	self.cleanId = ko.computed(function() {
 		return self.id().replace(self.attributeRegex, '');
 	});
@@ -63,76 +67,70 @@ function EditEventModel() {
 	var self = this,
 		m_pattern = 'MM/dd/yyyy hh:mm';
 
-	self.addedEvent = ko.observable();
-
-	self.resetEvent = function() {
-		var e = new CalendarEvent({});
-		self.addedEvent(e);
-		e = null;
-	};
+	self.currentEvent = ko.observable();
 
 	self.summary = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().summary() : "";
+			return self.currentEvent() ? self.currentEvent().summary() : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().summary(value);
+			if (self.currentEvent()) self.currentEvent().summary(value);
 		}
 	});
 	self.description = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().description() : "";
+			return self.currentEvent() ? self.currentEvent().description() : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().description(value);
+			if (self.currentEvent()) self.currentEvent().description(value);
 		}
 	});
 	self.startDate = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().startDate().toString(m_pattern) : "";
+			return self.currentEvent() ? self.currentEvent().startDate().toString(m_pattern) : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().startDate(Date.parse(value));
+			if (self.currentEvent()) self.currentEvent().startDate(Date.parse(value));
 		}
 	});
 	self.endDate = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().endDate().toString(m_pattern) : "";
+			return self.currentEvent() ? self.currentEvent().endDate().toString(m_pattern) : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().endDate(Date.parse(value));
+			if (self.currentEvent()) self.currentEvent().endDate(Date.parse(value));
 		}
 	});
 	self.location = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().location() : "";
+			return self.currentEvent() ? self.currentEvent().location() : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().location(value);
+			if (self.currentEvent()) self.currentEvent().location(value);
 		}
 	});
 	self.isPublic = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().isPublic() : "";
+			return self.currentEvent() ? self.currentEvent().isPublic() : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().isPublic(value);
+			if (self.currentEvent()) self.currentEvent().isPublic(value);
 		}
 	});
 	self.createdBy = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().createdBy() : "";
+			return self.currentEvent() ? self.currentEvent().createdBy() : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().createdBy(value);
+			if (self.currentEvent()) self.currentEvent().createdBy(value);
 		}
 	});
 	self.owner = ko.computed({
 		read: function() {
-			return self.addedEvent() ? self.addedEvent().owner() : "";
+			return self.currentEvent() ? self.currentEvent().owner() : "";
 		},
 		write: function(value) {
-			if (self.addedEvent()) self.addedEvent().owner(value);
+			if (self.currentEvent()) self.currentEvent().owner(value);
 		}
 	});
 	self.onCancel = function(formElement) {
@@ -145,8 +143,8 @@ function EditEventModel() {
 		return true;
 	};
 	self.onSubmit = function(formElement) {
-		if (self.addedEvent()) {
-			var postme = ko.toJS(self.addedEvent());
+		if (self.currentEvent()) {
+			var postme = ko.toJS(self.currentEvent());
 			postme.start = postme.startDate;
 			postme.end = postme.endDate;
 			delete postme.cleanId;
@@ -165,11 +163,6 @@ function EditEventModel() {
 				dataType: 'json',
 				contentType:"application/json; charset=utf-8",
 				statusCode: {
-					/*
-					200: function two_hundred() {
-						console.log('200 OK');
-					},
-					*/
 					401: function four_oh_one() {
 						console.log('401 not authorized');
 						app.navigation.model.authorized(false);
@@ -185,7 +178,7 @@ function EditEventModel() {
 				console.log('success!');
 				self.createdBy(app.server.serverModel.username());
 				self.owner(app.server.serverModel.username());
-				app.events.eventsViewModel.events.push(self.addedEvent());
+				app.events.eventsViewModel.events.push(self.currentEvent());
 				
 				var preEdit = app.navigation.model.preEdit();
 				if (preEdit && preEdit != 'edit-event' && preEdit != 'login') {

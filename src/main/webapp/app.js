@@ -205,7 +205,7 @@ setupDefaultView = function() {
 
 	setTimeout(function() {
 		app.events.ajaxUpdater.start();
-	}, 1000);
+	}, 2000);
 
 	showLoginOrCurrent();
 };
