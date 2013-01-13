@@ -2,7 +2,8 @@ console.log('app.js loading');
 
 var app = {
 	settings: {
-		eventUpdateInterval: 15000
+		eventUpdateInterval: 15000,
+		clickTimeout: 50
 	},
 	events: {},
 	views: {},
