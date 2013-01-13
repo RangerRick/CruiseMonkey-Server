@@ -220,6 +220,22 @@ setupDefaultView = function() {
 			$(element).text(valueUnwrapped.toString(pattern));
 		}
 	};
+    ko.bindingHandlers.touchOrClick = {
+        'init': function(element, valueAccessor, allBindingsAccessor, viewModel) {
+            var newValueAccessor = function () {
+                var result = {};
+				if (Modernizr.touch) {
+	                result['touchstart'] = valueAccessor();
+				} else {
+					result['click'] = valueAccessor();
+				}
+                return result;
+            };
+            return ko.bindingHandlers['event']['init'].call(this, element, newValueAccessor, allBindingsAccessor, viewModel);
+        }
+    }
+
+
 })();
 
 templateLoader.onFinished = function() {

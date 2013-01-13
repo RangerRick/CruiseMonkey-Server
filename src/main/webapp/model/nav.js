@@ -72,13 +72,15 @@ function NavModel() {
 		app.server.serverModel.persist();
 	};
 
-	self._navigateActive = false;
+	// self._navigateActive = false;
 	self.navigate = function(item, event) {
+		/*
 		if (self._navigateActive) { return; }
 		self._navigateActive = true;
 		setTimeout(function _toggleActive() {
 			self._navigateActive = false;
 		}, app.settings.clickTimeout);
+		*/
 
 		var host = document.URL.replace(/\??\#.*?$/, ''),
 			hostRegex = new RegExp('^' + cmUtils.escapeForRegExp(host) + '\\??'),

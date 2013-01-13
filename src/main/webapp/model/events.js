@@ -135,13 +135,15 @@ function EditEventModel() {
 			if (self.addedEvent()) self.addedEvent().owner(value);
 		}
 	});
-	self._onCancelActive = false;
+	// self._onCancelActive = false;
 	self.onCancel = function(formElement) {
+		/*
 		if (self._onCancelActive) { return; }
 		self._onCancelActive = true;
 		setTimeout(function _toggleActive() {
 			self._onCancelActive = false;
 		}, app.settings.clickTimeout);
+		*/
 
 		var preEdit = app.navigation.model.preEdit();
 		if (preEdit && preEdit != 'login' && preEdit != 'edit-event') {
@@ -315,7 +317,7 @@ function EventsViewModel() {
 		self.updating(false);
 	};
 	
-	self._toggleFavoriteActive = false;
+	// self._toggleFavoriteActive = false;
 	self.toggleFavorite = function _toggleFavorite(entry) {
 		'use strict';
 
@@ -324,11 +326,13 @@ function EventsViewModel() {
 			return false;
 		}
 
+		/*
 		if (self._toggleFavoriteActive) { return; }
 		self._toggleFavoriteActive = true;
 		setTimeout(function _toggleActive() {
 			self._toggleFavoriteActive = false;
 		}, app.settings.clickTimeout);
+		*/
 
 		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.favorite());
 		$.ajax({
@@ -363,7 +367,7 @@ function EventsViewModel() {
 		return true;
 	};
 	
-	self._togglePublicActive = false;
+	// self._togglePublicActive = false;
 	self.togglePublic = function _togglePublic(entry) {
 		'use strict';
 
@@ -372,11 +376,13 @@ function EventsViewModel() {
 			return false;
 		}
 
+		/*
 		if (self._togglePublicActive) { return; }
 		self._togglePublicActive = true;
 		setTimeout(function _toggleActive() {
 			self._togglePublicActive = false;
 		}, app.settings.clickTimeout);
+		*/
 
 		console.log('EventsViewModel::togglePublic: ' + entry.id() + ' isPublic has changed to: ' + entry.isPublic());
 		$.ajax({
@@ -411,15 +417,17 @@ function EventsViewModel() {
 		return true;
 	};
 
-	self._deleteEventActive = false;
+	// self._deleteEventActive = false;
 	self.deleteEvent = function _deleteEvent(entry) {
 		'use strict';
 
+		/*
 		if (self._deleteEventActive) { return; }
 		self._deleteEventActive = true;
 		setTimeout(function _toggleActive() {
 			self._deleteEventActive = false;
 		}, app.settings.clickTimeout);
+		*/
 
 		console.log('EventsViewModel::deleteEvent: ' + entry.id());
 		$.ajax({
@@ -542,7 +550,7 @@ function PublicEventsViewModel(parentModel) {
 		var filter = self.filter().toLowerCase(),
 
 		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.owner() != 'google' && event.owner() != app.server.serverModel.username() && event.isPublic()) {
+			if (event.owner() != 'google' && event.isPublic()) {
 				return true;
 			}
 			return false;

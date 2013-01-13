@@ -50,10 +50,7 @@ function CMUtils() {
 			return '';
 		}
 
-		hour = String('0' + (d.getHours() % 12)).slice(-2);
-		if (hour == '00') {
-			hour = '12';
-		}
+		hour = d.getHours() % 12;
 		ret = hour + ':' + String('0' + d.getMinutes()).slice(-2);
 
 		if (doSeconds === true) {
