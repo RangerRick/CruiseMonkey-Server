@@ -94,12 +94,13 @@ function NavModel() {
 		}
 		item = target = event = host = hostRegex = null;
 
-		console.log('NavModel::navigate(): href = ' + href + ', hash = ' + hash);
 		if (hash == 'edit-event') {
 			var currentPage = app.navigation.pageNavigator.getCurrentPage();
 			if (currentPage && currentPage != 'edit-event') {
+				console.log('setting pre-edit to ' + currentPage);
 				app.navigation.model.preEdit(currentPage);
 			}
+			console.log('resetting event model');
 			app.events.editEventModel.resetEvent();
 			currentPage = null;
 		} else if (hash == 'sign-out') {
@@ -108,6 +109,7 @@ function NavModel() {
 		} else if (hash == 'sign-in') {
 			hash = 'login';
 		}
+		console.log('NavModel::navigate(): href = ' + href + ', hash = ' + hash);
 
 		if (hash !== undefined) {
 			if (hash !== '') {
