@@ -148,6 +148,9 @@ showLoginOrCurrent = function() {
 	'use strict';
 
 	var current_page = app.navigation.pageNavigator.getCurrentPage();
+	if (current_page == 'login' || current_page == 'edit-events') {
+		current_page = 'official-events';
+	}
 
 	checkIfAuthorized(
 		// success

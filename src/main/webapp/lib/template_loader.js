@@ -54,6 +54,11 @@ function TemplateLoader(urls) {
 		console.log('TemplateLoader::f_onLoad(' + url + ', <template>)');
 		m_templates[url] = template;
 
+		if (url.indexOf('#') == 0) {
+			var escaped = url.replace(self.elementIdRegex, '\\$1');
+			$(escaped).remove();
+			escaped = null;
+		}
 		self.onLoad(url, template);
 		f_checkOnFinished();
 	};
@@ -76,6 +81,7 @@ function TemplateLoader(urls) {
 				console.log('TemplateLoader::f_loadTemplate: id-based url');
 				var escaped = url.replace(self.elementIdRegex, '\\$1');
 				f_onLoad(url, $(escaped).html());
+				escaped = null;
 			} else {
 				console.log('TemplateLoader::f_loadTemplate: standard url');
 				$.ajax({

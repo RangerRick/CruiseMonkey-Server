@@ -153,8 +153,6 @@
 					return;
 				}
 
-				$('#login').trigger('reveal:close');
-
 				m_deviceReady = true;
 				templateLoader.load();
 			},
@@ -265,7 +263,6 @@
 						</div>
 					</div>
 				</form>
-				<a class="close-reveal-modal">&#215;</a>
 			</div>
 		</div>
 	</body>

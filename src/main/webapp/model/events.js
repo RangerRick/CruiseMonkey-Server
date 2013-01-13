@@ -165,7 +165,7 @@ function EditEventModel() {
 						console.log('401 not authorized');
 						app.navigation.model.authorized(false);
 						app.server.serverModel.password(null);
-						$('#login').reveal();
+						app.navigation.pageNavigator.navigateTo('login');
 					}
 				},
 				beforeSend: function beforeSend(xhr) {
@@ -313,7 +313,7 @@ function EventsViewModel() {
 					console.log('EventsViewModel::toggleFavorite: 401 not authorized');
 					app.navigation.model.authorized(false);
 					app.server.serverModel.password(null);
-					$('#login').reveal();
+					app.navigation.pageNavigator.navigateTo('login');
 				}
 			},
 			beforeSend: function beforeSend(xhr) {
@@ -353,7 +353,7 @@ function EventsViewModel() {
 					console.log('EventsViewModel::togglePublic: 401 not authorized');
 					app.navigation.model.authorized(false);
 					app.server.serverModel.password(null);
-					$('#login').reveal();
+					app.navigation.pageNavigator.navigateTo('login');
 				}
 			},
 			beforeSend: function beforeSend(xhr) {
@@ -388,7 +388,7 @@ function EventsViewModel() {
 					console.log('EventsViewModel::deleteEvent: 401 not authorized');
 					app.navigation.model.authorized(false);
 					app.server.serverModel.password(null);
-					$('#login').reveal();
+					app.navigation.pageNavigator.navigateTo('login');
 				}
 			},
 			beforeSend: function beforeSend(xhr) {

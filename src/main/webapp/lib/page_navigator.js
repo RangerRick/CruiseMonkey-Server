@@ -56,7 +56,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		'use strict';
 		var current_page = amplify.store('current_page');
 		console.log('PageNavigator::getCurrentPage(): current_page = ' + current_page);
-		if (!current_page || current_page == 'login' || current_page == 'edit-event') {
+		if (!current_page) {
 			current_page = defaultPage;
 			amplify.store('current_page', current_page);
 		}
@@ -151,9 +151,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		}
 		self.replaceCurrentPage(pageId);
 
-		if (pageId != 'login' && pageId != 'edit-event') {
-			amplify.store('current_page', pageId);
-		}
+		amplify.store('current_page', pageId);
 
 		topElement = app.navigation.pageTracker.getTopElement(pageId);
 

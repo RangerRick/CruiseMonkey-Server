@@ -30,7 +30,7 @@ function AjaxUpdater() {
 						console.log('401 not authorized');
 						app.navigation.model.authorized(false);
 						app.server.serverModel.password(null);
-						$('#login').reveal();
+						app.navigation.pageNavigator.navigateTo('login');
 						self.onUpdate();
 					}
 				},
