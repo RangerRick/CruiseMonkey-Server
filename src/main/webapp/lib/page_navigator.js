@@ -122,10 +122,10 @@ function PageNavigator(defaultPage, elementCriteria) {
 	self.replaceCurrentPage = function _replaceCurrentPage(newPageId) {
 		'use strict';
 
-		console.log('replaceCurrentPage(' + newPageId + ')');
+		console.log('PageNavigator::replaceCurrentPage(' + newPageId + ')');
 
 		var currentPageId = self.getCurrentPage(),
-			newPage;
+			newPage, header;
 
 		if (app.cache.elements[newPageId]) {
 			newPage = $(app.cache.elements[newPageId]);
@@ -133,13 +133,15 @@ function PageNavigator(defaultPage, elementCriteria) {
 			newPage = $('#' + newPageId);
 		}
 
-		$(app.cache.elements.header).find('.icon-' + currentPageId).removeClass('selected');
-		$(app.cache.elements.header).find('.icon-' + newPageId).addClass('selected');
-
 		newPage.addClass('active');
 		$(app.cache.elements.content).children(':not(#' + newPageId + ')').removeClass('active');
+		newPage = null;
 
-		currentPageId = newPageId = newPage = null;
+		header = $(app.cache.elements.header);
+		header.find('.icon-' + currentPageId).removeClass('selected');
+		header.find('.icon-' + newPageId).addClass('selected');
+
+		header = currentPageId = newPageId = newPage = null;
 	};
 
 	self.navigateTo = function _navigateTo(pageId) {

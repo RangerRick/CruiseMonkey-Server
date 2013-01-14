@@ -37,8 +37,8 @@ page_scroll_element = [];
 // navigation
 (function() {
 	app.navigation.model = new NavModel();
-	app.navigation.pageTracker = new PageTracker('.scrollable');
-	app.navigation.pageNavigator = new PageNavigator('official-events', '.scrollable');
+	app.navigation.pageTracker = new PageTracker('.list-entry .scrollable');
+	app.navigation.pageNavigator = new PageNavigator('official-events', '.list-entry .scrollable');
 })();
 
 // live updating

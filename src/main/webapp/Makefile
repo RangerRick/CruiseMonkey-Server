@@ -56,7 +56,7 @@ CRUISEMONKEYMINJS = $(patsubst %.js,temp/%.min.js,$(CRUISEMONKEYJS))
 
 CRUISEMONKEYCSS = styles.css
 
-CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
+CRUISEMONKEYMINCSS = $(patsubst %.css,%.min.css,$(CRUISEMONKEYCSS))
 
 FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
@@ -142,8 +142,11 @@ runtime.js: $(CRUISEMONKEYJS) $(3RDPARTYJS) compile.sh
 	@echo ./compile.sh $(CRUISEMONKEYJS) $(3RDPARTYJS)
 	@./compile.sh $(CRUISEMONKEYJS) $(3RDPARTYJS) > "$@" 2>/dev/null || (rm runtime.js && exit 1)
 
-cruisemonkey.css: $(CRUISEMONKEYCSS) $(3RDPARTYCSS) $(MAKEFILE)
-	@cat $(3RDPARTYCSS) $(CRUISEMONKEYCSS) > "$@"
+styles.min.css: styles.css $(MAKEFILE)
+	@node_modules/.bin/yuicompressor "$<" > "$@"
+
+cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(3RDPARTYCSS) $(MAKEFILE)
+	@cat $(3RDPARTYCSS) $(CRUISEMONKEYMINCSS) > "$@"
 
 $(DESTDIR)/foundation/%: foundation/%
 	@DIR="$(DESTDIR)/`dirname $<`"; \
