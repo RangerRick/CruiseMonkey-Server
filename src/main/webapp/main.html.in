@@ -10,7 +10,7 @@
 		<title>CruiseMonkey 3</title>
 
 		<!-- BROWSER --><link rel="stylesheet" href="3rdparty/foundation/stylesheets/foundation.min.css" type="text/css" />
-		<!-- BROWSER --><link rel="stylesheet" href="3rdparty/jquery-ui/css/no-theme/jquery-ui-1.9.2.custom.min.css" type="text/css" />
+		<!-- BROWSER --><!-- <link rel="stylesheet" href="3rdparty/jquery-ui/css/no-theme/jquery-ui-1.9.2.custom.min.css" type="text/css" /> -->
 		<!-- BROWSER --><link rel="stylesheet" href="styles.min.css" type="text/css" />
 		<!-- PHONEGAP --><link rel="stylesheet" href="cruisemonkey.css" type="text/css" />
 

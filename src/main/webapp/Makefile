@@ -28,9 +28,9 @@
 	3rdparty/uuid.js
 
 3RDPARTYCSS = \
-	3rdparty/foundation/stylesheets/foundation.min.css \
-	3rdparty/jquery-ui/css/no-theme/jquery-ui-1.9.2.custom.min.css \
-	3rdparty/jquery-ui-timepicker-addon.css
+	3rdparty/foundation/stylesheets/foundation.min.css
+#	3rdparty/jquery-ui/css/no-theme/jquery-ui-1.9.2.custom.min.css \
+#	3rdparty/jquery-ui-timepicker-addon.css
 
 
 CRUISEMONKEYJS = \
@@ -69,9 +69,9 @@ PHONEGAPFILES = \
 	cruisemonkey.manifest \
 	$(RUNTIME) \
 	config.xml \
-	cruisemonkey.css \
-	3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js \
-	3rdparty/jquery-ui-timepicker-addon.js
+	cruisemonkey.css
+#	3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js \
+#	3rdparty/jquery-ui-timepicker-addon.js
 
 PHONEGAPDESTFILES = $(patsubst %,$(DESTDIR)/%,$(PHONEGAPFILES))
 
