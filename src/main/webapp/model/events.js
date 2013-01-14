@@ -3,13 +3,14 @@
  * @param {Object=} data
  */
 function CalendarEvent(id, createdBy) {
-	var self = this;
+	var self = this,
+		m_cleanId = id.replace(self.attributeRegex, '');
 
 	self.id = function _id() {
 		return id;
 	}
 	self.cleanId = function() {
-		return id.replace(self.attributeRegex, '');
+		return m_cleanId;
 	};
 	self.summary = ko.observable();
 	self.description = ko.observable();
