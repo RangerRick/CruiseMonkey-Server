@@ -46,12 +46,12 @@ CRUISEMONKEYJS = \
 	lib/page_tracker.js \
 	lib/page_navigator.js \
 	lib/scroll_manager.js \
-	lib/template_loader.js \
 	model/events.js \
 	model/nav.js \
 	model/server.js \
 	lib/ajax_updater.js \
 	app.js
+#	lib/template_loader.js \
 #	lib/photos.js
 #	lib/swiper.js
 
