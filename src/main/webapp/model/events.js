@@ -2,15 +2,11 @@
  * @constructor
  * @param {Object=} data
  */
-function CalendarEvent(data) {
+function CalendarEvent() {
 	var self = this;
 
-	if (!data) {
-		data = {};
-	}
-
 	// console.log('importing data: ' + ko.toJSON(data));
-	self.id = ko.observable(data['id'] ? data['id'] : uuid.v1());
+	self.id = ko.observable(uuid.v1());
 	self.cleanId = ko.computed(function() {
 		return self.id().replace(self.attributeRegex, '');
 	});
@@ -44,19 +40,18 @@ function CalendarEvent(data) {
 	});
 	
 	self.updateUsing = function(d) {
-		if (d.hasOwnProperty('summary')     && (self.summary()             != d.summary))             { self.summary(d.summary);         }
-		if (d.hasOwnProperty('description') && (self.description()         != d.description))         { self.description(d.description); }
-		if (d.hasOwnProperty('startDate')   && (self.startDate().getTime() != d.startDate.getTime())) { self.startDate(d.startDate);     }
-		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }
-		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }
-		if (d.hasOwnProperty('createdBy')   && (self.createdBy()           != d.createdBy))           { self.createdBy(d.createdBy);     }
-		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }
-		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }
-		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }
+		if (d.hasOwnProperty('id')          && (self.id()                  != d.id))                  { self.id(d.id);                   }; d.id = null;
+		if (d.hasOwnProperty('summary')     && (self.summary()             != d.summary))             { self.summary(d.summary);         }; d.summary = null;
+		if (d.hasOwnProperty('description') && (self.description()         != d.description))         { self.description(d.description); }; d.description = null;
+		if (d.hasOwnProperty('startDate')   && (self.startDate().getTime() != d.startDate.getTime())) { self.startDate(d.startDate);     }; d.startDate = null;
+		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }; d.endDate = null;
+		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }; d.location = null;
+		if (d.hasOwnProperty('createdBy')   && (self.createdBy()           != d.createdBy))           { self.createdBy(d.createdBy);     }; d.createdBy = null;
+		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }; d.owner = null;
+		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
+		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
+		d = null;
 	};
-	
-	self.updateUsing(data);
-	data = null;
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
 
@@ -235,20 +230,14 @@ function EventsViewModel() {
 				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
 			};
 
-			if (item) {
-				// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': reusing existing item');
-				event = null;
-				item.updateUsing(update);
-				update = null;
-				return item;
-			} else {
-				// console.log('EventsViewModel::updateData(): ' + event['@id'] + ': creating new item');
+			if (!item) {
+				item = new CalendarEvent();
 				update.id = event['@id'];
-				event = null;
-				var e = new CalendarEvent(update);
-				update = item = null;
-				return e;
 			}
+			event = null;
+			item.updateUsing(update);
+			update = null;
+			return item;
 		};
 	})();
 

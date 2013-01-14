@@ -102,7 +102,7 @@ function NavModel() {
 			}
 			console.log('resetting event model');
 			if (app.events.editEventModel) {
-				app.events.editEventModel.currentEvent(new CalendarEvent({}));
+				app.events.editEventModel.currentEvent(new CalendarEvent());
 			} else {
 				console.log("err, can't find editEventModel");
 			}
