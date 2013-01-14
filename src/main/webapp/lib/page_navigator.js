@@ -136,18 +136,9 @@ function PageNavigator(defaultPage, elementCriteria) {
 		$(app.cache.elements.header).find('.icon-' + currentPageId).removeClass('selected');
 		$(app.cache.elements.header).find('.icon-' + newPageId).addClass('selected');
 
-		newPage.css('display', 'block');
-		$(app.cache.elements.content).children(':not(#' + newPageId + ')').css('display', 'none');
+		newPage.addClass('active');
+		$(app.cache.elements.content).children(':not(#' + newPageId + ')').removeClass('active');
 
-		if (!Modernizr.touch) {
-			// on non-mobile devices, focus the search input
-			var search = newPage.children('input[type=search]').first();
-			if (search) {
-				search.focus();
-			}
-			search = null;
-		}
-		
 		currentPageId = newPageId = newPage = null;
 	};
 

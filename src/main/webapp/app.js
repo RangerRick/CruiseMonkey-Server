@@ -60,7 +60,6 @@ htmlInitialization = {
 		"templateAttributes": {
 			"eventType": "official"
 		},
-		"hide": true,
 		"model": app.views.officialEventsViewModel
 	},
 	"my-events": {
@@ -68,7 +67,6 @@ htmlInitialization = {
 		"templateAttributes": {
 			"eventType": "my"
 		},
-		"hide": true,
 		"model": app.views.myEventsViewModel
 	},
 	"public-events": {
@@ -76,20 +74,16 @@ htmlInitialization = {
 		"templateAttributes": {
 			"eventType": "public"
 		},
-		"hide": true,
 		"model": app.views.publicEventsViewModel
 	},
 	"amenities": {
-		"hide": true,
 		"model": amenitiesModel
 	},
 	"decks": {
-		"hide": true,
 		"model": decksModel
 	},
 	"edit-event": {
 		"model": app.events.editEventModel,
-		"hide": true,
 		"afterAttach": function _afterAttach() {
 			$('#start-datepicker').datetimepicker();
 			$('#end-datepicker').datetimepicker();
@@ -297,9 +291,6 @@ templateLoader.onFinished = function() {
 					for (var i = 0; i < data.divClasses.length; i++) {
 						div.addClass(data.divClasses[i]);
 					}
-				}
-				if (data.hide) {
-					div.css('display', 'none');
 				}
 
 				if (data.afterAttach) {

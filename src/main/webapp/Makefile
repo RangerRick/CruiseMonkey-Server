@@ -1,15 +1,28 @@
-3RDPARTYJS = \
+3RDPARTYMINJS = \
 	3rdparty/jquery/jquery-1.8.3.min.js \
 	3rdparty/mustache/mustache.min.js \
-	3rdparty/knockout/knockout-2.2.0.js \
-	3rdparty/knockout/knockout.mapping-latest.js \
-	3rdparty/hammer/hammer.min.js \
-	3rdparty/hammer/jquery.hammer.min.js \
-	3rdparty/foundation/javascripts/foundation.min.js \
 	3rdparty/datejs/date.min.js \
-	3rdparty/amplifyjs/amplify.min.js \
+	3rdparty/hammer/jquery.hammer.min.js \
 	3rdparty/jquery-url-parser/purl.js \
 	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js \
+	3rdparty/uuid.js
+#	3rdparty/hammer/hammer.min.js \
+#	3rdparty/amplifyjs/amplify.min.js \
+#	3rdparty/knockout/knockout-2.2.0.js \
+#	3rdparty/knockout/knockout.mapping-latest.js \
+
+3RDPARTYJS = \
+	3rdparty/mustache/mustache.js \
+	3rdparty/knockout/knockout.mapping-latest.debug.js \
+	3rdparty/hammer/hammer.js \
+	3rdparty/hammer/jquery.hammer.js \
+	3rdparty/foundation/javascripts/jquery.foundation.navigation.js \
+	3rdparty/datejs/date.js \
+	3rdparty/datejs/globalization/en-US.js \
+	3rdparty/datejs/parser.js \
+	3rdparty/amplifyjs/amplify.js \
+	3rdparty/jquery-url-parser/purl.js \
+	3rdparty/jquery.scrollTo/jquery.scrollTo.js \
 	3rdparty/uuid.js
 
 3RDPARTYCSS = \
@@ -19,6 +32,12 @@
 
 
 CRUISEMONKEYJS = \
+	3rdparty/foundation/javascripts/jquery.foundation.navigation.js \
+	3rdparty/hammer/hammer.js \
+	3rdparty/hammer/jquery.hammer.js \
+	3rdparty/amplifyjs/amplify.js \
+	3rdparty/knockout/knockout-2.2.0.js \
+	3rdparty/knockout/knockout.mapping-latest.js \
 	lib/cm_utils.js \
 	lib/locations.js \
 	lib/page_tracker.js \
@@ -62,13 +81,13 @@ all: cruisemonkey.manifest $(RUNTIME)
 DATE=$(shell date '+%s')
 GITHASH=$(shell git log -1 | grep -E '^commit' | cut -d' ' -f2)
 
-cruisemonkey.manifest: cruisemonkey.manifest.in $(3RDPARTYJS) $(CRUISEMONKEYJS) $(RUNTIME) $(MAKEFILE)
+cruisemonkey.manifest: cruisemonkey.manifest.in $(3RDPARTYMINJS) $(CRUISEMONKEYJS) $(RUNTIME) $(MAKEFILE)
 	@echo "$< -> $@"
 	@echo "CACHE MANIFEST" > "$@"
 	@echo "# version $(GITHASH) $(DATE)" >> "$@"
 	@echo "" >> "$@"
 	@echo "CACHE:" >> "$@"
-	@for FILE in $(3RDPARTYJS) $(CRUISEMONKEYJS) $(RUNTIME); do \
+	@for FILE in $(3RDPARTYMINJS) $(CRUISEMONKEYJS) $(RUNTIME); do \
 		echo "$$FILE"; \
 		done | sort -u >> "$@";
 	@echo "" >> "$@"
@@ -107,8 +126,8 @@ temp/%.min.css: %.css
 	@echo "- minifying $<"
 	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
-3rdparty.js: $(3RDPARTYJS)
-	@echo > 3rdparty.js; for FILE in $(3RDPARTYJS); do \
+3rdparty.js: $(3RDPARTYMINJS)
+	@echo > 3rdparty.js; for FILE in $(3RDPARTYMINJS); do \
 		echo "- $$FILE"; \
 		cat $$FILE >> 3rdparty.js; \
 		echo "" >> 3rdparty.js; \
@@ -117,7 +136,11 @@ temp/%.min.css: %.css
 cruisemonkey.js: $(CRUISEMONKEYJS) $(MAKEFILE) compile.sh $(wildcard externs/*.js)
 	@#cat $(CRUISEMONKEYMINJS) > cruisemonkey.js
 	@echo ./compile.sh $(CRUISEMONKEYJS)
-	@./compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null
+	@./compile.sh $(CRUISEMONKEYJS) > "$@" 2>/dev/null || (rm cruisemonkey.js && exit 1)
+
+runtime.js: $(CRUISEMONKEYJS) $(3RDPARTYJS) compile.sh
+	@echo ./compile.sh $(CRUISEMONKEYJS) $(3RDPARTYJS)
+	@./compile.sh $(CRUISEMONKEYJS) $(3RDPARTYJS) > "$@" 2>/dev/null || (rm runtime.js && exit 1)
 
 cruisemonkey.css: $(CRUISEMONKEYCSS) $(3RDPARTYCSS) $(MAKEFILE)
 	@cat $(3RDPARTYCSS) $(CRUISEMONKEYCSS) > "$@"
