@@ -63,7 +63,7 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,%.min.css,$(CRUISEMONKEYCSS))
 
 FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
-RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js 3rdparty/modernizr.js
+RUNTIME = 3rdparty.js cruisemonkey.js index.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js 3rdparty/modernizr.js
 
 PHONEGAPFILES = \
 	cruisemonkey.manifest \
@@ -110,11 +110,11 @@ $(DESTDIR)/cruisemonkey.manifest: cruisemonkey.manifest.in $(RUNTIME) $(MAKEFILE
 	@echo "NETWORK:" >> "$@"
 	@echo "*" >> "$@"
 
-main.html: main.html.in
+index.html: index.html.in
 	@echo "$< -> $@"
 	@cat "$<" | grep -v -E '(<!--|//) *PHONEGAP *(-->|//)' | sed -e 's,<!-- *BROWSER *--> *,,g' -e 's,// *BROWSER *// *,,g' -e 's,@GITHASH@,$(GITHASH),g' -e 's,@DATE@,$(DATE),g' > "$@" 2>/dev/null
 
-$(DESTDIR)/main.html: main.html.in
+$(DESTDIR)/index.html: index.html.in
 	@echo "$< -> $@"
 	@install -d -m 755 "$(DESTDIR)"
 	@cat "$<" | grep -v -E '(<!--|//) *BROWSER *(-->|//)' | sed -e 's,<!-- *PHONEGAP *--> *,,g' -e 's,// *PHONEGAP *// *,,g' -e 's,@GITHASH@,$(GITHASH),g' -e 's,@DATE@,$(DATE),g' > "$@" 2>/dev/null
