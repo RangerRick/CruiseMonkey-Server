@@ -159,6 +159,11 @@ var app = {
 					element = null;
 				}
 			});
+			
+			if (window.isPhoneGap) {
+				console.log('hiding splashscreen');
+				navigator.splashscreen.hide();
+			}
 		}, 0);
 	};
 })();
@@ -268,14 +273,6 @@ var app = {
 		'use strict';
 
 		console.log('setupDefaultView()');
-
-		if (window.isPhoneGap) {
-			console.log('configuring ajaxUpdater.onUpdate');
-			app.events.ajaxUpdater.onUpdate = function _onUpdate() {
-				console.log('hiding splashscreen');
-				navigator.splashscreen.hide();
-			}
-		};
 
 		setTimeout(function() {
 			// first, load default events
