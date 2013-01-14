@@ -21,7 +21,7 @@ public class MockFavoriteDao implements FavoriteDao {
 		m_eventDao = eventDao;
 
 		final Event event = m_eventDao.findAll().iterator().next();
-		final Favorite favorite = new Favorite(event.getOwner().getUsername(), event.getId());
+		final Favorite favorite = new Favorite(event.getCreatedBy(), event.getId());
 		favorite.setId(1);
 		m_favorites.add(favorite);
 	}

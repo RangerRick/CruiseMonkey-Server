@@ -16,7 +16,6 @@ function CalendarEvent() {
 	self.endDate = ko.observable(new Date());
 	self.location = ko.observable();
 	self.createdBy = ko.observable();
-	self.owner = ko.observable();
 	self.isPublic = ko.observable();
 	self.favorite = ko.observable();
 	self.lastUpdated = new Date().getTime();
@@ -48,7 +47,6 @@ function CalendarEvent() {
 		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }; d.endDate = null;
 		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }; d.location = null;
 		if (d.hasOwnProperty('createdBy')   && (self.createdBy()           != d.createdBy))           { self.createdBy(d.createdBy);     }; d.createdBy = null;
-		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }; d.owner = null;
 		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
 		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
 		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated            < d.lastUpdated))        { self.lastUpdated = d.lastUpdated; } else { self.lastUpdated = new Date().getTime(); }; d.lastUpdated = null;
@@ -122,14 +120,6 @@ function EditEventModel() {
 			if (self.currentEvent()) self.currentEvent().createdBy(value);
 		}
 	});
-	self.owner = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().owner() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().owner(value);
-		}
-	});
 	self.onCancel = function(formElement) {
 		var preEdit = app.navigation.model.preEdit();
 		if (preEdit && preEdit != 'login' && preEdit != 'edit-event') {
@@ -150,7 +140,6 @@ function EditEventModel() {
 			delete postme.endDate;
 			delete postme.toString;
 			delete postme.createdBy;
-			delete postme.owner;
 			delete postme.attributeRegex;
 			delete postme.lastUpdated;
 			$.ajax({
@@ -175,7 +164,6 @@ function EditEventModel() {
 			}).success(function _success() {
 				console.log('success!');
 				self.createdBy(app.server.serverModel.username());
-				self.owner(app.server.serverModel.username());
 				app.events.eventsViewModel.events.push(self.currentEvent());
 				
 				var preEdit = app.navigation.model.preEdit();
@@ -232,7 +220,6 @@ function EventsViewModel() {
 				"endDate": new Date(event.end),
 				"location": event.location,
 				"createdBy": event['created-by'],
-				"owner": event.owner,
 				"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
 				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)),
 				"lastUpdated": lastUpdated

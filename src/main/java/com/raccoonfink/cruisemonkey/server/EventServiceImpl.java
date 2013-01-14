@@ -16,7 +16,6 @@ import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
-import com.raccoonfink.cruisemonkey.model.User;
 
 public class EventServiceImpl implements EventService, InitializingBean {
 	@Autowired
@@ -52,17 +51,12 @@ public class EventServiceImpl implements EventService, InitializingBean {
 
 	@Override
 	public void putEvent(final Event event, final String userName) {
-		final User user = m_userService.getUser(userName);
-
 		final Session session = m_eventDao.createSession();
 		final Transaction tx = session.beginTransaction();
 
 		try {
 			if (event.getCreatedBy() == null) {
 				event.setCreatedBy(userName);
-			}
-			if (event.getOwner() == null) {
-				event.setOwner(user);
 			}
 			m_eventDao.save(event, session);
 		} finally {

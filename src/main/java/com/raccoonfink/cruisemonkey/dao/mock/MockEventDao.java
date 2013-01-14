@@ -16,7 +16,6 @@ import org.hibernate.Session;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
-import com.raccoonfink.cruisemonkey.model.User;
 
 public class MockEventDao implements EventDao {
 	private Set<Event> m_events = new TreeSet<Event>();
@@ -24,8 +23,7 @@ public class MockEventDao implements EventDao {
 	public MockEventDao() {
 		final Date now = new Date();
 		final Date hourAgo = new Date(now.getTime() - (60 * 60 * 1000));
-		final User owner = new User("ranger", "test", "Benjamin Reed");
-		m_events.add(new Event(UUID.randomUUID().toString(), "test", "test description", hourAgo, now, owner));
+		m_events.add(new Event(UUID.randomUUID().toString(), "test", "test description", hourAgo, now, "ranger"));
 	}
 
 	@Override

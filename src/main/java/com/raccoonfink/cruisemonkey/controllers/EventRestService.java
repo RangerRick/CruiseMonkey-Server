@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.model.Event;
-import com.raccoonfink.cruisemonkey.model.Favorite;
 import com.raccoonfink.cruisemonkey.server.EventService;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
@@ -99,8 +98,8 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 			m_logger.debug("Trying to modify an event that's not in the database!");
 			return Response.notModified().build();
 		} else {
-			if (!event.getOwner().getUsername().equals(userName)) {
-				m_logger.debug("owner = {}, username = {}", event.getOwner().getUsername(), userName);
+			if (!event.getCreatedBy().equals(userName)) {
+				m_logger.debug("createdBy = {}, username = {}", event.getCreatedBy(), userName);
 				throw new WebApplicationException(401);
 			}
 			event.setIsPublic(isPublic);
@@ -120,7 +119,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 		if (event == null) {
 			m_logger.debug("Trying to delete an event that's not in the database!");
 		} else {
-			if (event.getOwner().getUsername() != user) {
+			if (event.getCreatedBy() != user) {
 				throw new WebApplicationException(401);
 			}
 			m_eventService.deleteEvent(event);

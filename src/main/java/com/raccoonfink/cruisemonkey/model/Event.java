@@ -6,25 +6,19 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.raccoonfink.cruisemonkey.util.UsernameAdapter;
 
 @Entity
 @XmlRootElement(name="event")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event extends AbstractRecord implements Serializable {
-	private static final long serialVersionUID = 8869459149371750476L;
+	private static final long serialVersionUID = 5307530845286678349L;
 
 	@Override
 	public String toString() {
@@ -32,7 +26,7 @@ public class Event extends AbstractRecord implements Serializable {
 				+ ", description=" + m_description
 				+ ", location=" + m_location + ", startDate="
 				+ m_startDate + ", endDate=" + m_endDate + ", isPublic="
-				+ m_isPublic + ", owner=" + (m_owner == null? null : m_owner.getUsername()) + "]";
+				+ m_isPublic + ", createdBy=" + getCreatedBy() + "]";
 	}
 
 	@XmlID
@@ -57,23 +51,18 @@ public class Event extends AbstractRecord implements Serializable {
 	@XmlElement(name="isPublic")
 	private Boolean m_isPublic = false;
 
-	@XmlElement(name="owner")
-	@XmlJavaTypeAdapter(UsernameAdapter.class)
-	private User m_owner;
-
 	public Event() {
 		super();
 		m_id = UUID.randomUUID().toString();
 	}
 
-	public Event(final String id, String summary, final String description, final Date start, final Date end, final User owner) {
-		super(owner.getUsername());
+	public Event(final String id, String summary, final String description, final Date start, final Date end, final String createdBy) {
+		super(createdBy);
 		m_id          = id;
 		m_summary     = summary;
 		m_description = description;
 		m_startDate   = start;
 		m_endDate     = end;
-		m_owner       = owner;
 	}
 
 	@Id
@@ -104,9 +93,4 @@ public class Event extends AbstractRecord implements Serializable {
 	@Column(name="isPublic")
 	public Boolean getIsPublic() { return m_isPublic; }
 	public void setIsPublic(final Boolean isPublic) { m_isPublic = isPublic; }
-
-	@OneToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="owner")
-	public User getOwner() { return m_owner; }
-	public void setOwner(final User owner) { m_owner = owner; }
 }

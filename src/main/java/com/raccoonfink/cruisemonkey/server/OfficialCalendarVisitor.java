@@ -154,11 +154,10 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			event.setIsPublic(true);
 			event.setStartDate(startDate);
 			event.setEndDate(endDate);
-			event.setCreatedBy("google");
+			event.setCreatedBy(m_importUser.getUsername());
 			event.setCreatedDate(createdDate);
-			event.setLastModifiedBy("google");
+			event.setLastModifiedBy(m_importUser.getUsername());
 			event.setLastModifiedDate(lastModifiedDate);
-			event.setOwner(m_importUser);
 			return event;
 		} else {
 			System.err.println("found existing event: " + existingEvent);
@@ -168,9 +167,8 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			existingEvent.setStartDate(startDate);
 			existingEvent.setEndDate(endDate);
 			existingEvent.setCreatedDate(createdDate);
-			existingEvent.setLastModifiedBy("google");
+			existingEvent.setLastModifiedBy(m_importUser.getUsername());
 			existingEvent.setLastModifiedDate(lastModifiedDate);
-			existingEvent.setOwner(m_importUser);
 			return existingEvent;
 		}
 	}
