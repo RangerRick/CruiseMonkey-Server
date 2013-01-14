@@ -2,20 +2,23 @@
  * @constructor
  * @param {Object=} data
  */
-function CalendarEvent() {
+function CalendarEvent(id, createdBy) {
 	var self = this;
 
-	// console.log('importing data: ' + ko.toJSON(data));
-	self.id = ko.observable(uuid.v1());
+	self.id = function _id() {
+		return id;
+	}
 	self.cleanId = function() {
-		return self.id().replace(self.attributeRegex, '');
+		return id.replace(self.attributeRegex, '');
 	};
 	self.summary = ko.observable();
 	self.description = ko.observable();
 	self.startDate = ko.observable(new Date());
 	self.endDate = ko.observable(new Date());
 	self.location = ko.observable();
-	self.createdBy = ko.observable();
+	self.createdBy = function _createdBy() {
+		return createdBy;
+	};
 	self.isPublic = ko.observable();
 	self.favorite = ko.observable();
 	self.lastUpdated = new Date().getTime();
@@ -33,20 +36,19 @@ function CalendarEvent() {
 		return retVal;
 	};
 	self.isMine = function _isMine() {
-		return self.createdBy() == app.server.serverModel.username();
+		return createdBy == app.server.serverModel.username();
 	};
 	self.toString = function _toString() {
 		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	};
 	
 	self.updateUsing = function(d) {
-		if (d.hasOwnProperty('id')          && (self.id()                  != d.id))                  { self.id(d.id);                   }; d.id = null;
+		if (d.hasOwnProperty('id')          && (self.id()                  != d.id))                  { self.m_id = d.id;                }; d.id = null;
 		if (d.hasOwnProperty('summary')     && (self.summary()             != d.summary))             { self.summary(d.summary);         }; d.summary = null;
 		if (d.hasOwnProperty('description') && (self.description()         != d.description))         { self.description(d.description); }; d.description = null;
 		if (d.hasOwnProperty('startDate')   && (self.startDate().getTime() != d.startDate.getTime())) { self.startDate(d.startDate);     }; d.startDate = null;
 		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }; d.endDate = null;
 		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }; d.location = null;
-		if (d.hasOwnProperty('createdBy')   && (self.createdBy()           != d.createdBy))           { self.createdBy(d.createdBy);     }; d.createdBy = null;
 		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
 		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
 		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated            < d.lastUpdated))        { self.lastUpdated = d.lastUpdated; } else { self.lastUpdated = new Date().getTime(); }; d.lastUpdated = null;
@@ -112,14 +114,6 @@ function EditEventModel() {
 			if (self.currentEvent()) self.currentEvent().isPublic(value);
 		}
 	});
-	self.createdBy = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().createdBy() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().createdBy(value);
-		}
-	});
 	self.onCancel = function(formElement) {
 		var preEdit = app.navigation.model.preEdit();
 		if (preEdit && preEdit != 'login' && preEdit != 'edit-event') {
@@ -163,7 +157,6 @@ function EditEventModel() {
 				}
 			}).success(function _success() {
 				console.log('success!');
-				self.createdBy(app.server.serverModel.username());
 				app.events.eventsViewModel.events.push(self.currentEvent());
 				
 				var preEdit = app.navigation.model.preEdit();
@@ -219,7 +212,6 @@ function EventsViewModel() {
 				"startDate": new Date(event.start),
 				"endDate": new Date(event.end),
 				"location": event.location,
-				"createdBy": event['created-by'],
 				"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
 				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)),
 				"lastUpdated": lastUpdated
@@ -231,8 +223,7 @@ function EventsViewModel() {
 			};
 
 			if (!item) {
-				update.id = event['@id'];
-				ret.item = new CalendarEvent();
+				ret.item = new CalendarEvent(event['@id'], event['created-by']);
 				ret.exists = false;
 			}
 
