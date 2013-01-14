@@ -307,12 +307,16 @@ function EventsViewModel() {
 		self.updating(false);
 	};
 	
-	self.toggleFavorite = function _toggleFavorite(entry) {
+	self.toggleFavorite = function _toggleFavorite(entry, event) {
 		'use strict';
+
+		if (Modernizr.touch && event.type == 'click') {
+			return true;
+		}
 
 		if (app.events.eventsViewModel.updating()) {
 			console.log('EventsViewModel::toggleFavorite: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
-			return false;
+			return true;
 		}
 
 		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.favorite());
@@ -348,8 +352,12 @@ function EventsViewModel() {
 		return true;
 	};
 	
-	self.togglePublic = function _togglePublic(entry) {
+	self.togglePublic = function _togglePublic(entry, event) {
 		'use strict';
+
+		if (Modernizr.touch && event.type == 'click') {
+			return true;
+		}
 
 		if (app.events.eventsViewModel.updating()) {
 			console.log('EventsViewModel::togglePublic: skipping ajax update for ' + entry.id() + ', we are in the middle of a server update');
@@ -389,8 +397,12 @@ function EventsViewModel() {
 		return true;
 	};
 
-	self.deleteEvent = function _deleteEvent(entry) {
+	self.deleteEvent = function _deleteEvent(entry, event) {
 		'use strict';
+
+		if (Modernizr.touch && event.type == 'click') {
+			return true;
+		}
 
 		console.log('EventsViewModel::deleteEvent: ' + entry.id());
 		$.ajax({

@@ -276,7 +276,7 @@ var app = {
 
 		setTimeout(function() {
 			// first, load default events
-			// app.cache.functions.loadDefaultEvents();
+			app.cache.functions.loadDefaultEvents();
 
 			setTimeout(function() {
 				// then, start the background event-sync
@@ -315,9 +315,7 @@ var app = {
             };
             return ko.bindingHandlers['event']['init'].call(this, element, newValueAccessor, allBindingsAccessor, viewModel);
         }
-    }
-
-
+    };
 })();
 
 window['app'] = app;

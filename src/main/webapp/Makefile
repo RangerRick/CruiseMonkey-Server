@@ -10,10 +10,12 @@
 #	3rdparty/amplifyjs/amplify.min.js \
 #	3rdparty/knockout/knockout-2.2.0.js \
 #	3rdparty/knockout/knockout.mapping-latest.js \
+#	3rdparty/knockout/knockout-delegatedEvents.js \
 
 3RDPARTYJS = \
 	3rdparty/mustache/mustache.js \
 	3rdparty/knockout/knockout.mapping-latest.debug.js \
+	3rdparty/knockout/knockout-delegatedEvents.js \
 	3rdparty/hammer/hammer.js \
 	3rdparty/hammer/jquery.hammer.js \
 	3rdparty/foundation/javascripts/jquery.foundation.navigation.js \
@@ -38,6 +40,7 @@ CRUISEMONKEYJS = \
 	3rdparty/amplifyjs/amplify.js \
 	3rdparty/knockout/knockout-2.2.0.js \
 	3rdparty/knockout/knockout.mapping-latest.js \
+	3rdparty/knockout/knockout-delegatedEvents.js \
 	lib/cm_utils.js \
 	lib/locations.js \
 	lib/page_tracker.js \
