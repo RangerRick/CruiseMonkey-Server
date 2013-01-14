@@ -466,16 +466,17 @@ function EventsViewModel() {
 }
 
 /** used for filter/searching, match an event based on a filter **/
-var matchEventText = function _matchEventText(event, filter) {
+EventsViewModel.prototype.f_matchEventText = function _matchEventText(event, filter) {
 	'use strict';
 
+	var ret = false;
 	if (event.summary().toLowerCase().search(filter) != -1) {
-		return true;
+		ret = true;
 	} else if (event.description().toLowerCase().search(filter) != -1) {
-		return true;
-	} else {
-		return false;
+		ret = true;
 	}
+	event = filter  = null;
+	return ret;
 };
 
 /**
@@ -487,26 +488,19 @@ function OfficialEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable('');
 
-	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
-		var filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.computed(function _officialFilteredEvents() {
+		var filter = self.filter().toLowerCase();
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event === undefined) {
-				return false;
-			}
-			if (event.owner() == 'google') {
-				return true;
+		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event !== undefined && event.createdBy() == 'google') {
+				if (filter) {
+					return self.f_matchEventText.call(self, event, filter);
+				} else {
+					return true;
+				}
 			}
 			return false;
 		});
-
-		if (!filter) {
-			return matchesGroup;
-		} else {
-			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
-				return matchEventText(event, filter);
-			});
-		}
 	});
 }
 
@@ -518,22 +512,19 @@ function MyEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable('');
 
-	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
-		var filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.computed(function _myFilteredEvents(event) {
+		var filter = self.filter().toLowerCase();
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.favorite()) return true;
-			if (event.owner() == app.server.serverModel.username()) return true;
+		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event.favorite() || event.createdBy() == app.server.serverModel.username()) {
+				if (filter) {
+					return self.f_matchEventText.call(self, event, filter);
+				} else {
+					return true;
+				}
+			}
 			return false;
 		});
-
-		if (!filter) {
-			return matchesGroup;
-		} else {
-			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
-				return matchEventText(event, filter);
-			});
-		}
 	});
 }
 
@@ -545,22 +536,18 @@ function PublicEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable('');
 
-	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
-		var filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.computed(function _publicFilteredEvents() {
+		var filter = self.filter().toLowerCase();
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.owner() != 'google' && event.isPublic()) {
-				return true;
+		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event.createdBy() != 'google' && event.isPublic()) {
+				if (filter) {
+					return self.f_matchEventText.call(self, event, filter);
+				} else {
+					return true;
+				}
 			}
 			return false;
 		});
-
-		if (!filter) {
-			return matchesGroup;
-		} else {
-			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
-				return matchEventText(event, filter);
-			});
-		}
 	});
-}
+};
