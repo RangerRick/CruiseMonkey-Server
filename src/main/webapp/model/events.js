@@ -7,9 +7,9 @@ function CalendarEvent() {
 
 	// console.log('importing data: ' + ko.toJSON(data));
 	self.id = ko.observable(uuid.v1());
-	self.cleanId = ko.computed(function() {
+	self.cleanId = function() {
 		return self.id().replace(self.attributeRegex, '');
-	});
+	};
 	self.summary = ko.observable();
 	self.description = ko.observable();
 	self.startDate = ko.observable(new Date());
@@ -19,9 +19,9 @@ function CalendarEvent() {
 	self.owner = ko.observable();
 	self.isPublic = ko.observable();
 	self.favorite = ko.observable();
-	self.lastUpdated = ko.observable(new Date().getTime());
+	self.lastUpdated = new Date().getTime();
 
-	self.timespan = ko.computed(function() {
+	self.timespan = function _timespan() {
 		var start = (self.startDate() === null || self.startDate() === undefined) ? null : cmUtils.formatTime(self.startDate(), false);
 		var end = (self.endDate() === null || self.endDate() === undefined) ? null : cmUtils.formatTime(self.endDate(), false);
 		var retVal = '';
@@ -32,13 +32,13 @@ function CalendarEvent() {
 			}
 		}
 		return retVal;
-	}, self);
-	self.isMine = ko.computed(function() {
+	};
+	self.isMine = function _isMine() {
 		return self.createdBy() == app.server.serverModel.username();
-	});
-	self.toString = ko.computed(function() {
+	};
+	self.toString = function _toString() {
 		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
-	});
+	};
 	
 	self.updateUsing = function(d) {
 		if (d.hasOwnProperty('id')          && (self.id()                  != d.id))                  { self.id(d.id);                   }; d.id = null;
@@ -51,7 +51,7 @@ function CalendarEvent() {
 		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }; d.owner = null;
 		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
 		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
-		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated()          < d.lastUpdated))        { self.lastUpdated(d.lastUpdated); } else { self.lastUpdated(new Date().getTime()); }; d.lastUpdated = null;
+		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated            < d.lastUpdated))        { self.lastUpdated = d.lastUpdated; } else { self.lastUpdated = new Date().getTime(); }; d.lastUpdated = null;
 		d = null;
 	};
 }
@@ -313,7 +313,7 @@ function EventsViewModel() {
 			}
 
 			self.events.remove(function(item) {
-				return item.lastUpdated() < updateTime;
+				return item.lastUpdated < updateTime;
 			});
 			/*
 			console.log('EventsViewModel::updateData(): finished processing events, saving to model');
