@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find * lib/* model/* -type f -maxdepth 0 | grep -v -E '(3rdparty.js|cruisemonkey.css|cruisemonkey.js|phonegap.js|runtime.js)' | xargs grep -i "$@"
+find * lib/* model/* -type f -maxdepth 0 | grep -v -E '(3rdparty.js|cruisemonkey.css|cruisemonkey.js|phonegap.js|runtime.js|styles.min.css)' | xargs grep -i "$@"

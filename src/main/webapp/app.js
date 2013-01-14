@@ -110,7 +110,7 @@ var app = {
 		app.cache.elements['content'] = $('#content');
 
 		$.each(app.settings.init, function(index, data) {
-			if (app.cache.pages[index]) {
+			if (app.cache.elements[index]) {
 				console.log(index + ' has already been initialized');
 			} else {
 				console.log('initializing HTML for ' + index);
@@ -136,20 +136,30 @@ var app = {
 						console.log('calling afterAttach for ' + index);
 						data.afterAttach(div);
 					}
-					if (data.model) {
-						console.log('applying ' + data.model + ' to ' + index);
-						ko.applyBindings(data.model, div[0]);
-					}
 
 					app.cache.elements[index] = div;
 					div = null;
 				}
-				app.cache.pages[index] = true;
 			}
 			index = data = null;
 		});
 
 		app.cache.functions.setupDefaultView();
+		
+		setTimeout(function _initKnockout() {
+			$.each(app.settings.init, function(index, data) {
+				if (data.model) {
+					var element = app.cache.elements[index][0];
+					if (element) {
+						console.log('applying knockout model to ' + index);
+						ko.applyBindings(data.model, element);
+					} else {
+						console.log('unable to locate element for ' + index);
+					}
+					element = null;
+				}
+			});
+		}, 0);
 	};
 })();
 
