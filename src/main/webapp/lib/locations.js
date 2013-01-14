@@ -8,13 +8,10 @@ function Loc(deck, name, type) {
 	'use strict';
 	var self = this;
 
-	self.deck = ko.observable(deck);
-	self.name = ko.observable(name);
-	self.type = ko.observable(type);
-	self.id = ko.computed(function _computedId() {
-		var retval = self.deck() + '-' + self.name();
-		return retval.replace(self.alnumRegex, '');
-	});
+	self.deck = deck;
+	self.name = name;
+	self.type = type;
+	self.id   = (deck + '-' + name).replace(self.alnumRegex, '');
 }
 Loc.prototype.alnumRegex = /[^A-Za-z0-9\-]/g;
 
@@ -29,7 +26,9 @@ function LocationWithDescription(deck, name, type, description) {
 	'use strict';
 	var self = this;
 	$.extend(self, new Loc(deck, name, type));
-	self.description = ko.observable(description);
+	self.description = function() {
+		return description;
+	};
 }
 
 /**
@@ -79,7 +78,7 @@ function Food(deck, name, description, surcharge) {
 	'use strict';
 	var self = this;
 	$.extend(self, new LocationWithDescription(deck, name, 'Food', description));
-	self.surcharge = ko.observable(surcharge);
+	self.surcharge = surcharge;
 }
 
 /**
@@ -233,7 +232,7 @@ function AmenitiesModel() {
 			return self.amenities();
 		} else {
 			return ko.utils.arrayFilter(self.amenities(), function _amenitiesArrayFilter(amenity) {
-				if (amenity.name && amenity.name() && amenity.name().toLowerCase().search(filter) != -1) {
+				if (amenity.name && amenity.name.toLowerCase().search(filter) != -1) {
 					return true;
 				} else if (amenity.description && amenity.description() && amenity.description().toLowerCase().search(filter) != -1) {
 					return true;
@@ -263,23 +262,19 @@ function AmenitiesModel() {
 		amenities = self.filteredAmenities().sort(function _sortedFilteredAmenities(left, right) {
 			'use strict';
 			// first, order by deck
-			orderLeft = left.deck();
-			orderRight = right.deck();
-			if (orderLeft != orderRight) {
-				return ((orderLeft < orderRight) ? -1 : 1);
+			if (left.deck != right.deck) {
+				return ((left.deck < right.deck) ? -1 : 1);
 			}
 
 			// on the same deck, order by name
-			orderLeft = left.name();
-			orderRight = right.name();
-			return ((orderLeft == orderRight) ? 0 : ((orderLeft < orderRight) ? -1 : 1));
+			return ((left.name == right.name) ? 0 : ((left.name < right.name) ? -1 : 1));
 		});
 
 		var lastDeck, currentDeck, currentAmenity, deckObject, ret = [];
 
 		for (var i = 0; i < amenities.length; i++) {
 			currentAmenity = amenities[i];
-			currentDeck = currentAmenity.deck();
+			currentDeck = currentAmenity.deck;
 			if (currentDeck != lastDeck) {
 				if (deckObject) {
 					ret.push(deckObject);
@@ -313,16 +308,12 @@ Number.prototype.pad = function _pad(size) {
 function Deck(number) {
 	'use strict';
 	var self = this;
-	self.number = ko.observable(number);
-	self.size = ko.observable(300);
-	self.id = ko.computed(function _computedId() {
-		'use strict';
-		return 'deck-' + self.number();
-	});
-	self.image = ko.computed(function _computedImage() {
-		'use strict';
-		return 'images/deck' + self.number().pad(2) + '-' + self.size() + '.png';
-	});
+	self.number = number;
+	self.size = 300;
+	self.id = 'deck-' + number;
+	self.image = function() {
+		return 'images/deck' + self.number.pad(2) + '-' + self.size + '.png';
+	};
 }
 
 /**

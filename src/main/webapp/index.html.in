@@ -153,9 +153,9 @@
 			<div id="decks">
 				<ul class="list deck-list unstyled">
 					<!-- ko foreach: { data: decks, as: 'deck' } -->
-					<li data-bind="attr: { id: id() } " class="list-entry deck scrollable">
-						<div data-bind="text: 'Deck ' + number()" class="divider theme-header"></div>
-						<img data-bind="attr: { id: id() + '-image', src: image }" />
+					<li data-bind="attr: { id: id } " class="list-entry deck scrollable">
+						<div data-bind="text: 'Deck ' + number" class="divider theme-header"></div>
+						<img data-bind="attr: { id: id + '-image', src: image() }" />
 					</li>
 					<!-- /ko -->
 				</ul>
