@@ -278,6 +278,7 @@ function EventsViewModel() {
 					} else {
 						console.warn('event does not have an @id property!');
 					}
+					return false;
 				});
 			} else {
 				if (allData.events.event.hasOwnProperty('@id')) {

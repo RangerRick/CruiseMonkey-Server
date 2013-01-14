@@ -269,12 +269,10 @@ var app = {
 		// app.cache.functions.loadDefaultEvents();
 
 		console.log('setupDefaultView(): set up ajaxUpdater');
-		/*
 		setTimeout(function() {
 			// then, start the background event-sync
 			app.events.ajaxUpdater.start();
 		}, 2000);
-		*/
 
 		console.log('setupDefaultView(): calling showLoginOrCurrent()');
 		app.cache.functions.showLoginOrCurrent();
