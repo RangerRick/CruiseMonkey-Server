@@ -133,10 +133,12 @@ function PageNavigator(defaultPage, elementCriteria) {
 			newPage = $('#' + newPageId);
 		}
 
+		console.log('PageNavigator::replaceCurrentPage: updating css to show page');
 		newPage.addClass('active');
 		$(app.cache.elements.content).children(':not(#' + newPageId + ')').removeClass('active');
 		newPage = null;
 
+		console.log('PageNavigator::replaceCurrentPage: updating header');
 		header = $(app.cache.elements.header);
 		header.find('.icon-' + currentPageId).removeClass('selected');
 		header.find('.icon-' + newPageId).addClass('selected');
