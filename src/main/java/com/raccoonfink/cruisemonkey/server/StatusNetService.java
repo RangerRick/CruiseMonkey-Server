@@ -40,11 +40,13 @@ public class StatusNetService {
 	private BasicHttpContext m_context;
 	private final JsonFactory m_jsonFactory = new JsonFactory();
 	private boolean m_authorized = false;
+	private int m_timeout = 5000;
 
 	public StatusNetService(final String host, final int port, final String root, final String username, final String password) {
 		final HttpHost httpHost = new HttpHost(host, port, "http");
 		final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
 
+		m_timeout = Integer.parseInt(System.getProperty("serverTimeout", "5000"));
 		m_httpClient = getHttpClient(httpHost, credentials);
 
 		m_httpHost = httpHost;
@@ -54,8 +56,8 @@ public class StatusNetService {
 
 	private DefaultHttpClient getHttpClient(final HttpHost httpHost, final Credentials credentials) {
 		final HttpParams params = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(params, 5000);
-		HttpConnectionParams.setSoTimeout(params, 5000);
+		HttpConnectionParams.setConnectionTimeout(params, m_timeout);
+		HttpConnectionParams.setSoTimeout(params, m_timeout);
 
 		final DefaultHttpClient httpClient = new DefaultHttpClient(params);
 		httpClient.getCredentialsProvider().setCredentials(new AuthScope(httpHost.getHostName(), httpHost.getPort()), credentials);
