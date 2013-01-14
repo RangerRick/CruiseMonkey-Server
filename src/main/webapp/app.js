@@ -41,7 +41,6 @@ var app = {
 // startup
 (function() {
 	app.events.ajaxUpdater = new AjaxUpdater();
-	app.views.templateLoader = new TemplateLoader(['#events.html']);
 
 	app.settings.init = {
 		"header": {
@@ -51,21 +50,18 @@ var app = {
 			"model": app.server.serverModel
 		},
 		"official-events": {
-			"templateSource": "#events.html",
 			"templateAttributes": {
 				"eventType": "official"
 			},
 			"model": app.views.officialEventsViewModel
 		},
 		"my-events": {
-			"templateSource": "#events.html",
 			"templateAttributes": {
 				"eventType": "my"
 			},
 			"model": app.views.myEventsViewModel
 		},
 		"public-events": {
-			"templateSource": "#events.html",
 			"templateAttributes": {
 				"eventType": "public"
 			},
@@ -88,7 +84,7 @@ var app = {
 		}
 	};
 
-	app.views.templateLoader.onFinished = function() {
+	app.cache.functions.onReady = function() {
 		'use strict';
 
 		if (window.Modernizr.touch) {
@@ -119,15 +115,7 @@ var app = {
 				if (typeof data === 'function') {
 					data();
 				} else {
-					var div;
-					if (data.templateSource) {
-						div = $('<div>');
-						div.attr('id', index);
-						div.html(app.views.templateLoader.renderTemplate(data.templateSource, data.templateAttributes || {}));
-						app.cache.elements.content.append(div);
-					} else {
-						div = $('#' + index);
-					}
+					var div = $('#' + index);
 					if (data.divClasses) {
 						for (var i = 0; i < data.divClasses.length; i++) {
 							div.addClass(data.divClasses[i]);
