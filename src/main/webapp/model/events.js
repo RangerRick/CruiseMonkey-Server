@@ -278,7 +278,7 @@ function EventsViewModel() {
 			if (allData.favorites.favorite instanceof Array) {
 				favorites = $.map(allData.favorites.favorite, processFavorite);
 			} else {
-				favorites = [ processFavorite(allData.favorites.favorite) ];
+				favorites = [ processFavorite.call(window, allData.favorites.favorite) ];
 			}
 		}
 
@@ -291,7 +291,7 @@ function EventsViewModel() {
 			if (allData.events.event instanceof Array) {
 				$.each(allData.events.event, function(index, event) {
 					if (event.hasOwnProperty('@id')) {
-						var ret = processEvent(event, favorites, updateTime);
+						var ret = processEvent.call(window, event, favorites, updateTime);
 						if (!ret.exists) {
 							self.events.push(ret.item);
 						}
@@ -302,7 +302,7 @@ function EventsViewModel() {
 				});
 			} else {
 				if (allData.events.event.hasOwnProperty('@id')) {
-					var ret = processEvent(allData.events.event, favorites, updateTime);
+					var ret = processEvent.call(window, allData.events.event, favorites, updateTime);
 					if (!ret.exists) {
 						self.events.push(ret.item);
 					}
