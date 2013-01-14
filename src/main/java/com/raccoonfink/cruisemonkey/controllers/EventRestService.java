@@ -99,7 +99,8 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 			m_logger.debug("Trying to modify an event that's not in the database!");
 			return Response.notModified().build();
 		} else {
-			if (event.getOwner().getUsername() != userName) {
+			if (!event.getOwner().getUsername().equals(userName)) {
+				m_logger.debug("owner = {}, username = {}", event.getOwner().getUsername(), userName);
 				throw new WebApplicationException(401);
 			}
 			event.setIsPublic(isPublic);
