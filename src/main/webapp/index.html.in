@@ -160,7 +160,7 @@
 						<div class="createdBy" data-bind="visible: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy"></span></div>
 						<div class="time">Time: <span data-bind="text: timespan()"></span></div>
 						<div class="location">Location: <span data-bind="text: location"></span></div>
-						<div class="description" data-bind="text: description"></div>
+						<div class="description" data-bind="text: description()"></div>
 					</li>
 				</ul>
 			</div>
