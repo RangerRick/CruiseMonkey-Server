@@ -228,6 +228,7 @@ var app = {
 	app.cache.functions.showLoginOrCurrent = function _showLoginOrCurrent() {
 		'use strict';
 
+		console.log('app.cache.functions.showLoginOrCurrent');
 		var current_page = app.navigation.pageNavigator.getCurrentPage();
 		if (current_page == 'login' || current_page == 'edit-events') {
 			current_page = app.navigation.pageNavigator.setCurrentPage('official-events');
