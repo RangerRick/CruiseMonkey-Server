@@ -177,11 +177,8 @@ showLoginOrCurrent = function() {
 		// console.log(events);
 		if (events) {
 			console.log('loading stored ReST events');
-			try {
-				app.events.eventsViewModel.updateData(events);
-			} catch (err) {
-				console.log('an error occurred restoring events from storage: ' + err.message);
-			}
+			app.events.eventsViewModel.updateData(events);
+			events = null;
 		} else {
 			console.log('no stored ReST events');
 		}

@@ -32,7 +32,7 @@
 			</ul>
 		</script>
 		
-		<script src="3rdparty/foundation/javascripts/modernizr.foundation.js"></script>
+		<script src="3rdparty/modernizr.js"></script>
 
 		<!-- IE Fix for HTML5 Tags -->
 		<!--[if lt IE 9]>

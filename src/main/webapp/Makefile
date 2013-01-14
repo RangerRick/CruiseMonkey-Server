@@ -2,11 +2,11 @@
 	3rdparty/jquery/jquery-1.8.3.min.js \
 	3rdparty/mustache/mustache.min.js \
 	3rdparty/datejs/date.min.js \
-	3rdparty/hammer/jquery.hammer.min.js \
 	3rdparty/jquery-url-parser/purl.js \
 	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js \
 	3rdparty/uuid.js
 #	3rdparty/hammer/hammer.min.js \
+#	3rdparty/hammer/jquery.hammer.min.js \
 #	3rdparty/amplifyjs/amplify.min.js \
 #	3rdparty/knockout/knockout-2.2.0.js \
 #	3rdparty/knockout/knockout.mapping-latest.js \
@@ -60,7 +60,7 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,temp/%.min.css,$(CRUISEMONKEYCSS))
 
 FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
-RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js
+RUNTIME = 3rdparty.js cruisemonkey.js index.html main.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js 3rdparty/modernizr.js
 
 PHONEGAPFILES = \
 	cruisemonkey.manifest \
