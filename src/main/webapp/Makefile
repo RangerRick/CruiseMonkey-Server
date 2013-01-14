@@ -1,29 +1,24 @@
 3RDPARTYMINJS = \
-	3rdparty/jquery/jquery-1.8.3.min.js \
+	3rdparty/zepto/zepto.min.js \
 	3rdparty/mustache/mustache.min.js \
 	3rdparty/datejs/date.min.js \
-	3rdparty/jquery-url-parser/purl.js \
 	3rdparty/jquery.scrollTo/jquery.scrollTo.min.js \
 	3rdparty/uuid.js
-#	3rdparty/hammer/hammer.min.js \
-#	3rdparty/hammer/jquery.hammer.min.js \
+#	3rdparty/jquery/jquery-1.8.3.min.js \
 #	3rdparty/amplifyjs/amplify.min.js \
 #	3rdparty/knockout/knockout-2.2.0.js \
 #	3rdparty/knockout/knockout.mapping-latest.js \
 #	3rdparty/knockout/knockout-delegatedEvents.js \
 
 3RDPARTYJS = \
+	3rdparty/zepto/zepto.js \
 	3rdparty/mustache/mustache.js \
 	3rdparty/knockout/knockout.mapping-latest.debug.js \
 	3rdparty/knockout/knockout-delegatedEvents.js \
-	3rdparty/hammer/hammer.js \
-	3rdparty/hammer/jquery.hammer.js \
-	3rdparty/foundation/javascripts/jquery.foundation.navigation.js \
 	3rdparty/datejs/date.js \
 	3rdparty/datejs/globalization/en-US.js \
 	3rdparty/datejs/parser.js \
 	3rdparty/amplifyjs/amplify.js \
-	3rdparty/jquery-url-parser/purl.js \
 	3rdparty/jquery.scrollTo/jquery.scrollTo.js \
 	3rdparty/uuid.js
 
@@ -34,9 +29,6 @@
 
 
 CRUISEMONKEYJS = \
-	3rdparty/foundation/javascripts/jquery.foundation.navigation.js \
-	3rdparty/hammer/hammer.js \
-	3rdparty/hammer/jquery.hammer.js \
 	3rdparty/amplifyjs/amplify.js \
 	3rdparty/knockout/knockout-2.2.0.js \
 	3rdparty/knockout/knockout.mapping-latest.js \

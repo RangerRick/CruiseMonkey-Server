@@ -37,19 +37,19 @@ function AjaxUpdater() {
 				beforeSend: function beforeSend(xhr) {
 					app.server.serverModel.setBasicAuth(xhr);
 					xhr = null;
+				}, success: function _success(data) {
+					console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
+					app.events.eventsViewModel.updateData(data);
+					data = null;
+					m_inFlight = false;
+					self.onUpdate();
+				}, error: function _error(jqXHR, textStatus, errorThrown) {
+					console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(jqXHR));
+					console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+					jqXHR = textStatus = errorThrown = null;
+					m_inFlight = false;
+					self.onUpdate();
 				}
-			}).success(function _success(data) {
-				console.log('AjaxUpdater::f_updateEventModel(): received updated event JSON');
-				app.events.eventsViewModel.updateData(data);
-				data = null;
-				m_inFlight = false;
-				self.onUpdate();
-			}).fail(function _error(jqXHR, textStatus, errorThrown) {
-				console.log('AjaxUpdater::f_updateEventModel(): An error occurred while updating event JSON: ' + ko.toJSON(jqXHR));
-				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
-				jqXHR = textStatus = errorThrown = null;
-				m_inFlight = false;
-				self.onUpdate();
 			});
 		} else {
 			console.log('Not authorized according to navigation model, skipping update.');

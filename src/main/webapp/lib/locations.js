@@ -214,7 +214,7 @@ var locations = [
 			});
 		}
 	};
-})(jQuery);
+})(Zepto);
 
 /**
  * @constructor

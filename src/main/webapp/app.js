@@ -196,29 +196,31 @@ var app = {
 					app.navigation.pageNavigator.navigateTo('login');
 				}
 			},
-			beforeSend: function beforeSend(xhr) {
+			beforeSend: function _beforeSend(xhr) {
 				app.server.serverModel.setBasicAuth(xhr);
 				xhr = null;
-			}
-		}).success(function _success(data) {
-			'use strict';
+			},
+			success: function _success(data) {
+				'use strict';
 
-			if (data === true) {
-				console.log('checkIfAuthorized(): test returned OK');
-				data = null;
-				success();
-				return;
-			} else {
-				console.log('checkIfAuthorized(): success function called, but data was not OK!');
-				data = null;
+				if (data === true) {
+					console.log('checkIfAuthorized(): test returned OK');
+					data = null;
+					success();
+					return;
+				} else {
+					console.log('checkIfAuthorized(): success function called, but data was not OK!');
+					data = null;
+					failure();
+					return;
+				}
+			},
+			error: function _error(jqXHR, textStatus, errorThrown) {
+				'use strict';
+				console.log('checkIfAuthorized(): An error occurred: ' + errorThrown + ' (' + textStatus + ')');
+				jqXHR = textStatus = errorThrown = null;
 				failure();
-				return;
 			}
-		}).fail(function _error(jqXHR, textStatus, errorThrown) {
-			'use strict';
-			console.log('checkIfAuthorized(): An error occurred: ' + errorThrown + ' (' + textStatus + ')');
-			jqXHR = textStatus = errorThrown = null;
-			failure();
 		});
 	};
 

@@ -44,10 +44,12 @@ JSON.stringify = function(jsonObj, opt_replacer, opt_space) {};
 var console = {};
 /**
  * @param {string} message
+ * @param {string=} objects
  */
 console.warn = function (message, var_args) {};
 
 /**
  * @param {string} message
+ * @param {string=} objects
  */
 console.log = function (message, var_args) {};
