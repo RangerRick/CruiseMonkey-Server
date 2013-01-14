@@ -257,6 +257,7 @@ var app = {
 
 (function() {
 	app.cache.functions.loadDefaultEvents = function _loadDefaultEvents() {
+		console.log('loadDefaultEvents()');
 		var events = amplify.store('events');
 		// console.log('read events:');
 		// console.log(events);
@@ -268,6 +269,7 @@ var app = {
 			console.log('no stored ReST events');
 		}
 		events = null;
+		console.log('loadDefaultEvents(): finished');
 	};
 })();
 
@@ -276,19 +278,18 @@ var app = {
 		'use strict';
 
 		console.log('setupDefaultView()');
+		app.cache.functions.loadDefaultEvents();
 
+		console.log('setupDefaultView(): set up ajaxUpdater');
 		setTimeout(function() {
-			// first, load default events
-			app.cache.functions.loadDefaultEvents();
-
-			setTimeout(function() {
-				// then, start the background event-sync
-				app.events.ajaxUpdater.start();
-			}, 2000);
-
+			// then, start the background event-sync
+			app.events.ajaxUpdater.start();
 		}, 2000);
 
+		console.log('setupDefaultView(): calling showLoginOrCurrent()');
 		app.cache.functions.showLoginOrCurrent();
+		
+		console.log('setupDefaultView(): finished');
 	};
 })();
 

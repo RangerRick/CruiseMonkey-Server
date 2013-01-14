@@ -306,6 +306,7 @@ function EventsViewModel() {
 		}
 		favorites = null;
 		self.updating(false);
+		console.log('EventsViewModel::updateData(): complete');
 	};
 	
 	self.toggleFavorite = function _toggleFavorite(entry, event) {
