@@ -278,7 +278,7 @@ var app = {
 		'use strict';
 
 		console.log('setupDefaultView()');
-		app.cache.functions.loadDefaultEvents();
+		// app.cache.functions.loadDefaultEvents();
 
 		console.log('setupDefaultView(): set up ajaxUpdater');
 		setTimeout(function() {
