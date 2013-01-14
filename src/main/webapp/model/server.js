@@ -43,7 +43,7 @@ function ServerModel() {
 	self.onSubmit = function(formElement) {
 		self.persist();
 		app.events.ajaxUpdater.pollNow();
-		showLoginOrCurrent();
+		app.cache.functions.showLoginOrCurrent();
 	};
 
 	self.persist = ko.computed(function() {

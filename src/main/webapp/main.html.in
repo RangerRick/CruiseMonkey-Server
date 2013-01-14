@@ -94,7 +94,7 @@
 				}
 
 				m_deviceReady = true;
-				templateLoader.load();
+				app.views.templateLoader.load();
 			},
 			onLoad = function() {
 				if (window.applicationCache) {
