@@ -126,7 +126,7 @@ public class StatusNetService {
 			}
 	    }
 
-	    throw new AuthorizationFailureException("Unable to authenticate to Status.Net server.  Reason: " +response.getStatusLine());
+	    throw new AuthorizationFailureException("Unable to authenticate to " + m_httpHost.toString() + ".  Reason: " +response.getStatusLine());
 	}
 
 	public User getUser() throws UserRetrievalException {
