@@ -294,6 +294,7 @@ function EventsViewModel() {
 
 			console.log('EventsViewModel::updateData(): finished processing events, saving to model');
 			self.events(mappedTasks);
+			console.log('EventsViewModel::updateData(): finished saving to model');
 
 			processEvent = null;
 			mappedTasks = null;
