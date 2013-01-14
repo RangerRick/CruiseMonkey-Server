@@ -63,6 +63,7 @@ function AjaxUpdater() {
 		f_updateEventModel();
 	};
 	self.start = function _start() {
+		console.log('AjaxUpdater::start()');
 		self.pollNow();
 		m_timer = setInterval(f_updateEventModel, app.settings.eventUpdateInterval);
 	};

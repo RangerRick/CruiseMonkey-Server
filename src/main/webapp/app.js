@@ -80,8 +80,10 @@ var app = {
 		"edit-event": {
 			"model": app.events.editEventModel,
 			"afterAttach": function _afterAttach() {
+				/*
 				$('#start-datepicker').datetimepicker();
 				$('#end-datepicker').datetimepicker();
+				*/
 			}
 		}
 	};
