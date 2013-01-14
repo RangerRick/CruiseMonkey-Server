@@ -3,20 +3,33 @@
  * @param {Object=} data
  */
 function CalendarEvent() {
-	var self = this;
+	var self = this,
+		m_id,
+		m_cleanId,
+		m_createdBy;
 
 	// console.log('importing data: ' + ko.toJSON(data));
-	self.id = ko.observable(uuid.v1());
-	self.cleanId = function() {
-		return self.id().replace(self.attributeRegex, '');
+	self.id = function _id() {
+		return m_id;
+	};
+	self.setId = function _setId(id) {
+		m_id = id;
+		m_cleanId = id.replace(self.attributeRegex, '');
+	};
+	self.cleanId = function _cleanId() {
+		return m_cleanId;
 	};
 	self.summary = ko.observable();
 	self.description = ko.observable();
 	self.startDate = ko.observable(new Date());
 	self.endDate = ko.observable(new Date());
 	self.location = ko.observable();
-	self.createdBy = ko.observable();
-	self.owner = ko.observable();
+	self.createdBy = function _getCreatedBy() {
+		return m_createdBy;
+	};
+	self.setCreatedBy = function _setCreatedBy(createdBy) {
+		m_createdBy = createdBy;
+	};
 	self.isPublic = ko.observable();
 	self.favorite = ko.observable();
 	self.lastUpdated = new Date().getTime();
@@ -33,27 +46,30 @@ function CalendarEvent() {
 		}
 		return retVal;
 	};
+
 	self.isMine = function _isMine() {
-		return self.createdBy() == app.server.serverModel.username();
+		return self.m_createdBy == app.server.serverModel.username();
 	};
+
 	self.toString = function _toString() {
-		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
+		return self.id + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	};
 	
 	self.updateUsing = function(d) {
-		if (d.hasOwnProperty('id')          && (self.id()                  != d.id))                  { self.id(d.id);                   }; d.id = null;
+		if (d.hasOwnProperty('id')          && (self.m_id                  != d.id))                  { self.setId(d.id);                }; d.id = null;
 		if (d.hasOwnProperty('summary')     && (self.summary()             != d.summary))             { self.summary(d.summary);         }; d.summary = null;
 		if (d.hasOwnProperty('description') && (self.description()         != d.description))         { self.description(d.description); }; d.description = null;
 		if (d.hasOwnProperty('startDate')   && (self.startDate().getTime() != d.startDate.getTime())) { self.startDate(d.startDate);     }; d.startDate = null;
 		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }; d.endDate = null;
 		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }; d.location = null;
-		if (d.hasOwnProperty('createdBy')   && (self.createdBy()           != d.createdBy))           { self.createdBy(d.createdBy);     }; d.createdBy = null;
-		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }; d.owner = null;
+		if (d.hasOwnProperty('createdBy')   && (self.m_createdBy           != d.createdBy))           { self.m_createdBy = d.createdBy;  }; d.createdBy = null;
 		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
 		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
 		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated            < d.lastUpdated))        { self.lastUpdated = d.lastUpdated; } else { self.lastUpdated = new Date().getTime(); }; d.lastUpdated = null;
 		d = null;
 	};
+
+	self.setId(uuid.v1());
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
 
@@ -119,15 +135,7 @@ function EditEventModel() {
 			return self.currentEvent() ? self.currentEvent().createdBy() : "";
 		},
 		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().createdBy(value);
-		}
-	});
-	self.owner = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().owner() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().owner(value);
+			if (self.currentEvent()) self.currentEvent().setCreatedBy(value);
 		}
 	});
 	self.onCancel = function(formElement) {
@@ -149,8 +157,6 @@ function EditEventModel() {
 			delete postme.startDate;
 			delete postme.endDate;
 			delete postme.toString;
-			delete postme.createdBy;
-			delete postme.owner;
 			delete postme.attributeRegex;
 			delete postme.lastUpdated;
 			$.ajax({
@@ -174,8 +180,7 @@ function EditEventModel() {
 				}
 			}).success(function _success() {
 				console.log('success!');
-				self.createdBy(app.server.serverModel.username());
-				self.owner(app.server.serverModel.username());
+				self.setCreatedBy(app.server.serverModel.username());
 				app.events.eventsViewModel.events.push(self.currentEvent());
 				
 				var preEdit = app.navigation.model.preEdit();
@@ -232,7 +237,6 @@ function EventsViewModel() {
 				"endDate": new Date(event.end),
 				"location": event.location,
 				"createdBy": event['created-by'],
-				"owner": event.owner,
 				"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
 				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)),
 				"lastUpdated": lastUpdated
@@ -466,16 +470,17 @@ function EventsViewModel() {
 }
 
 /** used for filter/searching, match an event based on a filter **/
-var matchEventText = function _matchEventText(event, filter) {
+EventsViewModel.prototype.f_matchEventText = function _matchEventText(event, filter) {
 	'use strict';
 
+	var ret = false;
 	if (event.summary().toLowerCase().search(filter) != -1) {
-		return true;
+		ret = true;
 	} else if (event.description().toLowerCase().search(filter) != -1) {
-		return true;
-	} else {
-		return false;
+		ret = true;
 	}
+	event = filter  = null;
+	return ret;
 };
 
 /**
@@ -487,26 +492,19 @@ function OfficialEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable('');
 
-	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
-		var filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.computed(function _officialFilteredEvents() {
+		var filter = self.filter().toLowerCase();
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event === undefined) {
-				return false;
-			}
-			if (event.owner() == 'google') {
-				return true;
+		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event !== undefined && event.createdBy() == 'google') {
+				if (filter) {
+					return self.f_matchEventText.call(self, event, filter);
+				} else {
+					return true;
+				}
 			}
 			return false;
 		});
-
-		if (!filter) {
-			return matchesGroup;
-		} else {
-			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
-				return matchEventText(event, filter);
-			});
-		}
 	});
 }
 
@@ -518,22 +516,19 @@ function MyEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable('');
 
-	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
-		var filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.computed(function _myFilteredEvents(event) {
+		var filter = self.filter().toLowerCase();
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.favorite()) return true;
-			if (event.owner() == app.server.serverModel.username()) return true;
+		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event.favorite() || event.createdBy() == app.server.serverModel.username()) {
+				if (filter) {
+					return self.f_matchEventText.call(self, event, filter);
+				} else {
+					return true;
+				}
+			}
 			return false;
 		});
-
-		if (!filter) {
-			return matchesGroup;
-		} else {
-			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
-				return matchEventText(event, filter);
-			});
-		}
 	});
 }
 
@@ -545,22 +540,18 @@ function PublicEventsViewModel(parentModel) {
 	$.extend(self, parentModel);
 	self.filter = ko.observable('');
 
-	self.filteredEvents = ko.dependentObservable(function _filteredEvents() {
-		var filter = self.filter().toLowerCase(),
+	self.filteredEvents = ko.computed(function _publicFilteredEvents() {
+		var filter = self.filter().toLowerCase();
 
-		matchesGroup = ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.owner() != 'google' && event.isPublic()) {
-				return true;
+		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+			if (event.createdBy() != 'google' && event.isPublic()) {
+				if (filter) {
+					return self.f_matchEventText.call(self, event, filter);
+				} else {
+					return true;
+				}
 			}
 			return false;
 		});
-
-		if (!filter) {
-			return matchesGroup;
-		} else {
-			return ko.utils.arrayFilter(matchesGroup, function _matchesGroupFilter(event) {
-				return matchEventText(event, filter);
-			});
-		}
 	});
-}
+};
