@@ -19,6 +19,7 @@ function CalendarEvent() {
 	self.owner = ko.observable();
 	self.isPublic = ko.observable();
 	self.favorite = ko.observable();
+	self.lastUpdated = ko.observable(new Date().getTime());
 
 	self.timespan = ko.computed(function() {
 		var start = (self.startDate() === null || self.startDate() === undefined) ? null : cmUtils.formatTime(self.startDate(), false);
@@ -50,6 +51,7 @@ function CalendarEvent() {
 		if (d.hasOwnProperty('owner')       && (self.owner()               != d.owner))               { self.owner(d.owner);             }; d.owner = null;
 		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
 		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
+		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated()          < d.lastUpdated))        { self.lastUpdated(d.lastUpdated); } else { self.lastUpdated(new Date().getTime()); }; d.lastUpdated = null;
 		d = null;
 	};
 }
@@ -150,6 +152,7 @@ function EditEventModel() {
 			delete postme.createdBy;
 			delete postme.owner;
 			delete postme.attributeRegex;
+			delete postme.lastUpdated;
 			$.ajax({
 				url: app.server.serverModel.eventEditUrl(),
 				timeout: m_timeout,
@@ -206,8 +209,12 @@ function EventsViewModel() {
 	self.updating = ko.observable(false);
 
 	(function _processEvent() {
-		app.cache.functions.processEvent = function(event, favorites) {
+		app.cache.functions.processEvent = function(event, favorites, lastUpdated) {
 			'use strict';
+
+			if (!lastUpdated) {
+				lastUpdated = new Date().getTime();
+			}
 
 			var item = ko.utils.arrayFirst(self.events(), function(entry) {
 				'use strict';
@@ -227,17 +234,25 @@ function EventsViewModel() {
 				"createdBy": event['created-by'],
 				"owner": event.owner,
 				"isPublic": event.isPublic !== undefined ? (event.isPublic === true || event.isPublic == 'true') : false,
-				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1))
+				"isFavorite": (event.favorite !== undefined ? event.favorite : (favorites.indexOf(event['@id']) != -1)),
+				"lastUpdated": lastUpdated
+			};
+
+			var ret = {
+				"item": item,
+				"exists": true
 			};
 
 			if (!item) {
-				item = new CalendarEvent();
 				update.id = event['@id'];
+				ret.item = new CalendarEvent();
+				ret.exists = false;
 			}
-			event = null;
-			item.updateUsing(update);
+
+			item = event = lastUpdated = null;
+			ret.item.updateUsing(update);
 			update = null;
-			return item;
+			return ret;
 		};
 	})();
 
@@ -265,31 +280,49 @@ function EventsViewModel() {
 			} else {
 				favorites = [ processFavorite(allData.favorites.favorite) ];
 			}
-			allData.favorites.favorite = null;
-			allData.favorites = null;
 		}
 
 		if (allData.events && allData.events.event) {
 			console.log('EventsViewModel::updateData(): processing events');
-			var mappedTasks, processEvent = app.cache.functions.processEvent;
+			var mappedTasks,
+				processEvent = app.cache.functions.processEvent,
+				updateTime = new Date().getTime();
 
 			if (allData.events.event instanceof Array) {
-				mappedTasks = $.map(allData.events.event, function(event) {
-					return processEvent(event, favorites);
+				$.each(allData.events.event, function(index, event) {
+					if (event.hasOwnProperty('@id')) {
+						var ret = processEvent(event, favorites, updateTime);
+						if (!ret.exists) {
+							self.events.push(ret.item);
+						}
+						ret = null;
+					} else {
+						console.warn('event does not have an @id property!');
+					}
 				});
 			} else {
-				mappedTasks = [ processEvent(allData.events.event, favorites) ];
+				if (allData.events.event.hasOwnProperty('@id')) {
+					var ret = processEvent(allData.events.event, favorites, updateTime);
+					if (!ret.exists) {
+						self.events.push(ret.item);
+					}
+					ret = null;
+				} else {
+					console.warn('event does not have an @id property!');
+				}
 			}
 
+			self.events.remove(function(item) {
+				return item.lastUpdated() < updateTime;
+			});
+			/*
 			console.log('EventsViewModel::updateData(): finished processing events, saving to model');
 			self.events(mappedTasks);
 			console.log('EventsViewModel::updateData(): finished saving to model');
+			*/
 
 			processEvent = null;
 			mappedTasks = null;
-			allData.events.event = null;
-			allData.events = null;
-			allData = null;
 		} else {
 			console.log('no proper event data found');
 		}
