@@ -42,18 +42,20 @@
 		<!-- PHONEGAP --><script src="3rdparty.js"></script>
 		<!-- PHONEGAP --><!-- <script src="3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.min.js"></script> -->
 		<!-- PHONEGAP --><!-- <script src="3rdparty/jquery-ui-timepicker-addon.js"></script> -->
-		<!-- BROWSER --><!-- <script src="3rdparty/jquery/jquery-1.8.3.js"></script> -->
-		<!-- BROWSER --><script src="3rdparty/zepto/zepto.js"></script>
+		<!-- BROWSER --><script src="3rdparty/jquery/jquery-1.8.3.js"></script>
 		<!-- BROWSER --><!-- <script src="3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.js"></script> -->
 		<!-- BROWSER --><script src="3rdparty/mustache/mustache.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout-2.2.0.debug.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout.mapping-latest.debug.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout-delegatedEvents.js"></script>
-		<!-- BROWSER --><!-- <script src="3rdparty/foundation/javascripts/jquery.foundation.navigation.js"></script> -->
+		<!-- BROWSER --><script src="3rdparty/hammer/hammer.js"></script>
+		<!-- BROWSER --><script src="3rdparty/hammer/jquery.hammer.js"></script>
+		<!-- BROWSER --><script src="3rdparty/foundation/javascripts/jquery.foundation.navigation.js"></script>
 		<!-- BROWSER --><script src="3rdparty/datejs/core.js"></script>
 		<!-- BROWSER --><script src="3rdparty/datejs/globalization/en-US.js"></script>
 		<!-- BROWSER --><script src="3rdparty/datejs/parser.js"></script>
 		<!-- BROWSER --><script src="3rdparty/amplifyjs/amplify.js"></script>
+		<!-- BROWSER --><script src="3rdparty/jquery-url-parser/purl.js"></script>
 		<!-- BROWSER --><script src="3rdparty/jquery.scrollTo/jquery.scrollTo.js"></script>
 		<!-- BROWSER --><!-- <script src="3rdparty/jquery-ui-timepicker-addon.js"></script> -->
 		<!-- BROWSER --><script src="3rdparty/uuid.js"></script>
@@ -72,6 +74,7 @@
 		<!-- BROWSER --><!--<script src="lib/swiper.js"></script> -->
 		<!-- BROWSER --><script src="lib/template_loader.js"></script>
 		<!-- BROWSER --><script src="app.js"></script>
+		<!-- BROWSER --><script src="3rdparty/memory_leak_checker.js"></script>
 		
 		<script>
 			'use strict';

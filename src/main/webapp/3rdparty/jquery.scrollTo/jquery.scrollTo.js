@@ -111,7 +111,7 @@
 		settings.offset = both( settings.offset );
 		settings.over = both( settings.over );
 
-		return $.each( this._scrollable(), function(){
+		return this._scrollable().each(function(){
 			// Null target yields nothing, just like jQuery does
 			if (target == null) return;
 
@@ -191,8 +191,7 @@
 				});
 			};
 
-//		}).end();
-		});
+		}).end();
 	};
 	
 	// Max scrolling position, works on quirks mode
@@ -216,4 +215,4 @@
 		return typeof val == 'object' ? val : { top:val, left:val };
 	};
 
-})( Zepto );
+})( jQuery );
