@@ -253,6 +253,7 @@ function EventsViewModel() {
 	})();
 
 	self.updateData = function(allData) {
+		console.log('EventsViewModel::updateData()');
 		m_updateCount++;
 		self.updating(true);
 
@@ -261,10 +262,12 @@ function EventsViewModel() {
 			return;
 		}
 
+		console.log('EventsViewModel::updateData(): saving data to local storage');
 		amplify.store('events', allData);
 
 		var favorites = [];
 		if (allData.favorites && allData.favorites.favorite) {
+			console.log('EventsViewModel::updateData(): processing favorites');
 			var processFavorite = function(favorite) {
 				return favorite['@event'];
 			};
@@ -278,6 +281,7 @@ function EventsViewModel() {
 		}
 
 		if (allData.events && allData.events.event) {
+			console.log('EventsViewModel::updateData(): processing events');
 			var mappedTasks, processEvent = app.cache.functions.processEvent;
 
 			if (allData.events.event instanceof Array) {
@@ -287,6 +291,8 @@ function EventsViewModel() {
 			} else {
 				mappedTasks = [ processEvent(allData.events.event, favorites) ];
 			}
+
+			console.log('EventsViewModel::updateData(): finished processing events, saving to model');
 			self.events(mappedTasks);
 
 			processEvent = null;
