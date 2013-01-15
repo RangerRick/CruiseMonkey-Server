@@ -114,8 +114,8 @@
 				<li><a href="#edit-event"      class="icon icon-add"             data-bind="delegatedClick: navigate, delegatedTouchstart: navigate"><div class="icon icon-add"            ></div>Add Event</a></li>
 			</ul>
 			<ul class="right icons">
-				<li class="signin" style="display:none" data-bind="visible: showSignIn" ><a href="#sign-in"  class="icon icon-login" data-bind="delegatedClick: navigate, delegatedTouchstart: navigate"><div class="icon icon-login"></div>Sign In</a></li>
-				<li class="signout"                     data-bind="visible: showSignOut"><a href="#sign-out" class="icon icon-login" data-bind="delegatedClick: navigate, delegatedTouchstart: navigate"><div class="icon icon-login"></div>Sign Out</a></li>
+				<li class="signin" style="display:none" data-bind="if: showSignIn" ><a href="#sign-in"  class="icon icon-login" data-bind="delegatedClick: navigate, delegatedTouchstart: navigate"><div class="icon icon-login"></div>Sign In</a></li>
+				<li class="signout"                     data-bind="if: showSignOut"><a href="#sign-out" class="icon icon-login" data-bind="delegatedClick: navigate, delegatedTouchstart: navigate"><div class="icon icon-login"></div>Sign Out</a></li>
 			</ul>
 		</div>
 		<div id="content">
@@ -124,10 +124,10 @@
 				<ul class="list event-list unstyled" data-bind="delegatedHandler: ['click', 'touchstart'], foreach: filteredEvents">
 					<li class="list-entry calendar-event official scrollable" data-bind="attr: { id: cleanId }, css: { mine: isMine() }">
 						<div class="summary" data-bind="text: summary()"></div>
-						<div class="favorite" data-bind="visible: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
-						<div class="trash" data-bind="visible: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
-						<div class="public" data-bind="visible: isMine()"><input type="checkbox" data-bind="checked: isPublic, delegatedClick: $parent.togglePublic, delegatedTouchstart: $parent.togglePublic, attr: { id: cleanId() + '-public' }" /><label data-bind="attr: { for: cleanId() + '-public' }">&nbsp;</div>
-						<div class="createdBy" data-bind="visible: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy"></span></div>
+						<div class="favorite" data-bind="if: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
+						<div class="trash" data-bind="if: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
+						<div class="public" data-bind="if: isMine()"><input type="checkbox" data-bind="checked: isPublic(), delegatedClick: $parent.togglePublic, delegatedTouchstart: $parent.togglePublic, attr: { id: cleanId() + '-public' }" /><label data-bind="attr: { for: cleanId() + '-public' }">&nbsp;</div>
+						<div class="createdBy" data-bind="if: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy()"></span></div>
 						<div class="time">Time: <span data-bind="text: timespan()"></span></div>
 						<div class="location">Location: <span data-bind="text: location()"></span></div>
 						<div class="description" data-bind="text: description()"></div>
@@ -139,10 +139,10 @@
 				<ul class="list event-list unstyled" data-bind="delegatedHandler: ['click', 'touchstart'], foreach: filteredEvents">
 					<li class="list-entry calendar-event public scrollable" data-bind="attr: { id: cleanId }, css: { mine: isMine() }">
 						<div class="summary" data-bind="text: summary()"></div>
-						<div class="favorite" data-bind="visible: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
-						<div class="trash" data-bind="visible: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
-						<div class="public" data-bind="visible: isMine()"><input type="checkbox" data-bind="checked: isPublic, delegatedClick: $parent.togglePublic, delegatedTouchstart: $parent.togglePublic, attr: { id: cleanId() + '-public' }" /><label data-bind="attr: { for: cleanId() + '-public' }">&nbsp;</div>
-						<div class="createdBy" data-bind="visible: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy"></span></div>
+						<div class="favorite" data-bind="if: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
+						<div class="trash" data-bind="if: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
+						<div class="public" data-bind="if: isMine()"><input type="checkbox" data-bind="checked: isPublic(), delegatedClick: $parent.togglePublic, delegatedTouchstart: $parent.togglePublic, attr: { id: cleanId() + '-public' }" /><label data-bind="attr: { for: cleanId() + '-public' }">&nbsp;</div>
+						<div class="createdBy" data-bind="if: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy()"></span></div>
 						<div class="time">Time: <span data-bind="text: timespan()"></span></div>
 						<div class="location">Location: <span data-bind="text: location()"></span></div>
 						<div class="description" data-bind="text: description()"></div>
@@ -154,10 +154,10 @@
 				<ul class="list event-list unstyled" data-bind="delegatedHandler: ['click', 'touchstart'], foreach: filteredEvents">
 					<li class="list-entry calendar-event my scrollable" data-bind="attr: { id: cleanId }, css: { mine: isMine() }">
 						<div class="summary" data-bind="text: summary()"></div>
-						<div class="favorite" data-bind="visible: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
-						<div class="trash" data-bind="visible: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
-						<div class="public" data-bind="visible: isMine()"><input type="checkbox" data-bind="checked: isPublic, delegatedClick: $parent.togglePublic, delegatedTouchstart: $parent.togglePublic, attr: { id: cleanId() + '-public' }" /><label data-bind="attr: { for: cleanId() + '-public' }">&nbsp;</div>
-						<div class="createdBy" data-bind="visible: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy"></span></div>
+						<div class="favorite" data-bind="if: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
+						<div class="trash" data-bind="if: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
+						<div class="public" data-bind="if: isMine()"><input type="checkbox" data-bind="checked: isPublic(), delegatedClick: $parent.togglePublic, delegatedTouchstart: $parent.togglePublic, attr: { id: cleanId() + '-public' }" /><label data-bind="attr: { for: cleanId() + '-public' }">&nbsp;</div>
+						<div class="createdBy" data-bind="if: !isMine() &amp;&amp; createdBy() != 'google'">Created By: <span data-bind="text: createdBy()"></span></div>
 						<div class="time">Time: <span data-bind="text: timespan()"></span></div>
 						<div class="location">Location: <span data-bind="text: location()"></span></div>
 						<div class="description" data-bind="text: description()"></div>
