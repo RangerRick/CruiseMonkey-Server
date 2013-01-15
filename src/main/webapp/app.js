@@ -13,7 +13,8 @@ var app = {
 	events: {},
 	views: {},
 	server: {},
-	navigation: {}
+	navigation: {},
+	empty: {}
 };
 
 
@@ -24,11 +25,8 @@ var app = {
 
 // events
 (function() {
-	app.events.eventsViewModel        = new EventsViewModel();
-	app.views.officialEventsViewModel = new OfficialEventsViewModel(app.events.eventsViewModel);
-	app.views.myEventsViewModel       = new MyEventsViewModel(app.events.eventsViewModel);
-	app.views.publicEventsViewModel   = new PublicEventsViewModel(app.events.eventsViewModel);
-	app.events.editEventModel         = new EditEventModel();
+	app.events.eventsViewModel   = new EventsViewModel();
+	app.events.editEventModel    = new EditEventModel();
 })();
 
 // navigation
@@ -49,23 +47,8 @@ var app = {
 		"login": {
 			"model": app.server.serverModel
 		},
-		"official-events": {
-			"templateAttributes": {
-				"eventType": "official"
-			},
-			"model": app.views.officialEventsViewModel
-		},
-		"my-events": {
-			"templateAttributes": {
-				"eventType": "my"
-			},
-			"model": app.views.myEventsViewModel
-		},
-		"public-events": {
-			"templateAttributes": {
-				"eventType": "public"
-			},
-			"model": app.views.publicEventsViewModel
+		"events": {
+			"model": app.events.eventsViewModel
 		},
 		"amenities": {
 			"model": amenitiesModel
@@ -173,6 +156,7 @@ var app = {
 		$.ajax({
 			url: app.server.serverModel.authUrl(),
 			timeout: m_timeout,
+			context: app.empty,
 			cache: false,
 			dataType: 'json',
 			type: 'GET',

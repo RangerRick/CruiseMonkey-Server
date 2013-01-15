@@ -112,6 +112,9 @@ function NavModel() {
 			hash = 'login';
 		} else if (hash == 'sign-in') {
 			hash = 'login';
+		} else if (hash == 'official-events' || hash == 'public-events' || hash == 'my-events') {
+			app.events.eventsViewModel.viewType(hash);
+			hash = 'events';
 		}
 		console.log('NavModel::navigate(): href = ' + href + ', hash = ' + hash);
 

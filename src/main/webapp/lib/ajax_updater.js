@@ -23,6 +23,7 @@ function AjaxUpdater() {
 			$.ajax({
 				url: url,
 				timeout: m_timeout,
+				context: app.empty,
 				cache: false,
 				dataType: 'json',
 				statusCode: {

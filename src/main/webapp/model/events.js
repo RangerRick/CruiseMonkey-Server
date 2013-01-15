@@ -125,6 +125,7 @@ function EditEventModel() {
 		$.ajax({
 			url: app.server.serverModel.eventEditUrl(),
 			timeout: m_timeout,
+			context: app.empty,
 			type: 'POST',
 			data: ko.toJSON(postme),
 			dataType: 'json',
@@ -173,8 +174,10 @@ function EventsViewModel() {
 	var self = this,
 		m_updateCount = 0;
 
-	self.events = ko.observableArray();
+	self.events   = ko.observableArray();
 	self.updating = ko.observable(false);
+	self.filter   = ko.observable("");
+	self.viewType = ko.observable('official-events');
 
 	(function _processEvent() {
 		app.cache.functions.processEvent = function(event, favorites, lastUpdated) {
@@ -313,6 +316,7 @@ function EventsViewModel() {
 		$.ajax({
 			url: app.server.serverModel.favoritesUrl() + '?event=' + encodeURI(entry.id()),
 			timeout: m_timeout,
+			context: app.empty,
 			cache: false,
 			dataType: 'json',
 			type: entry.isFavorite() ? 'PUT' : 'DELETE',
@@ -358,6 +362,7 @@ function EventsViewModel() {
 		$.ajax({
 			url: app.server.serverModel.eventEditUrl() + '/' + encodeURI(entry.id()) + '?isPublic=' + entry.isPublic(),
 			timeout: m_timeout,
+			context: app.empty,
 			cache: false,
 			dataType: 'json',
 			type: 'PUT',
@@ -398,6 +403,7 @@ function EventsViewModel() {
 		$.ajax({
 			url: app.server.serverModel.eventEditUrl() + '/' + encodeURI(entry.id()),
 			timeout: m_timeout,
+			context: app.empty,
 			cache: false,
 			dataType: 'json',
 			type: 'DELETE',
@@ -429,21 +435,63 @@ function EventsViewModel() {
 		});
 		return true;
 	};
+	
+	self.f_matchEventText = function _matchEventText(event, filter) {
+		'use strict';
+
+		var ret = false;
+		if (event.summary().toLowerCase().search(filter) != -1) {
+			ret = true;
+		} else if (event.description().toLowerCase().search(filter) != -1) {
+			ret = true;
+		}
+		event = filter  = null;
+		return ret;
+	};
+
+	self.filteredEvents = ko.computed(function _filteredEvents() {
+		var filter = self.filter().toLowerCase();
+
+		switch (self.viewType()) {
+			case 'my-events':
+				return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+					if (event.isFavorite() || event.createdBy() == app.server.serverModel.username()) {
+						if (filter) {
+							return self.f_matchEventText.call(self, event, filter);
+						} else {
+							return true;
+						}
+					}
+					return false;
+				});
+				break;
+			case 'public-events':
+				return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+					if (event.createdBy() != 'google' && event.isPublic()) {
+						if (filter) {
+							return self.f_matchEventText.call(self, event, filter);
+						} else {
+							return true;
+						}
+					}
+					return false;
+				});
+				break;
+			default:
+				return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+					if (event !== undefined && event.createdBy() == 'google') {
+						if (filter) {
+							return self.f_matchEventText.call(self, event, filter);
+						} else {
+							return true;
+						}
+					}
+					return false;
+				});
+				break;
+		}
+	});
 }
-
-/** used for filter/searching, match an event based on a filter **/
-EventsViewModel.prototype.f_matchEventText = function _matchEventText(event, filter) {
-	'use strict';
-
-	var ret = false;
-	if (event.summary().toLowerCase().search(filter) != -1) {
-		ret = true;
-	} else if (event.description().toLowerCase().search(filter) != -1) {
-		ret = true;
-	}
-	event = filter  = null;
-	return ret;
-};
 
 /**
  * @constructor

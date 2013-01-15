@@ -119,10 +119,10 @@
 			</ul>
 		</div>
 		<div id="content">
-			<div id="official-events">
-				<form id="official-search" class="search-bar"><input type="search" results="5" autosave="official-search-results" placeholder="Search..." data-bind="value: filter, valueUpdate: ['afterkeydown', 'search']" /></form>
+			<div id="events">
+				<form id="search" class="search-bar"><input type="search" results="5" autosave="search-results" placeholder="Search..." data-bind="value: filter, valueUpdate: ['afterkeydown', 'search']" /></form>
 				<ul class="list event-list unstyled" data-bind="delegatedHandler: ['click', 'touchstart'], foreach: filteredEvents">
-					<li class="list-entry calendar-event official scrollable" data-bind="attr: { id: cleanId() }, css: { mine: isMine() }">
+					<li class="list-entry calendar-event scrollable" data-bind="attr: { id: cleanId() }, css: { mine: isMine() }">
 						<div class="summary" data-bind="text: summary()"></div>
 						<div class="favorite" data-bind="if: !isMine()"><input type="checkbox" data-bind="checked: isFavorite(), delegatedClick: $parent.toggleFavorite, delegatedTouchstart: $parent.toggleFavorite, attr: { id: cleanId() + '-favorite' }" /><label data-bind="attr: { for: cleanId() + '-favorite' }">&nbsp;</div>
 						<div class="trash" data-bind="if: isMine()"><input type="button" data-bind="delegatedClick: $parent.deleteEvent, delegatedTouchstart: $parent.deleteEvent, attr: { id: cleanId() + '-trash' }" /><label data-bind="attr: { for: cleanId() + '-trash' }">&nbsp;</div>
@@ -134,6 +134,7 @@
 					</li>
 				</ul>
 			</div>
+			<!--
 			<div id="public-events">
 				<form id="public-search" class="search-bar"><input type="search" results="5" autosave="public-search-results" placeholder="Search..." data-bind="value: filter, valueUpdate: ['afterkeydown', 'search']" /></form>
 				<ul class="list event-list unstyled" data-bind="delegatedHandler: ['click', 'touchstart'], foreach: filteredEvents">
@@ -164,6 +165,7 @@
 					</li>
 				</ul>
 			</div>
+			-->
 			<div id="amenities">
 				<form id="amenities-search" class="search-bar"><input type="search" results="5" autosave="amenities-search-results" placeholder="Search..." data-bind="value: filter, valueUpdate: ['afterkeydown', 'search']" /></form>
 				<ul class="list amenities-list unstyled">
