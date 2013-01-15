@@ -63,7 +63,7 @@ CRUISEMONKEYMINCSS = $(patsubst %.css,%.min.css,$(CRUISEMONKEYCSS))
 
 FOUNDATION = $(shell find 3rdparty/foundation -type f)
 
-RUNTIME = 3rdparty.js cruisemonkey.js index.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css 3rdparty/html5shim/html5.js 3rdparty/modernizr.js
+RUNTIME = 3rdparty.js cruisemonkey.js index.html $(wildcard images/*.png images/icons/*/*.png) $(FOUNDATION) styles.css styles.min.css 3rdparty/html5shim/html5.js 3rdparty/modernizr.js
 
 PHONEGAPFILES = \
 	cruisemonkey.manifest \
