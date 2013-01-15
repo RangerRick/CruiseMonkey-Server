@@ -146,7 +146,9 @@ runtime.js: $(CRUISEMONKEYJS) $(3RDPARTYJS) compile.sh
 	@./compile.sh $(CRUISEMONKEYJS) $(3RDPARTYJS) > "$@" 2>/dev/null || (rm runtime.js && exit 1)
 
 styles.min.css: styles.css $(MAKEFILE)
-	@node_modules/.bin/yuicompressor "$<" > "$@"
+	@install -d $(shell dirname $@)
+	@echo "- minifying $<"
+	@java -jar node_modules/yuicompressor/build/yuicompressor-2.4.7.jar -v "$<" > "$@" 2>/dev/null
 
 cruisemonkey.css: $(CRUISEMONKEYMINCSS) $(3RDPARTYCSS) $(MAKEFILE)
 	@cat $(3RDPARTYCSS) $(CRUISEMONKEYMINCSS) > "$@"
