@@ -6,22 +6,41 @@ function CalendarEvent(id, createdBy) {
 	var self = this,
 		m_cleanId = id.replace(self.attributeRegex, '');
 
+	self.data = ko.observable({
+		startDate: new Date(),
+		endDate: new Date()
+	});
+
 	self.id = function _id() {
 		return id;
 	}
 	self.cleanId = function() {
 		return m_cleanId;
 	};
-	self.summary = ko.observable();
-	self.description = ko.observable();
-	self.startDate = ko.observable(new Date());
-	self.endDate = ko.observable(new Date());
-	self.location = ko.observable();
+	self.summary = function _summary() {
+		return self.data().summary;
+	};
+	self.description = function _description() {
+		return self.data().description;
+	};
+	self.startDate = function _startDate() {
+		return self.data().startDate;
+	}
+	self.endDate = function _endDate() {
+		return self.data().endDate;
+	}
+	self.location = function _location() {
+		return self.data().location;
+	}
 	self.createdBy = function _createdBy() {
 		return createdBy;
 	};
-	self.isPublic = ko.observable();
-	self.favorite = ko.observable();
+	self.isPublic = function _isPublic() {
+		return self.data().isPublic;
+	};
+	self.isFavorite = function _isFavorite() {
+		return self.data().isFavorite;
+	}
 	self.lastUpdated = new Date().getTime();
 
 	self.timespan = function _timespan() {
@@ -44,16 +63,17 @@ function CalendarEvent(id, createdBy) {
 	};
 	
 	self.updateUsing = function(d) {
-		if (d.hasOwnProperty('id')          && (self.id()                  != d.id))                  { self.m_id = d.id;                }; d.id = null;
-		if (d.hasOwnProperty('summary')     && (self.summary()             != d.summary))             { self.summary(d.summary);         }; d.summary = null;
-		if (d.hasOwnProperty('description') && (self.description()         != d.description))         { self.description(d.description); }; d.description = null;
-		if (d.hasOwnProperty('startDate')   && (self.startDate().getTime() != d.startDate.getTime())) { self.startDate(d.startDate);     }; d.startDate = null;
-		if (d.hasOwnProperty('endDate')     && (self.endDate().getTime()   != d.endDate.getTime()))   { self.endDate(d.endDate);         }; d.endDate = null;
-		if (d.hasOwnProperty('location')    && (self.location()            != d.location))            { self.location(d.location);       }; d.location = null;
-		if (d.hasOwnProperty('isPublic')    && (self.isPublic()            != d.isPublic))            { self.isPublic(d.isPublic);       }; d.isPublic = null;
-		if (d.hasOwnProperty('isFavorite')  && (self.favorite()            != d.isFavorite))          { self.favorite(d.isFavorite);     }; d.isFavorite = null;
-		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated            < d.lastUpdated))        { self.lastUpdated = d.lastUpdated; } else { self.lastUpdated = new Date().getTime(); }; d.lastUpdated = null;
+		var data = self.data();
+		if (d.hasOwnProperty('summary')     && (data.summary             != d.summary))             { data.summary = d.summary;         }; d.summary = null;
+		if (d.hasOwnProperty('description') && (data.description         != d.description))         { data.description = d.description; }; d.description = null;
+		if (d.hasOwnProperty('startDate')   && (data.startDate.getTime() != d.startDate.getTime())) { data.startDate = d.startDate;     }; d.startDate = null;
+		if (d.hasOwnProperty('endDate')     && (data.endDate.getTime()   != d.endDate.getTime()))   { data.endDate = d.endDate;         }; d.endDate = null;
+		if (d.hasOwnProperty('location')    && (data.location            != d.location))            { data.location = d.location;       }; d.location = null;
+		if (d.hasOwnProperty('isPublic')    && (data.isPublic            != d.isPublic))            { data.isPublic = d.isPublic;       }; d.isPublic = null;
+		if (d.hasOwnProperty('isFavorite')  && (data.isFavorite          != d.isFavorite))          { data.isFavorite = d.isFavorite;   }; d.isFavorite = null;
+		if (d.hasOwnProperty('lastUpdated') && (self.lastUpdated          < d.lastUpdated))         { self.lastUpdated = d.lastUpdated; } else { self.lastUpdated = new Date().getTime(); }; d.lastUpdated = null;
 		d = null;
+		self.data(data);
 	};
 }
 CalendarEvent.prototype.attributeRegex = /[\W\@]+/g;
@@ -65,56 +85,23 @@ function EditEventModel() {
 	var self = this,
 		m_pattern = 'MM/dd/yyyy hh:mm';
 
-	self.currentEvent = ko.observable();
+	self.summary = ko.observable();
+	self.description = ko.observable();
+	self.startDate = ko.observable();
+	self.endDate = ko.observable();
+	self.location = ko.observable();
+	self.isPublic = ko.observable();
 
-	self.summary = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().summary() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().summary(value);
-		}
-	});
-	self.description = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().description() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().description(value);
-		}
-	});
-	self.startDate = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().startDate().toString(m_pattern) : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().startDate(Date.parse(value));
-		}
-	});
-	self.endDate = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().endDate().toString(m_pattern) : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().endDate(Date.parse(value));
-		}
-	});
-	self.location = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().location() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().location(value);
-		}
-	});
-	self.isPublic = ko.computed({
-		read: function() {
-			return self.currentEvent() ? self.currentEvent().isPublic() : "";
-		},
-		write: function(value) {
-			if (self.currentEvent()) self.currentEvent().isPublic(value);
-		}
-	});
+	self.resetModel = function() {
+		var now = new Date().toString(m_pattern);
+
+		self.summary("");
+		self.description("");
+		self.startDate(now);
+		self.endDate(now);
+		self.location("");
+		self.isPublic(false);
+	};
 	self.onCancel = function(formElement) {
 		var preEdit = app.navigation.model.preEdit();
 		if (preEdit && preEdit != 'login' && preEdit != 'edit-event') {
@@ -125,57 +112,56 @@ function EditEventModel() {
 		return true;
 	};
 	self.onSubmit = function(formElement) {
-		if (self.currentEvent()) {
-			var postme = ko.toJS(self.currentEvent());
-			postme.start = postme.startDate;
-			postme.end = postme.endDate;
-			delete postme.cleanId;
-			delete postme.timespan;
-			delete postme.startDate;
-			delete postme.endDate;
-			delete postme.toString;
-			delete postme.createdBy;
-			delete postme.attributeRegex;
-			delete postme.lastUpdated;
-			$.ajax({
-				url: app.server.serverModel.eventEditUrl(),
-				timeout: m_timeout,
-				type: 'POST',
-				data: ko.toJSON(postme),
-				dataType: 'json',
-				contentType:"application/json; charset=utf-8",
-				statusCode: {
-					401: function four_oh_one() {
-						console.log('401 not authorized');
-						app.navigation.model.authorized(false);
-						app.server.serverModel.password(null);
-						app.navigation.pageNavigator.navigateTo('login');
-					}
-				},
-				beforeSend: function beforeSend(xhr) {
-					app.server.serverModel.setBasicAuth(xhr);
-					xhr = null;
+		var postme = {
+			id: uuid.v1(),
+			createdBy: app.server.serverModel.username(),
+			summary: self.summary(),
+			description: self.description(),
+			start: Date.parse(self.startDate()),
+			end: Date.parse(self.endDate()),
+			location: self.location(),
+			isPublic: self.isPublic()
+		};
+		$.ajax({
+			url: app.server.serverModel.eventEditUrl(),
+			timeout: m_timeout,
+			type: 'POST',
+			data: ko.toJSON(postme),
+			dataType: 'json',
+			contentType:"application/json; charset=utf-8",
+			statusCode: {
+				401: function four_oh_one() {
+					console.log('401 not authorized');
+					app.navigation.model.authorized(false);
+					app.server.serverModel.password(null);
+					app.navigation.pageNavigator.navigateTo('login');
 				}
-			}).success(function _success() {
-				console.log('success!');
-				app.events.eventsViewModel.events.push(self.currentEvent());
-				
-				var preEdit = app.navigation.model.preEdit();
-				if (preEdit && preEdit != 'edit-event' && preEdit != 'login') {
-					app.navigation.pageNavigator.navigateTo(preEdit);
-				} else {
-					app.navigation.pageNavigator.navigateTo('official-events');
-				}
-			}).fail(function _error(jqXHR, textStatus, errorThrown) {
-				console.log('EditEventModel::onSubmit(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
-				console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
-				jqXHR = textStatus = errorThrown = null;
-			}).done(function _done() {
-				postme = null;
-			});
-		} else {
-			console.log('wtf?!? no event?!');
-		}
+			},
+			beforeSend: function beforeSend(xhr) {
+				app.server.serverModel.setBasicAuth(xhr);
+				xhr = null;
+			}
+		}).success(function _success() {
+			console.log('success!');
+			var e = new CalendarEvent(postme.id, postme.createdBy);
+			e.updateUsing(postme);
+			app.events.eventsViewModel.events.push(e);
+			e = null;
+			
+			var preEdit = app.navigation.model.preEdit();
+			if (preEdit && preEdit != 'edit-event' && preEdit != 'login') {
+				app.navigation.pageNavigator.navigateTo(preEdit);
+			} else {
+				app.navigation.pageNavigator.navigateTo('official-events');
+			}
+		}).fail(function _error(jqXHR, textStatus, errorThrown) {
+			console.log('EditEventModel::onSubmit(): An error occurred while adding a new event: ' + ko.toJSON(jqXHR));
+			console.log('textStatus = ' + textStatus + ', errorThrown = ' + errorThrown);
+			jqXHR = textStatus = errorThrown = null;
+		}).done(function _done() {
+			postme = null;
+		});
+
 		return true;
 	};
 }
@@ -278,7 +264,7 @@ function EventsViewModel() {
 					} else {
 						console.warn('event does not have an @id property!');
 					}
-					return false;
+					return true;
 				});
 			} else {
 				if (allData.events.event.hasOwnProperty('@id')) {
@@ -323,13 +309,13 @@ function EventsViewModel() {
 			return true;
 		}
 
-		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.favorite());
+		console.log('EventsViewModel::toggleFavorite: ' + entry.id() + ' favorite has changed to: ' + entry.isFavorite());
 		$.ajax({
 			url: app.server.serverModel.favoritesUrl() + '?event=' + encodeURI(entry.id()),
 			timeout: m_timeout,
 			cache: false,
 			dataType: 'json',
-			type: entry.favorite() ? 'PUT' : 'DELETE',
+			type: entry.isFavorite() ? 'PUT' : 'DELETE',
 			statusCode: {
 				/*
 				200: function two_hundred() {
@@ -496,7 +482,7 @@ function MyEventsViewModel(parentModel) {
 		var filter = self.filter().toLowerCase();
 
 		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.favorite() || event.createdBy() == app.server.serverModel.username()) {
+			if (event.isFavorite() || event.createdBy() == app.server.serverModel.username()) {
 				if (filter) {
 					return self.f_matchEventText.call(self, event, filter);
 				} else {
