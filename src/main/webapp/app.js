@@ -2,7 +2,7 @@ console.log('app.js loading');
 
 var app = {
 	settings: {
-		eventUpdateInterval: 15000,
+		eventUpdateInterval: 500,
 		clickTimeout: 50
 	},
 	cache: {
@@ -19,25 +19,25 @@ var app = {
 
 
 // server
-(function() {
+(function _initServer() {
 	app.server.serverModel = new ServerModel();
 })();
 
 // events
-(function() {
+(function _initEvents() {
 	app.events.eventsViewModel   = new EventsViewModel();
 	app.events.editEventModel    = new EditEventModel();
 })();
 
 // navigation
-(function() {
+(function _initNavigation() {
 	app.navigation.model         = new NavModel();
 	app.navigation.pageTracker   = new PageTracker('.list-entry .scrollable');
 	app.navigation.pageNavigator = new PageNavigator('official-events', '.list-entry .scrollable');
 })();
 
 // startup
-(function() {
+(function _initStartup() {
 	app.events.ajaxUpdater = new AjaxUpdater();
 
 	app.settings.init = {
@@ -67,18 +67,18 @@ var app = {
 		}
 	};
 
-	app.cache.functions.onReady = function() {
+	app.cache.functions.onReady = function _onReady() {
 		'use strict';
 
 		if (window.Modernizr.touch) {
 			$(app.cache.elements.content).addClass('hide-scrollbar');
 		}
 
-		(function() {
+		(function _initScrollManager() {
 			app.navigation.scrollManager = new ScrollManager('#content');
 			app.navigation.scrollManager.delay = 100; // ms
 
-			app.navigation.scrollManager.onScrollStop = function(enabled) {
+			app.navigation.scrollManager.onScrollStop = function _appNavigationScrollManagerOnScrollStop(enabled) {
 				'use strict';
 
 				console.log('onScrollStop: enabled = ' + enabled);
@@ -90,7 +90,7 @@ var app = {
 
 		app.cache.elements['content'] = $('#content');
 
-		$.each(app.settings.init, function(index, data) {
+		$.each(app.settings.init, function _appSettingsInit(index, data) {
 			if (app.cache.elements[index]) {
 				console.log(index + ' has already been initialized');
 			} else {
@@ -120,7 +120,7 @@ var app = {
 		app.cache.functions.setupDefaultView();
 		
 		setTimeout(function _initKnockout() {
-			$.each(app.settings.init, function(index, data) {
+			$.each(app.settings.init, function _appSettingsInitBindKnockout(index, data) {
 				if (data.model) {
 					var element = app.cache.elements[index][0];
 					if (element) {
@@ -142,7 +142,7 @@ var app = {
 })();
 
 (function _checkIfAuthorized() {
-	app.cache.functions.checkIfAuthorized = function(success, failure) {
+	app.cache.functions.checkIfAuthorized = function _appCacheFunctionsCheckIfAuthorized(success, failure) {
 		'use strict';
 
 		console.log('checkIfAuthorized()');
@@ -196,7 +196,7 @@ var app = {
 
 })();
 
-(function() {
+(function _initShowLoginOrCurrent() {
 	app.cache.functions.showLoginOrCurrent = function _showLoginOrCurrent() {
 		'use strict';
 
@@ -208,7 +208,7 @@ var app = {
 
 		app.cache.functions.checkIfAuthorized(
 			// success
-			function() {
+			function _success() {
 				'use strict';
 
 				console.log('checkIfAuthorized: success');
@@ -216,7 +216,7 @@ var app = {
 				app.navigation.pageNavigator.navigateTo(current_page);
 			},
 			// failure
-			function() {
+			function _failure() {
 				'use strict';
 
 				console.log('checkIfAuthorized: failure');
@@ -227,7 +227,7 @@ var app = {
 	};
 })();
 
-(function() {
+(function _initLoadDefaultEvents() {
 	app.cache.functions.loadDefaultEvents = function _loadDefaultEvents() {
 		console.log('loadDefaultEvents()');
 		var events = amplify.store('events');
@@ -245,15 +245,15 @@ var app = {
 	};
 })();
 
-(function() {
-	app.cache.functions.setupDefaultView = function() {
+(function _initSetupDefaultView() {
+	app.cache.functions.setupDefaultView = function _setupDefaultView() {
 		'use strict';
 
 		console.log('setupDefaultView()');
 		// app.cache.functions.loadDefaultEvents();
 
 		console.log('setupDefaultView(): set up ajaxUpdater');
-		setTimeout(function() {
+		setTimeout(function _startAjaxUpdater() {
 			// then, start the background event-sync
 			app.events.ajaxUpdater.start();
 		}, 2000);
@@ -265,7 +265,7 @@ var app = {
 	};
 })();
 
-(function() {
+(function _initKnockoutBindingHandlers() {
 	/** filter dates in Knockout data-bind **/
 	ko.bindingHandlers.dateString = {
 		update: function _update(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -279,7 +279,7 @@ var app = {
 		}
 	};
     ko.bindingHandlers.touchOrClick = {
-        'init': function(element, valueAccessor, allBindingsAccessor, viewModel) {
+        'init': function _init(element, valueAccessor, allBindingsAccessor, viewModel) {
             var newValueAccessor = function () {
                 var result = {};
 				if (Modernizr.touch) {

@@ -11,15 +11,15 @@ function ScrollManager(selector) {
 
 	/* User-configurable options */
 	self.delay = 500; // ms
-	self.onScrollStart = function(enabled) {};
-	self.onScrollStop = function(enabled) {};
-	self.onScroll = function(enabled) {};
+	self.onScrollStart = function _onScrollStart(enabled) {};
+	self.onScrollStop = function _onScrollStop(enabled) {};
+	self.onScroll = function _onScroll(enabled) {};
 
 	/* Public properties */
 	self.enabled = true;
 
 	/* Internal callbacks */
-	f_onScrollStart = function() {
+	f_onScrollStart = function _f_onScrollStart() {
 		'use strict';
 
 		if (m_activeTimeout === null) {
@@ -32,7 +32,7 @@ function ScrollManager(selector) {
 		}
 		self.onScroll(self.enabled);
 	};
-	f_onScrollStop = function(callback) {
+	f_onScrollStop = function _f_onScrollStop(callback) {
 		'use strict';
 
 		console.log('ScrollManager::onScrollStop(): scrolling stopped: enabled = ' + self.enabled);

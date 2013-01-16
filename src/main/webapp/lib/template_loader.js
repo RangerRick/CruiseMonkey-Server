@@ -1,5 +1,5 @@
 if (!Array.prototype.indexOf) {
-	Array.prototype.indexOf = function(elt /*, from*/) {
+	Array.prototype.indexOf = function _indexOf(elt /*, from*/) {
 		'use strict';
 		var len = this.length >>> 0,
 			from = Number(arguments[1]) || 0;
@@ -29,7 +29,7 @@ function TemplateLoader(urls) {
 	f_onFail,
 	f_loadTemplate;
 
-	f_getSize = function(obj) {
+	f_getSize = function _f_getSize(obj) {
 		'use strict';
 		// http://stackoverflow.com/a/6700/11236
 		var size = 0, key;
@@ -39,7 +39,7 @@ function TemplateLoader(urls) {
 		return size;
 	};
 
-	f_checkOnFinished = function() {
+	f_checkOnFinished = function _f_checkOnFinished() {
 		'use strict';
 		var templateLength = f_getSize(m_templates),
 			failedLength = f_getSize(m_failed);
@@ -49,7 +49,7 @@ function TemplateLoader(urls) {
 		}
 	};
 
-	f_onLoad = function(url, template) {
+	f_onLoad = function _f_onLoad(url, template) {
 		'use strict';
 		console.log('TemplateLoader::f_onLoad(' + url + ', <template>)');
 		m_templates[url] = template;
@@ -63,7 +63,7 @@ function TemplateLoader(urls) {
 		f_checkOnFinished();
 	};
 
-	f_onFail = function(url, textStatus, errorThrown) {
+	f_onFail = function _f_onFail(url, textStatus, errorThrown) {
 		'use strict';
 		console.log('TemplateLoader::f_onFail(' + url + ', ' + textStatus + ')');
 		m_failed[url] = errorThrown;
@@ -72,7 +72,7 @@ function TemplateLoader(urls) {
 		f_checkOnFinished();
 	};
 
-	f_loadTemplate = function(url) {
+	f_loadTemplate = function _f_loadTemplate(url) {
 		'use strict';
 		console.log('TemplateLoader::f_loadTemplate(' + url + ')');
 		(function loadUrl() {
@@ -100,31 +100,31 @@ function TemplateLoader(urls) {
 		})();
 	};
 
-	self.add = function(url) {
+	self.add = function _add(url) {
 		'use strict';
 		m_templateUrls.push(url);
 	};
-	self.remove = function(url) {
+	self.remove = function _remove(url) {
 		'use strict';
 		m_templateUrls.splice(m_templateUrls.indexOf(url), 1);
 		delete m_templates[url];
 		delete m_failed[url];
 	};
-	self.clear = function() {
+	self.clear = function _clear() {
 		'use strict';
 		m_templateUrls = [];
 		m_templates = {};
 		m_failed = {};
 	};
-	self.urls = function() {
+	self.urls = function _urls() {
 		'use strict';
 		return m_templateUrls.slice(0);
 	};
-	self.getTemplate = function(url) {
+	self.getTemplate = function _getTemplate(url) {
 		'use strict';
 		return m_templates[url];
 	};
-	self.renderTemplate = function(url, replacements) {
+	self.renderTemplate = function _renderTemplate(url, replacements) {
 		'use strict';
 		if (!replacements) {
 			replacements = {};
@@ -137,7 +137,7 @@ function TemplateLoader(urls) {
 		}
 	};
 
-	self.load = function() {
+	self.load = function _load() {
 		'use strict';
 		console.log('TemplateLoader::load()');
 		var index, url;
@@ -151,15 +151,15 @@ function TemplateLoader(urls) {
 	 * @param {String|string=} url
 	 * @param {String|string=} template
 	 */
-	self.onLoad = function(url, template) {
+	self.onLoad = function _onLoad(url, template) {
 	};
 	/**
 	 * @param {String|string=} url
 	 * @param {String|string=} template
 	 */
-	self.onFail = function(url, template) {
+	self.onFail = function _onFail(url, template) {
 	};
-	self.onFinished = function() {
+	self.onFinished = function _onFinished() {
 	};
 }
 TemplateLoader.prototype.elementIdRegex = /([^0-9A-Za-z\#])/g;

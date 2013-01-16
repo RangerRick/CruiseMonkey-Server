@@ -26,7 +26,7 @@ function LocationWithDescription(deck, name, type, description) {
 	'use strict';
 	var self = this;
 	$.extend(self, new Loc(deck, name, type));
-	self.description = function() {
+	self.description = function _description() {
 		return description;
 	};
 }
@@ -292,7 +292,7 @@ function Deck(number) {
 	self.number = number;
 	self.size = 300;
 	self.id = 'deck-' + number;
-	self.image = function() {
+	self.image = function _image() {
 		return 'images/deck' + self.number.pad(2) + '-' + self.size + '.png';
 	};
 }

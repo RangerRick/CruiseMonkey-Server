@@ -40,12 +40,12 @@ function NavModel() {
 		return self.isSignedIn();
 	});
 
-	self.showSignIn = ko.computed(function() {
+	self.showSignIn = ko.computed(function _showSignIn() {
 		'use strict';
 		return !self.showSignOut();
 	});
 
-	self.online = function() {
+	self.online = function _online() {
 		'use strict';
 		if (navigator && navigator.connection) {
 			console.log('connection type = ' + navigator.connection.type);
@@ -59,14 +59,14 @@ function NavModel() {
 	self.preEdit = ko.observable();
 	self.authorized = ko.observable(false);
 
-	self.isAuthorized = ko.computed(function() {
+	self.isAuthorized = ko.computed(function _isAuthorized() {
 		'use strict';
 		// console.log("isSignedIn = " + self.isSignedIn());
 		// console.log('authorized = ' + self.authorized());
 		return self.isSignedIn() && self.authorized();
 	});
 
-	self.logOut = function() {
+	self.logOut = function _logOut() {
 		'use strict';
 		app.server.serverModel.password(null);
 		app.server.serverModel.persist();

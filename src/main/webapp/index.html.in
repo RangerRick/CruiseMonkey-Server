@@ -29,7 +29,7 @@
 		<!-- BROWSER --><script src="3rdparty/jquery/jquery-1.8.3.js"></script>
 		<!-- BROWSER --><!-- <script src="3rdparty/jquery-ui/js/jquery-ui-1.9.2.custom.js"></script> -->
 		<!-- BROWSER --><!-- <script src="3rdparty/mustache/mustache.js"></script> -->
-		<!-- BROWSER --><script src="3rdparty/knockout/knockout-2.2.0.debug.js"></script>
+		<!-- BROWSER --><script src="3rdparty/knockout/knockout-2.2.1.debug.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout.mapping-latest.debug.js"></script>
 		<!-- BROWSER --><script src="3rdparty/knockout/knockout-delegatedEvents.js"></script>
 		<!-- BROWSER --><!-- <script src="3rdparty/hammer/hammer.js"></script> -->
@@ -64,7 +64,7 @@
 			'use strict';
 			var m_timeout = 10000;
 			var m_deviceReady = false,
-			initializeApp = function(event) {
+			initializeApp = function _initializeApp(event) {
 				console.log('Initializing Cruise Monkey. @GITHASH@ @DATE@');
 				if (window.isPhoneGap) {
 					console.log('Running under PhoneGap.');
@@ -79,12 +79,12 @@
 				m_deviceReady = true;
 				app.cache.functions.onReady();
 			},
-			onLoad = function() {
+			onLoad = function _onLoad() {
 				if (window.applicationCache) {
 					if (window.applicationCache.status == window.applicationCache.IDLE) {
 						console.log('application cache is up-to-date');
 					} else {
-						window.applicationCache.addEventListener('updateready', function(e) {
+						window.applicationCache.addEventListener('updateready', function _updateReady(e) {
 							if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
 								console.log('application cache has changed');
 								// Browser downloaded a new app cache.

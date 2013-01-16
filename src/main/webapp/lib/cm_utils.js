@@ -67,13 +67,17 @@ function CMUtils() {
 
 	self.formatDate = function _formatDate(d) {
 		'use strict';
-		return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+		var ret = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+		d = null;
+		return ret;
 	};
 
 	self.getDateFromString = function _getDateFromString(dateTime) {
 		'use strict';
 		if (dateTime instanceof Date) {
-			return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(), dateTime.getHours(), dateTime.getMinutes(), 0, 0);
+			var ret = new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate(), dateTime.getHours(), dateTime.getMinutes(), 0, 0);
+			dateTime = null;
+			return ret;
 		}
 		var dateTimeParts = dateTime.split('T'),
 			dateParts = dateTimeParts[0].split('-'),
@@ -82,17 +86,23 @@ function CMUtils() {
 		// console.log('year = ' + dateParts[0] + ', month = ' + dateParts[1] + ', day = ' + dateParts[2]);
 		// console.log('hours = ' + timeParts[0] + ', minutes = ' + timeParts[1]);
 
-		return new Date(dateParts[0], dateParts[1] - 1, dateParts[2], timeParts[0], timeParts[1], 0, 0);
+		var ret = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], timeParts[0], timeParts[1], 0, 0);
+		dateTimeParts = dateParts = timeParts = dateTime = null;
+		return ret;
 	};
 
 	self.padNumber = function _padNumber(num) {
 		'use strict';
-		return (String('0' + num).slice(-2));
+		var ret = (String('0' + num).slice(-2));
+		num = null;
+		return ret;
 	};
 
-	self.getStringFromDate = function(d) {
+	self.getStringFromDate = function _getStringFromDate(d) {
 		'use strict';
-		return d.getFullYear() + '-' + self.padNumber(d.getMonth() + 1) + '-' + self.padNumber(d.getDate()) + 'T' + self.padNumber(d.getHours()) + ':' + self.padNumber(d.getMinutes()) + ':' + self.padNumber(d.getSeconds()) + '-00:00';
+		var ret = d.getFullYear() + '-' + self.padNumber(d.getMonth() + 1) + '-' + self.padNumber(d.getDate()) + 'T' + self.padNumber(d.getHours()) + ':' + self.padNumber(d.getMinutes()) + ':' + self.padNumber(d.getSeconds()) + '-00:00';
+		d = null;
+		return ret;
 	};
 
 	self.openLink = function _openLink(url) {
@@ -105,11 +115,14 @@ function CMUtils() {
 			console.log('openLink(' + url + '): using window.open()');
 			window.open(url, '_blank');
 		}
+		url = null;
 	};
 
 	self.escapeForRegExp = function _escapeForRegExp(str) {
 		'use strict';
-		return str.replace(regex, '\\$&');
+		var ret = str.replace(regex, '\\$&');
+		str = null;
+		return ret;
 	};
 };
 

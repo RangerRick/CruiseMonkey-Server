@@ -14,7 +14,7 @@ function Swiper() {
 		container = $('#container'),
 		w = $(window),
 
-	eventHandler = function(e) {
+	eventHandler = function _eventHandler(e) {
 		'use strict';
 		// console.log('e = ' + e.type);
 		switch (e.type) {
@@ -34,7 +34,7 @@ function Swiper() {
 		}
 	};
 
-	self.__start = function(e) {
+	self.__start = function ___start(e) {
 		'use strict';
 		console.log('__start: ' + e);
 		//e.preventDefault();
@@ -57,7 +57,7 @@ function Swiper() {
 
 		this.__event('touchstart');
 	};
-	self.__move = function(e) {
+	self.__move = function ___move(e) {
 		'use strict';
 		if (!self.initiated) return;
 
@@ -107,7 +107,7 @@ function Swiper() {
 
 		// self.__pos(newX);
 	};
-	self.__end = function(e) {
+	self.__end = function ___end(e) {
 		'use strict';
 		console.log('__end: ' + e);
 
@@ -136,14 +136,14 @@ function Swiper() {
 
 		// self.__checkPosition();
 	};
-	self.__resize = function(e) {
+	self.__resize = function ___resize(e) {
 		'use strict';
 		console.log('__resize: ' + e);
 
 		self.snapThreshold = Math.round($(window).width() * 0.15);
 	};
 
-	self.__event = function(type) {
+	self.__event = function ___event(type) {
 		'use strict';
 		console.log('event fired: ' + type);
 
@@ -162,12 +162,12 @@ function Swiper() {
 }
 
 var swiper = new Swiper();
-(function() {
+(function _initSwiper() {
 	'use strict';
 	var pageOrder = ['official-events', 'my-events', 'amenities', 'decks'];
 
 	var w = $(window);
-	w.on('swiper-moveout', function() {
+	w.on('swiper-moveout', function _swiperMoveout() {
 		'use strict';
 		var direction = swiper.directionX,
 			currentPage = app.navigation.pageNavigator.getCurrentPage(),

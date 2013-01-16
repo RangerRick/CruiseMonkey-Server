@@ -8,7 +8,7 @@
 #	3rdparty/hammer/hammer.min.js \
 #	3rdparty/hammer/jquery.hammer.min.js \
 #	3rdparty/amplifyjs/amplify.min.js \
-#	3rdparty/knockout/knockout-2.2.0.js \
+#	3rdparty/knockout/knockout-2.2.1.js \
 #	3rdparty/knockout/knockout.mapping-latest.js \
 #	3rdparty/knockout/knockout-delegatedEvents.js \
 
@@ -38,7 +38,7 @@ CRUISEMONKEYJS = \
 	3rdparty/hammer/hammer.js \
 	3rdparty/hammer/jquery.hammer.js \
 	3rdparty/amplifyjs/amplify.js \
-	3rdparty/knockout/knockout-2.2.0.js \
+	3rdparty/knockout/knockout-2.2.1.js \
 	3rdparty/knockout/knockout.mapping-latest.js \
 	3rdparty/knockout/knockout-delegatedEvents.js \
 	lib/cm_utils.js \

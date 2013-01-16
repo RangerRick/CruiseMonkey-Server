@@ -58,7 +58,7 @@ function AjaxUpdater() {
 		//MemoryLeakChecker.checkLeaks(window);
 	};
 
-	self.onUpdate = function() {}
+	self.onUpdate = function _onUpdate() {}
 
 	self.pollNow = function _pollNow() {
 		f_updateEventModel();

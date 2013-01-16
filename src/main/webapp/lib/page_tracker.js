@@ -70,7 +70,7 @@ function PageTracker(elementCriteria) {
 	};
 
 	/** internal methods **/
-	f_getPageCache = function() {
+	f_getPageCache = function _f_getPageCache() {
 		'use strict';
 		var page_store_cache = amplify.store('page_store_cache');
 		if (!page_store_cache) {
@@ -78,12 +78,12 @@ function PageTracker(elementCriteria) {
 		}
 		return page_store_cache;
 	};
-	f_setPageCache = function(new_page_store_cache) {
+	f_setPageCache = function _f_setPageCache(new_page_store_cache) {
 		'use strict';
 		amplify.store('page_store_cache', new_page_store_cache);
 		new_page_store_cache = null;
 	};
-	f_getElementForPageId = function(pageId) {
+	f_getElementForPageId = function _f_getElementForPageId(pageId) {
 		'use strict';
 		// console.log('f_getElementForPageId(' + pageId + ', criteria = ' + elementCriteria + ')');
 		var topElement = self.getScrolledId(pageId),
@@ -96,7 +96,7 @@ function PageTracker(elementCriteria) {
 		} else {
 			page = $('#' + pageId);
 		}
-		page.find(elementCriteria).each(function(index, element) {
+		page.find(elementCriteria).each(function _eachElement(index, element) {
 			'use strict';
 			id = element.getAttribute('id');
 			if (id == topElement) {

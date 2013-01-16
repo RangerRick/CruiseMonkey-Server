@@ -14,7 +14,7 @@ function CalendarEvent(id, createdBy) {
 	self.id = function _id() {
 		return id;
 	}
-	self.cleanId = function() {
+	self.cleanId = function _cleanId() {
 		return m_cleanId;
 	};
 	self.summary = function _summary() {
@@ -53,6 +53,8 @@ function CalendarEvent(id, createdBy) {
 				retVal += '-' + end;
 			}
 		}
+
+		start = end = null;
 		return retVal;
 	};
 	self.isMine = function _isMine() {
@@ -62,7 +64,7 @@ function CalendarEvent(id, createdBy) {
 		return self.id() + ': ' + self.summary() + ' (' + self.isPublic() + ')';
 	};
 	
-	self.updateUsing = function(d) {
+	self.updateUsing = function _updateUsing(d) {
 		var data = self.data();
 		if (d.hasOwnProperty('summary')     && (data.summary             != d.summary))             { data.summary = d.summary;         }; d.summary = null;
 		if (d.hasOwnProperty('description') && (data.description         != d.description))         { data.description = d.description; }; d.description = null;
@@ -92,7 +94,7 @@ function EditEventModel() {
 	self.location = ko.observable();
 	self.isPublic = ko.observable();
 
-	self.resetModel = function() {
+	self.resetModel = function _resetModel() {
 		var now = new Date().toString(m_pattern);
 
 		self.summary("");
@@ -102,7 +104,7 @@ function EditEventModel() {
 		self.location("");
 		self.isPublic(false);
 	};
-	self.onCancel = function(formElement) {
+	self.onCancel = function _onCancel(formElement) {
 		var preEdit = app.navigation.model.preEdit();
 		if (preEdit && preEdit != 'login' && preEdit != 'edit-event') {
 			app.navigation.pageNavigator.navigateTo(preEdit);
@@ -111,7 +113,7 @@ function EditEventModel() {
 		}
 		return true;
 	};
-	self.onSubmit = function(formElement) {
+	self.onSubmit = function _onSubmit(formElement) {
 		var postme = {
 			id: uuid.v1(),
 			createdBy: app.server.serverModel.username(),
@@ -180,14 +182,14 @@ function EventsViewModel() {
 	self.viewType = ko.observable('official-events');
 
 	(function _processEvent() {
-		app.cache.functions.processEvent = function(event, favorites, lastUpdated) {
+		app.cache.functions.processEvent = function _processEvent(event, favorites, lastUpdated) {
 			'use strict';
 
 			if (!lastUpdated) {
 				lastUpdated = new Date().getTime();
 			}
 
-			var item = ko.utils.arrayFirst(self.events(), function(entry) {
+			var item = ko.utils.arrayFirst(self.events(), function _item(entry) {
 				'use strict';
 				if (entry && entry.id() == event['@id']) {
 					return true;
@@ -224,7 +226,7 @@ function EventsViewModel() {
 		};
 	})();
 
-	self.updateData = function(allData) {
+	self.updateData = function _updateData(allData) {
 		console.log('EventsViewModel::updateData()');
 		m_updateCount++;
 		self.updating(true);
@@ -240,7 +242,7 @@ function EventsViewModel() {
 		var favorites = [];
 		if (allData.favorites && allData.favorites.favorite) {
 			console.log('EventsViewModel::updateData(): processing favorites');
-			var processFavorite = function(favorite) {
+			var processFavorite = function _processFavorite(favorite) {
 				return favorite['@event'];
 			};
 			if (allData.favorites.favorite instanceof Array) {
@@ -257,7 +259,7 @@ function EventsViewModel() {
 				updateTime = new Date().getTime();
 
 			if (allData.events.event instanceof Array) {
-				$.each(allData.events.event, function(index, event) {
+				$.each(allData.events.event, function _eachEvent(index, event) {
 					if (event.hasOwnProperty('@id')) {
 						var ret = processEvent.call(window, event, favorites, updateTime);
 						if (!ret.exists) {
@@ -281,7 +283,7 @@ function EventsViewModel() {
 				}
 			}
 
-			self.events.remove(function(item) {
+			self.events.remove(function _removeEvents(item) {
 				return item.lastUpdated < updateTime;
 			});
 			/*
@@ -450,11 +452,13 @@ function EventsViewModel() {
 	};
 
 	self.filteredEvents = ko.computed(function _filteredEvents() {
-		var filter = self.filter().toLowerCase();
+		var filter = self.filter().toLowerCase(),
+			events = self.events(),
+			ret = null;
 
 		switch (self.viewType()) {
 			case 'my-events':
-				return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+				ret = ko.utils.arrayFilter(events, function _eventsFilter(event) {
 					if (event.isFavorite() || event.createdBy() == app.server.serverModel.username()) {
 						if (filter) {
 							return self.f_matchEventText.call(self, event, filter);
@@ -466,7 +470,7 @@ function EventsViewModel() {
 				});
 				break;
 			case 'public-events':
-				return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+				ret = ko.utils.arrayFilter(events, function _eventsFilter(event) {
 					if (event.createdBy() != 'google' && event.isPublic()) {
 						if (filter) {
 							return self.f_matchEventText.call(self, event, filter);
@@ -478,7 +482,7 @@ function EventsViewModel() {
 				});
 				break;
 			default:
-				return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
+				ret = ko.utils.arrayFilter(events, function _eventsFilter(event) {
 					if (event !== undefined && event.createdBy() == 'google') {
 						if (filter) {
 							return self.f_matchEventText.call(self, event, filter);
@@ -490,78 +494,7 @@ function EventsViewModel() {
 				});
 				break;
 		}
+		filter = events = null;
+		return ret;
 	});
 }
-
-/**
- * @constructor
- */
-function OfficialEventsViewModel(parentModel) {
-	var self = this;
-
-	$.extend(self, parentModel);
-	self.filter = ko.observable('');
-
-	self.filteredEvents = ko.computed(function _officialFilteredEvents() {
-		var filter = self.filter().toLowerCase();
-
-		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event !== undefined && event.createdBy() == 'google') {
-				if (filter) {
-					return self.f_matchEventText.call(self, event, filter);
-				} else {
-					return true;
-				}
-			}
-			return false;
-		});
-	});
-}
-
-/**
- * @constructor
- */
-function MyEventsViewModel(parentModel) {
-	var self = this;
-	$.extend(self, parentModel);
-	self.filter = ko.observable('');
-
-	self.filteredEvents = ko.computed(function _myFilteredEvents(event) {
-		var filter = self.filter().toLowerCase();
-
-		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.isFavorite() || event.createdBy() == app.server.serverModel.username()) {
-				if (filter) {
-					return self.f_matchEventText.call(self, event, filter);
-				} else {
-					return true;
-				}
-			}
-			return false;
-		});
-	});
-}
-
-/**
- * @constructor
- */
-function PublicEventsViewModel(parentModel) {
-	var self = this;
-	$.extend(self, parentModel);
-	self.filter = ko.observable('');
-
-	self.filteredEvents = ko.computed(function _publicFilteredEvents() {
-		var filter = self.filter().toLowerCase();
-
-		return ko.utils.arrayFilter(self.events(), function _eventsFilter(event) {
-			if (event.createdBy() != 'google' && event.isPublic()) {
-				if (filter) {
-					return self.f_matchEventText.call(self, event, filter);
-				} else {
-					return true;
-				}
-			}
-			return false;
-		});
-	});
-};

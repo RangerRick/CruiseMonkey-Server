@@ -65,7 +65,7 @@ function PageNavigator(defaultPage, elementCriteria) {
 		return current_page;
 	};
 	
-	self.setCurrentPage = function(pageId) {
+	self.setCurrentPage = function _setCurrentPage(pageId) {
 		amplify.store('current_page', pageId);
 		return pageId;
 	};
