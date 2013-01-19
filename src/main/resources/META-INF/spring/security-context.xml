@@ -17,9 +17,9 @@
 	<security:global-method-security secured-annotations="enabled" />
 
 	<!-- create-session="stateless" -->
-	<security:http auto-config="true" realm="CruiseMonkey 3" pattern="/rest/**">
+	<security:http auto-config="true" realm="CruiseMonkey 3" pattern="/rest/**" use-expressions="true">
 		<security:intercept-url method="OPTIONS" pattern="/rest/**" access="permitAll" />
-		<security:intercept-url pattern="/rest/**" access="ROLE_USER" />
+		<security:intercept-url pattern="/rest/**" access="hasRole('ROLE_USER')" />
 		<security:http-basic />
 	</security:http>
 
