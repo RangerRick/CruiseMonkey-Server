@@ -18,6 +18,7 @@
 
 	<!-- create-session="stateless" -->
 	<security:http auto-config="true" realm="CruiseMonkey 3" pattern="/rest/**">
+		<security:intercept-url method="OPTIONS" pattern="/rest/**" access="permitAll" />
 		<security:intercept-url pattern="/rest/**" access="ROLE_USER" />
 		<security:http-basic />
 	</security:http>
