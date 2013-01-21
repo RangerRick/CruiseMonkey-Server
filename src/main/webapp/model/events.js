@@ -119,8 +119,8 @@ function EditEventModel() {
 			createdBy: app.server.serverModel.username(),
 			summary: self.summary(),
 			description: self.description(),
-			start: Date.parse(self.startDate()),
-			end: Date.parse(self.endDate()),
+			start: self.startDate().getTime(),
+			end: self.endDate().getTime(),
 			location: self.location(),
 			isPublic: self.isPublic()
 		};

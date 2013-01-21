@@ -7,13 +7,15 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.raccoonfink.cruisemonkey.util.DateXmlAdapter;
 
 @Entity
 @XmlRootElement(name="event")
@@ -44,9 +46,11 @@ public class Event extends AbstractRecord implements Serializable {
 	private String m_location;
 
 	@XmlElement(name="start")
+	@XmlJavaTypeAdapter(DateXmlAdapter.class)
 	private Date m_startDate;
 
 	@XmlElement(name="end")
+	@XmlJavaTypeAdapter(DateXmlAdapter.class)
 	private Date m_endDate;
 
 	@XmlElement(name="isPublic")
@@ -94,24 +98,4 @@ public class Event extends AbstractRecord implements Serializable {
 	@Column(name="isPublic")
 	public Boolean getIsPublic() { return m_isPublic; }
 	public void setIsPublic(final Boolean isPublic) { m_isPublic = isPublic; }
-
-	@XmlElement(name="startEpoch")
-	@Transient
-	public Long getStartEpoch() {
-		return getStartDate().getTime();
-	}
-
-	public void setStartEpoch(final Long epoch) {
-		setStartDate(new Date(epoch));
-	}
-
-	@XmlElement(name="endEpoch")
-	@Transient
-	public Long getEndEpoch() {
-		return getStartDate().getTime();
-	}
-
-	public void setEndEpoch(final Long epoch) {
-		setEndDate(new Date(epoch));
-	}
 }
