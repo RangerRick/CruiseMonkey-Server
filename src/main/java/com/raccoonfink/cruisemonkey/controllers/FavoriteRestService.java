@@ -122,7 +122,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 	public Response postFavorite(final Favorite favorite) {
 		final String userName = getCurrentUser();
 		
-		if (userName != favorite.getUser()) {
+		if (!userName.equals(favorite.getUser())) {
 			throw new IllegalArgumentException("You cannot create favorites for other users!");
 		}
 

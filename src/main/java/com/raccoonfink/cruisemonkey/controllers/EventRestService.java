@@ -63,7 +63,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional(readOnly=true)
 	public List<Event> getEvents(@QueryParam("start") final Date start, @QueryParam("end") final Date end, @QueryParam("user") final String userName) {
-    	m_logger.debug("start = {}, end = {}, user = {}", start, end, userName);
+    	m_logger.debug("getEvents: start = {}, end = {}, user = {}", start, end, userName);
 		final List<Event> events;
 		if (start != null && end != null) {
 			events = m_eventService.getEventsInRange(start, end, userName);
@@ -78,7 +78,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional(readOnly=true)
 	public Event getEvent(@PathParam("id") final String id) {
-		m_logger.debug("id = {}", id);
+		m_logger.debug("getEvent: id = {}", id);
 		return m_eventService.getEvent(id);
 	}
 
@@ -88,18 +88,18 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	public Response putEvent(@PathParam("id") final String eventId, @QueryParam("isPublic") final Boolean isPublic) {
 		final String userName = getCurrentUser();
 
-		m_logger.debug("user = {}, event = {}, isPublic = {}", userName, eventId, isPublic);
+		m_logger.debug("putEvent: user = {}, event = {}, isPublic = {}", userName, eventId, isPublic);
 		if (userName == null || eventId == null || isPublic == null) {
 			return Response.serverError().build();
 		}
 
 		final Event event = m_eventService.getEvent(eventId);
 		if (event == null) {
-			m_logger.debug("Trying to modify an event that's not in the database!");
+			m_logger.debug("putEvent: Trying to modify an event that's not in the database!");
 			return Response.notModified().build();
 		} else {
 			if (!event.getCreatedBy().equals(userName)) {
-				m_logger.debug("createdBy = {}, username = {}", event.getCreatedBy(), userName);
+				m_logger.debug("putEvent: createdBy = {}, username = {}", event.getCreatedBy(), userName);
 				throw new WebApplicationException(401);
 			}
 			event.setIsPublic(isPublic);
@@ -113,13 +113,14 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional(readOnly=true)
 	public void deleteEvent(@PathParam("id") final String id) {
-		m_logger.debug("id = {}", id);
+		m_logger.debug("deleteEvent: id = {}", id);
 		final String user = getCurrentUser();
 		final Event event = m_eventService.getEvent(id);
 		if (event == null) {
-			m_logger.debug("Trying to delete an event that's not in the database!");
+			m_logger.debug("deleteEvent: Trying to delete an event that's not in the database!");
 		} else {
-			if (event.getCreatedBy() != user) {
+			if (!event.getCreatedBy().equals(user)) {
+				m_logger.debug("deleteEvent: createdBy = {}, username = {}", event.getCreatedBy(), user);
 				throw new WebApplicationException(401);
 			}
 			m_eventService.deleteEvent(event);
@@ -130,7 +131,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional
 	public Response putEvent(final Event event) {
-		m_logger.debug("event = {}", event);
+		m_logger.debug("putEvent: event = {}", event);
 		m_eventService.putEvent(event, getCurrentUser());
 		return Response.seeOther(getRedirectUri(m_uriInfo, event.getId())).build();
 	}
