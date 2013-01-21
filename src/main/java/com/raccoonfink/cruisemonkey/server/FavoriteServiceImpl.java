@@ -26,7 +26,7 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	@Override
 	public Favorite getFavorite(final String username, final Integer id) {
 		final Favorite favorite = m_favoriteDao.get(id);
-		if (favorite.getUser() == username) {
+		if (favorite.getUser().equals(username)) {
 			return favorite;
 		}
 		return null;
@@ -89,7 +89,7 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 		try {
 			final Favorite favorite = m_favoriteDao.get(id, session);
 			if (favorite != null) {
-				if (favorite.getUser() != username) {
+				if (!favorite.getUser().equals(username)) {
 					throw new IllegalArgumentException("You can't remove someone else's favorite!");
 				}
 				m_favoriteDao.delete(favorite, session);
