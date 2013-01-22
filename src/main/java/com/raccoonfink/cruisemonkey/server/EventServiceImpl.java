@@ -78,7 +78,7 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				Restrictions.or(
 					new Criterion[] {
 							Restrictions.eq("createdBy", userName).ignoreCase(),
-							Restrictions.eq("createdBy", "google").ignoreCase(),
+							Restrictions.eq("createdBy", "official").ignoreCase(),
 							Restrictions.eq("isPublic", true)
 					}
 				)
@@ -108,7 +108,7 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				Restrictions.or(
 					new Criterion[] {
 							Restrictions.eq("createdBy", userName).ignoreCase(),
-							Restrictions.eq("createdBy", "google").ignoreCase(),
+							Restrictions.eq("createdBy", "official").ignoreCase(),
 							Restrictions.eq("isPublic", true)
 					}
 				)

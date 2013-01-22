@@ -1,5 +1,7 @@
 package com.raccoonfink.cruisemonkey.server;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -15,9 +17,9 @@ public class UserInitializer implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 
-		User user = m_userDao.get("google");
+		User user = m_userDao.get("official");
 		if (user == null) {
-			user = new User("google", "google", "Google");
+			user = new User("official", UUID.randomUUID().toString(), "Official Calendar");
 			m_userDao.save(user);
 		} else {
 			System.err.println("already have a user: " + user);

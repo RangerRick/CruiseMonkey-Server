@@ -53,7 +53,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_eventDao);
-		m_importUser = m_userDao.get("google");
+		m_importUser = m_userDao.get("official");
 	}
 
     public EventDao getEventDao() {
@@ -101,7 +101,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	    	final List<Event> events = m_eventDao.find(criteria);
 	
 	        for (final Event event : events) {
-	        	if ("google".equals(event.getCreatedBy())) {
+	        	if ("official".equals(event.getCreatedBy())) {
 	        		m_eventDao.delete(event, m_session);
 	        	}
 	        }

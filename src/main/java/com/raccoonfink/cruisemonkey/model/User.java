@@ -68,7 +68,7 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	@Override
 	@XmlElement(name="password")
 	@XmlReadOnly
-	@Column(name="password", length=32)
+	@Column(name="password", length=40)
 	public String getPassword() {
 		return m_password;
 	}
