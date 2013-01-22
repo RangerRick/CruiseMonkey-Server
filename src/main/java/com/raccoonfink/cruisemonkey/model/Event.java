@@ -62,12 +62,18 @@ public class Event extends AbstractRecord implements Serializable {
 	}
 
 	public Event(final String id, String summary, final String description, final Date start, final Date end, final String createdBy) {
+		this(id, summary, description, start, end, createdBy, null, false);
+	}
+
+	public Event(final String id, String summary, final String description, final Date start, final Date end, final String createdBy, final String location, final boolean isPublic) {
 		super(createdBy);
 		m_id          = id;
 		m_summary     = summary;
 		m_description = description;
 		m_startDate   = start;
 		m_endDate     = end;
+		m_location    = location;
+		m_isPublic    = isPublic;
 	}
 
 	@Id
