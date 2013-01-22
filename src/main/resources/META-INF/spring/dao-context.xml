@@ -58,7 +58,7 @@
     <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao" />
     <bean id="favoriteDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateFavoriteDao" />
     <bean id="userInitializer" class="com.raccoonfink.cruisemonkey.server.UserInitializer" />
-    <bean id="officialScheduleInitializer" class="com.raccoonfink.cruisemonkey.server.OfficialScheduleInitializer" />
+    <bean id="officialScheduleInitializer" class="com.raccoonfink.cruisemonkey.server.OfficialScheduleInitializer" depends-on="userInitializer" />
 
     <tx:annotation-driven proxy-target-class="true" />
 </beans>
