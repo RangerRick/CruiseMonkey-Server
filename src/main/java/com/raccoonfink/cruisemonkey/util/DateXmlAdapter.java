@@ -1,20 +1,22 @@
 package com.raccoonfink.cruisemonkey.util;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class DateXmlAdapter extends XmlAdapter<Long, Date> {
-
+public class DateXmlAdapter extends XmlAdapter<String, Date> {
+	final DateFormat m_format = new SimpleDateFormat("yyyy-MM-dd hh:mma");
 	@Override
-	public Long marshal(final Date value) throws Exception {
-		return value.getTime();
+	public String marshal(final Date value) throws Exception {
+		return m_format.format(value);
 	}
 
 	@Override
-	public Date unmarshal(final Long value) throws Exception {
+	public Date unmarshal(final String value) throws Exception {
 		if (value != null) {
-			return new Date(value);
+			return m_format.parse(value);
 		}
 		return null;
 	}
