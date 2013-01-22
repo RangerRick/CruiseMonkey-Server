@@ -170,7 +170,6 @@ public class StatusNetService {
 			user.setUsername(userName);
 			user.setPassword(m_credentials.getPassword());
 			user.setCreatedBy(userName);
-			user.setLastModifiedBy(userName);
 
 			final JsonParser parser = m_jsonFactory.createJsonParser(in);
 

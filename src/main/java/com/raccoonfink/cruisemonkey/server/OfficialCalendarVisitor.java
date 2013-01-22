@@ -97,7 +97,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
     public void end() {
     	if (m_session != null && m_transaction != null) {
 	    	final Criteria criteria = m_session.createCriteria(Event.class)
-	    			.add(Restrictions.lt("lastModifiedDate", new Date(m_lastUpdated)));
+	    			.add(Restrictions.lt("createdDate", new Date(m_lastUpdated)));
 	    	final List<Event> events = m_eventDao.find(criteria);
 	
 	        for (final Event event : events) {
@@ -126,12 +126,9 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 		final DtStart dtStartDate = vevent.getStartDate();
 		final DtEnd dtEndDate = vevent.getEndDate();
 		final Created created = vevent.getCreated();
-		// final LastModified lastModified = vevent.getLastModified();
 		final Date startDate = new Date(dtStartDate.getDate().getTime());
 		final Date endDate = new Date(dtEndDate.getDate().getTime());
-		final Date createdDate = new Date(created.getDate().getTime());
-		// final Date lastModifiedDate = new Date(lastModified.getDate().getTime());
-		final Date lastModifiedDate = new Date(m_lastUpdated);
+		final Date createdDate = new Date(m_lastUpdated);
 
 		String summaryString = summary.getValue().trim();
 		final String locationString = location.getValue().trim();
@@ -156,8 +153,6 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			event.setEndDate(endDate);
 			event.setCreatedBy(m_importUser.getUsername());
 			event.setCreatedDate(createdDate);
-			event.setLastModifiedBy(m_importUser.getUsername());
-			event.setLastModifiedDate(lastModifiedDate);
 			return event;
 		} else {
 			System.err.println("found existing event: " + existingEvent);
@@ -167,8 +162,6 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			existingEvent.setStartDate(startDate);
 			existingEvent.setEndDate(endDate);
 			existingEvent.setCreatedDate(createdDate);
-			existingEvent.setLastModifiedBy(m_importUser.getUsername());
-			existingEvent.setLastModifiedDate(lastModifiedDate);
 			return existingEvent;
 		}
 	}

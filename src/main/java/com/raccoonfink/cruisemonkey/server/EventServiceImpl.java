@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService, InitializingBean {
 			);
 
 			criteria.addOrder(Order.asc("startDate"))
-				.addOrder(Order.asc("lastModifiedDate"))
+				.addOrder(Order.asc("createdDate"))
 				.addOrder(Order.asc("summary"));
 
 			return (List<Event>)criteria.list();
@@ -118,7 +118,7 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				.add(Restrictions.le("endDate", end));
 
 			criteria.addOrder(Order.asc("startDate"))
-				.addOrder(Order.asc("lastModifiedDate"))
+				.addOrder(Order.asc("createdDate"))
 				.addOrder(Order.asc("summary"));
 
 			return (List<Event>)criteria.list();

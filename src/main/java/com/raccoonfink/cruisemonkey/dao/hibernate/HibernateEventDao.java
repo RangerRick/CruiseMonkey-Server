@@ -70,7 +70,7 @@ public class HibernateEventDao extends AbstractHibernateDao<Event,String> implem
 	protected List<Event> resultWithDefaultSort(final Criteria criteria) {
 		final Criteria resultCriteria = criteria
 				.addOrder(Order.asc("startDate"))
-				.addOrder(Order.asc("lastModifiedDate"))
+				.addOrder(Order.asc("createdDate"))
 				.addOrder(Order.asc("summary"));
 
 		return (List<Event>)resultCriteria.list();

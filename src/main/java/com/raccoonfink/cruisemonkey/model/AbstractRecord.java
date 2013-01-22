@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.raccoonfink.cruisemonkey.util.DateXmlAdapter;
 
 @MappedSuperclass
 @XmlRootElement(name="record")
@@ -17,24 +20,17 @@ public abstract class AbstractRecord implements Record {
 	private String m_createdBy;
 
 	@XmlElement(name="created-date")
+	@XmlJavaTypeAdapter(DateXmlAdapter.class)
 	private Date m_createdDate;
-
-	@XmlElement(name="last-modified-by")
-	private String m_lastModifiedBy;
-
-	@XmlElement(name="last-modified-date")
-	private Date m_lastModifiedDate;
 
 	public AbstractRecord() {
 		final long time = System.currentTimeMillis();
 		m_createdDate = new Date(time);
-		m_lastModifiedDate = new Date(time);
 	}
 
 	public AbstractRecord(final String createdBy) {
 		this();
 		m_createdBy = createdBy;
-		m_lastModifiedBy = createdBy;
 	}
 
 	@Override
@@ -45,7 +41,6 @@ public abstract class AbstractRecord implements Record {
 	
 	public void setCreatedBy(final String username) {
 		m_createdBy = username;
-		if (m_lastModifiedBy == null) m_lastModifiedBy = username;
 	}
 
 	@Override
@@ -56,27 +51,6 @@ public abstract class AbstractRecord implements Record {
 
 	public void setCreatedDate(final Date created) {
 		m_createdDate = created;
-		if (m_lastModifiedDate == null) m_lastModifiedDate = created;
-	}
-
-	@Override
-	@Column(name="last_modified_by", length=64)
-	public String getLastModifiedBy() {
-		return m_lastModifiedBy;
-	}
-
-	public void setLastModifiedBy(final String username) {
-		m_lastModifiedBy = username;
-	}
-
-	@Override
-	@Column(name="last_modified_date")
-	public Date getLastModifiedDate() {
-		return m_lastModifiedDate;
-	}
-	
-	public void setLastModifiedDate(final Date modified) {
-		m_lastModifiedDate = modified;
 	}
 
 }
