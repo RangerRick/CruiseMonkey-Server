@@ -24,6 +24,10 @@ public class HibernateEventDao extends AbstractHibernateDao<Event,String> implem
 		
 		try {
 			return findByUser(userName, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed findByUser for user: " + userName, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -45,6 +49,10 @@ public class HibernateEventDao extends AbstractHibernateDao<Event,String> implem
 		
 		try {
 			return findInRange(start, end, userName, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed findInRange for user " + userName, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}

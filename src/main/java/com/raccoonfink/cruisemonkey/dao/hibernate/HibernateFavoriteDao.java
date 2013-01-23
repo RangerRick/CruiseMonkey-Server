@@ -38,6 +38,10 @@ public class HibernateFavoriteDao extends AbstractHibernateDao<Favorite,Integer>
 		
 		try {
 			return findByUser(userName, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed findByUser for user " + userName, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -60,6 +64,10 @@ public class HibernateFavoriteDao extends AbstractHibernateDao<Favorite,Integer>
 		
 		try {
 			return findByUserAndEventId(userName, eventId, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed findByUserAndEventId for user " + userName + ", event " + eventId, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}

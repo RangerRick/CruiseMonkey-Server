@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -12,6 +14,8 @@ import com.raccoonfink.cruisemonkey.dao.FavoriteDao;
 import com.raccoonfink.cruisemonkey.model.Favorite;
 
 public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
+	final Logger m_logger = LoggerFactory.getLogger(FavoriteServiceImpl.class);
+
 	@Autowired
 	private FavoriteDao m_favoriteDao;
 
@@ -51,6 +55,10 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			if (dbFavorite != null) return dbFavorite;
 			m_favoriteDao.save(favorite, session);
 			return favorite;
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed addFavorite " + favorite, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -72,6 +80,10 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 				m_favoriteDao.save(favorite, session);
 			}
 			return m_favoriteDao.get(favorite.getId(), session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed addFavorite " + username + "/" + eventId, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -94,6 +106,10 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 				}
 				m_favoriteDao.delete(favorite, session);
 			}
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed removeFavorite " + username + "/" + id, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -113,6 +129,10 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			if (favorite != null) {
 				m_favoriteDao.delete(favorite, session);
 			}
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed removeFavorite " + username + "/" + eventId, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}

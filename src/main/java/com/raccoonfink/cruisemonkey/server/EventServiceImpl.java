@@ -10,6 +10,8 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -18,6 +20,8 @@ import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 
 public class EventServiceImpl implements EventService, InitializingBean {
+	final Logger m_logger = LoggerFactory.getLogger(EventServiceImpl.class);
+
 	@Autowired
 	private EventDao m_eventDao;
 
@@ -59,6 +63,10 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				event.setCreatedBy(userName);
 			}
 			m_eventDao.save(event, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed putEvent " + event, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -89,6 +97,10 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				.addOrder(Order.asc("summary"));
 
 			return (List<Event>)criteria.list();
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed getPublicEvents " + userName, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -122,6 +134,10 @@ public class EventServiceImpl implements EventService, InitializingBean {
 				.addOrder(Order.asc("summary"));
 
 			return (List<Event>)criteria.list();
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed getPublicEventsInRange " + userName, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -136,6 +152,10 @@ public class EventServiceImpl implements EventService, InitializingBean {
 		
 		try {
 			m_eventDao.delete(event, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed deleteEvent " + event, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}

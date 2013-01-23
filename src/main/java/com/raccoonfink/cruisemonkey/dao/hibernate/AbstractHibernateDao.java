@@ -46,6 +46,10 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		final Transaction tx = session.beginTransaction();
 		try {
 			return findAll(session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Failed to find all objects.", e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -85,6 +89,10 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		
 		try {
 			delete(obj, session);
+		} catch (final RuntimeException e) {
+			tx.rollback();
+			m_logger.warn("Had to roll back delete on " + obj, e);
+			throw e;
 		} finally {
 			tx.commit();
 		}
@@ -102,6 +110,10 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		
 		try {
 			save(obj, session);
+		} catch (final RuntimeException e) {
+			m_logger.warn("Had to roll back save on " + obj, e);
+			tx.rollback();
+			throw e;
 		} finally {
 			tx.commit();
 		}
