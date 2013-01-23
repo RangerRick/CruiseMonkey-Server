@@ -1,5 +1,6 @@
 package com.raccoonfink.cruisemonkey.controllers;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.model.Event;
 import com.raccoonfink.cruisemonkey.server.EventService;
+import com.raccoonfink.cruisemonkey.util.DateXmlAdapter;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
@@ -82,14 +84,33 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 		return m_eventService.getEvent(id);
 	}
 
+	/*
+	 * 				builder.setParameter("createdBy", CM3.getNetworkState().getUsername());
+				builder.setParameter("summary", summary.getText());
+				builder.setParameter("description", summary.getText());
+				builder.setParameter("start", startString);
+				builder.setParameter("end", endString);
+				builder.setParameter("location", location.getText());
+				builder.setParameter("isPublic", isPublic.getValue().toString());
+
+	 */
 	@PUT
 	@Path("/{id}")
 	@Transactional
-	public Response putEvent(@PathParam("id") final String eventId, @QueryParam("isPublic") final Boolean isPublic) {
+	public Response putEvent(
+		@PathParam("id") final String eventId,
+		@QueryParam("summary") final String summary,
+		@QueryParam("description") final String description,
+		@QueryParam("start") final String start,
+		@QueryParam("end") final String end,
+		@QueryParam("location") final String location,
+		@QueryParam("isPublic") final Boolean isPublic
+	) {
 		final String userName = getCurrentUser();
+		boolean modified = false;
 
 		m_logger.debug("putEvent: user = {}, event = {}, isPublic = {}", userName, eventId, isPublic);
-		if (userName == null || eventId == null || isPublic == null) {
+		if (userName == null || eventId == null) {
 			return Response.serverError().build();
 		}
 
@@ -102,7 +123,44 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 				m_logger.debug("putEvent: createdBy = {}, username = {}", event.getCreatedBy(), userName);
 				throw new WebApplicationException(401);
 			}
-			event.setIsPublic(isPublic);
+			
+			if (summary != null) {
+				event.setSummary(summary);
+				modified = true;
+			}
+			if (description != null) {
+				event.setDescription(description);
+				modified = true;
+			}
+			if (start != null) {
+				try {
+					event.setStartDate(DateXmlAdapter.DATE_FORMAT.parse(start));
+					modified = true;
+				} catch (final ParseException e) {
+					throw new WebApplicationException(e);
+				}
+			}
+			if (end != null) {
+				try {
+					event.setEndDate(DateXmlAdapter.DATE_FORMAT.parse(end));
+					modified = true;
+				} catch (final ParseException e) {
+					throw new WebApplicationException(e);
+				}
+			}
+			if (location != null) {
+				event.setLocation(location);
+				modified = true;
+			}
+			if (isPublic != null) {
+				event.setIsPublic(isPublic);
+				modified = true;
+			}
+
+			if (!modified) {
+				return Response.notModified().build();
+			}
+
 			m_eventService.putEvent(event);
 			return Response.seeOther(getRedirectUri(m_uriInfo)).build();
 		}
