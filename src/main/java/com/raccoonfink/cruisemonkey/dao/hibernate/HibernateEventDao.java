@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -20,17 +19,7 @@ public class HibernateEventDao extends AbstractHibernateDao<Event,String> implem
 	@Override
 	public List<Event> findByUser(final String userName) {
 		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			return findByUser(userName, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed findByUser for user: " + userName, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			tx.commit();
-		}
+		return findByUser(userName, session);
 	}
 	
 	public List<Event> findByUser(final String userName, final Session session) {
@@ -45,17 +34,7 @@ public class HibernateEventDao extends AbstractHibernateDao<Event,String> implem
 	@Override
 	public List<Event> findInRange(final Date start, final Date end, final String userName) {
 		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			return findInRange(start, end, userName, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed findInRange for user " + userName, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			tx.commit();
-		}
+		return findInRange(start, end, userName, session);
 	}
 
 	public List<Event> findInRange(final Date start, final Date end, final String userName, final Session session) {

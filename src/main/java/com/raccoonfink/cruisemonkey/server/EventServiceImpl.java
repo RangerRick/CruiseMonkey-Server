@@ -5,9 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -28,6 +27,9 @@ public class EventServiceImpl implements EventService, InitializingBean {
 
 	@Autowired
 	private UserService m_userService;
+
+	@Autowired
+	private SessionFactory m_sessionFactory;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -56,25 +58,10 @@ public class EventServiceImpl implements EventService, InitializingBean {
 
 	@Override
 	public void putEvent(final Event event, final String userName) {
-		final Session session = m_eventDao.createSession();
-		final Transaction tx = session.beginTransaction();
-
-		try {
-			if (event.getCreatedBy() == null) {
-				event.setCreatedBy(userName);
-			}
-			m_eventDao.save(event, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed putEvent " + event, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit putEvent on " + event + "/" + userName, e);
-			}
+		if (event.getCreatedBy() == null) {
+			event.setCreatedBy(userName);
 		}
+		m_eventDao.save(event);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -82,37 +69,24 @@ public class EventServiceImpl implements EventService, InitializingBean {
 	public List<Event> getPublicEvents(final String userName) {
 		if (userName == null) throw new IllegalArgumentException("You must provide a username!");
 
-		final Session session = m_eventDao.createSession();
-		final Transaction tx = session.beginTransaction();
+		final Session session = m_sessionFactory.getCurrentSession();
 
-		try {
-			final Criteria criteria = session.createCriteria(Event.class);
-			criteria.add(
-				Restrictions.or(
-					new Criterion[] {
-							Restrictions.eq("createdBy", userName).ignoreCase(),
-							Restrictions.eq("createdBy", "official").ignoreCase(),
-							Restrictions.eq("isPublic", true)
-					}
-				)
-			);
+		final Criteria criteria = session.createCriteria(Event.class);
+		criteria.add(
+			Restrictions.or(
+				new Criterion[] {
+						Restrictions.eq("createdBy", userName).ignoreCase(),
+						Restrictions.eq("createdBy", "official").ignoreCase(),
+						Restrictions.eq("isPublic", true)
+				}
+			)
+		);
 
-			criteria.addOrder(Order.asc("startDate"))
-				.addOrder(Order.asc("createdDate"))
-				.addOrder(Order.asc("summary"));
+		criteria.addOrder(Order.asc("startDate"))
+			.addOrder(Order.asc("createdDate"))
+			.addOrder(Order.asc("summary"));
 
-			return (List<Event>)criteria.list();
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed getPublicEvents " + userName, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit getPublicEvents on " + userName, e);
-			}
-		}
+		return (List<Event>)criteria.list();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -120,61 +94,33 @@ public class EventServiceImpl implements EventService, InitializingBean {
 	public List<Event> getPublicEventsInRange(final Date start, final Date end, final String userName) {
 		if (userName == null) throw new IllegalArgumentException("You must provide a username!");
 
-		final Session session = m_eventDao.createSession();
-		final Transaction tx = session.beginTransaction();
+		final Session session = m_sessionFactory.getCurrentSession();
 
-		try {
-			final Criteria criteria = session.createCriteria(Event.class);
-			criteria.add(
-				Restrictions.or(
-					new Criterion[] {
-							Restrictions.eq("createdBy", userName).ignoreCase(),
-							Restrictions.eq("createdBy", "official").ignoreCase(),
-							Restrictions.eq("isPublic", true)
-					}
-				)
-			);
+		final Criteria criteria = session.createCriteria(Event.class);
+		criteria.add(
+			Restrictions.or(
+				new Criterion[] {
+						Restrictions.eq("createdBy", userName).ignoreCase(),
+						Restrictions.eq("createdBy", "official").ignoreCase(),
+						Restrictions.eq("isPublic", true)
+				}
+			)
+		);
 
-			criteria.add(Restrictions.ge("startDate", start))
-				.add(Restrictions.le("endDate", end));
+		criteria.add(Restrictions.ge("startDate", start))
+			.add(Restrictions.le("endDate", end));
 
-			criteria.addOrder(Order.asc("startDate"))
-				.addOrder(Order.asc("createdDate"))
-				.addOrder(Order.asc("summary"));
+		criteria.addOrder(Order.asc("startDate"))
+			.addOrder(Order.asc("createdDate"))
+			.addOrder(Order.asc("summary"));
 
-			return (List<Event>)criteria.list();
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed getPublicEventsInRange " + userName, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit getPublicEventsInRange on " + userName, e);
-			}
-		}
+		return (List<Event>)criteria.list();
 	}
 	
 	@Override
 	public void deleteEvent(final Event event) {
 		if (event == null) throw new IllegalArgumentException("You must provide an event to delete!");
 		
-		final Session session = m_eventDao.createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			m_eventDao.delete(event, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed deleteEvent " + event, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit deleteEvent on " + event, e);
-			}
-		}
+		m_eventDao.delete(event);
 	}
 }

@@ -24,8 +24,8 @@
 
 	<!-- 
 	<bean id="calendarVisitor" class="com.raccoonfink.cruisemonkey.server.OfficialCalendarVisitor">
-		<property name="userDao" ref="userDao" />
-		<property name="eventDao" ref="eventDao" />
+		<property name="userDao" ref="userDaoProxy" />
+		<property name="eventDao" ref="eventDaoProxy" />
 	</bean>
 
 	<bean id="calendarManager" class="com.raccoonfink.cruisemonkey.server.CalendarManager">

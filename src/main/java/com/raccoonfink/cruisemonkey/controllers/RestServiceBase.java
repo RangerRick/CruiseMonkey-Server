@@ -35,7 +35,7 @@ public class RestServiceBase implements InitializingBean {
                 return requestUri;
             }
         } else {
-            UriBuilder builder = m_uriInfo.getRequestUriBuilder();
+        	UriBuilder builder = m_uriInfo.getRequestUriBuilder();
             for (final Object component : pathComponents) {
                 if (component != null) {
                     builder = builder.path(component.toString());

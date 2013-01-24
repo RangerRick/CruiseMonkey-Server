@@ -60,5 +60,23 @@
     <bean id="userInitializer" class="com.raccoonfink.cruisemonkey.server.UserInitializer" />
     <bean id="officialScheduleInitializer" class="com.raccoonfink.cruisemonkey.server.OfficialScheduleInitializer" depends-on="userInitializer" />
 
+	<!--
+	<bean id="userDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<qualifier value="proxy" />
+		<property name="target" ref="userDao" />
+		<property name="interceptorNames"><list><value>transactionInterceptor</value></list></property>
+	</bean>
+	<bean id="eventDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<qualifier value="proxy" />
+		<property name="target" ref="eventDao" />
+		<property name="interceptorNames"><list><value>transactionInterceptor</value></list></property>
+	</bean>
+	<bean id="favoriteDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<qualifier value="proxy" />
+		<property name="target" ref="favoriteDao" />
+		<property name="interceptorNames"><list><value>transactionInterceptor</value></list></property>
+	</bean>
+	-->
+
     <tx:annotation-driven proxy-target-class="true" />
 </beans>

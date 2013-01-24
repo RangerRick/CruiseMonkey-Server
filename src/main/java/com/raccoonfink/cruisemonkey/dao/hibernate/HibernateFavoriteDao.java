@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -34,17 +33,7 @@ public class HibernateFavoriteDao extends AbstractHibernateDao<Favorite,Integer>
 	@Override
 	public List<Favorite> findByUser(final String userName) {
 		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			return findByUser(userName, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed findByUser for user " + userName, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			tx.commit();
-		}
+		return findByUser(userName, session);
 	}
 	
 	public List<Favorite> findByUser(final String userName, final Session session) {
@@ -60,17 +49,7 @@ public class HibernateFavoriteDao extends AbstractHibernateDao<Favorite,Integer>
 	@Override
 	public Favorite findByUserAndEventId(final String userName, final String eventId) {
 		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			return findByUserAndEventId(userName, eventId, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed findByUserAndEventId for user " + userName + ", event " + eventId, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			tx.commit();
-		}
+		return findByUserAndEventId(userName, eventId, session);
 	}
 
 	public Favorite findByUserAndEventId(String userName, String eventId, final Session session) {

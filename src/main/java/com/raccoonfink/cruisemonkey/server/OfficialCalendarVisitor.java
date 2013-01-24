@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.Created;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -19,14 +18,14 @@ import net.fortuna.ical4j.model.property.Uid;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.CalendarVisitor;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
-import com.raccoonfink.cruisemonkey.dao.HibernateDao;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 import com.raccoonfink.cruisemonkey.model.User;
@@ -38,12 +37,15 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 
     private User m_importUser;
 
+    @Autowired
     private UserDao m_userDao;
+
+    @Autowired
     private EventDao m_eventDao;
-    private Session m_session         = null;
-    private Transaction m_transaction = null;
-	@SuppressWarnings("unused")
-	private VTimeZone m_timeZone;
+
+    @Autowired
+	private SessionFactory m_sessionFactory;
+
 	private long m_lastUpdated;
 
     public OfficialCalendarVisitor() {
@@ -53,67 +55,35 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_eventDao);
+		Assert.notNull(m_sessionFactory);
 		m_importUser = m_userDao.get("official");
-	}
-
-    public EventDao getEventDao() {
-    	return m_eventDao;
-    }
-    
-    public void setEventDao(final EventDao eventDao) {
-    	m_eventDao = eventDao;
-    }
-
-    public UserDao getUserDao() {
-    	return m_userDao;
-    }
-    
-    public void setUserDao(final UserDao userDao) {
-    	m_userDao = userDao;
-    }
-
-	@Override
-    @SuppressWarnings("unchecked")
-	public void begin() {
-    	if (m_eventDao instanceof HibernateDao<?,?>) {
-            m_session = ((HibernateDao<Event,String>)m_eventDao).createSession();
-            m_transaction = m_session.beginTransaction();
-    	}
-        m_lastUpdated = System.currentTimeMillis();
 	}
 
     @Override
 	public void visitEvent(final Component component) {
         final Event event = getEvent(component);
-        m_eventDao.save(event, m_session);
+        m_eventDao.save(event);
 	}
 
     @Override
-    public void visitTimezone(final Component component) {
-    	m_timeZone = getTimeZone(component);
+    public void begin() {
+    	m_lastUpdated = System.currentTimeMillis();
     }
-    
+
     @Override
     public void end() {
-    	if (m_session != null && m_transaction != null) {
-	    	final Criteria criteria = m_session.createCriteria(Event.class)
-	    			.add(Restrictions.lt("createdDate", new Date(m_lastUpdated)));
-	    	final List<Event> events = m_eventDao.find(criteria);
-	
-	        for (final Event event : events) {
-	        	if ("official".equals(event.getCreatedBy())) {
-	        		m_eventDao.delete(event, m_session);
-	        	}
-	        }
-	    	// System.out.println("");
-	        m_transaction.commit();
-	        System.out.println("added " + m_eventDao.findAll().size() + " events");
-    	}
-    }
+    	final Session session = m_sessionFactory.getCurrentSession();
+    	final Criteria criteria = session.createCriteria(Event.class)
+    			.add(Restrictions.lt("createdDate", new Date(m_lastUpdated)));
+    	final List<Event> events = m_eventDao.find(criteria);
 
-    private VTimeZone getTimeZone(final Component component) {
-		return new VTimeZone(component.getProperties());
-	}
+        for (final Event event : events) {
+        	if ("official".equals(event.getCreatedBy())) {
+        		m_eventDao.delete(event);
+        	}
+        }
+        System.out.println("added " + m_eventDao.findAll().size() + " events");
+    }
 
 	private Event getEvent(final Component component) {
 		final VEvent vevent = new VEvent(component.getProperties());
@@ -139,7 +109,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 			// System.err.println("new summaryString: '" + summaryString + "'");
 		}
 
-		final Event existingEvent = m_eventDao.get(id, m_session);
+		final Event existingEvent = m_eventDao.get(id);
 		// final String username = m_importUser.getUsername();
 
 		if (existingEvent == null) {

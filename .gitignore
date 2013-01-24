@@ -1,4 +1,5 @@
 *.swp
+.externalToolBuilders
 .settings
 .project
 .classpath

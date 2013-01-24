@@ -7,7 +7,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,7 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		m_sessionFactory = sessionFactory;
 	}
 	
-	@Override
-	public Session createSession() throws HibernateException {
+	protected Session createSession() throws HibernateException {
 		return m_sessionFactory.getCurrentSession();
 	}
 
@@ -42,26 +40,7 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 
 	@Override
 	public List<T> findAll() {
-		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		try {
-			return findAll(session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Failed to find all objects.", e);
-			tx.rollback();
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit findAll", e);
-			}
-		}
-	}
-
-	@Override
-	public List<T> findAll(final Session session) {
-		return resultWithDefaultSort(session.createCriteria(getClassType()));
+		return resultWithDefaultSort(createSession().createCriteria(getClassType()));
 	}
 
 	@Override
@@ -70,75 +49,20 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 	}
 	
 	@Override
-	public T get(final K id) {
-		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		try {
-			return get(id, session);
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit get of " + id, e);
-			}
-		}
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
-	public T get(final K id, final Session session) {
-		return (T)session.get(getClassType(), id);
+	public T get(final K id) {
+		return (T)createSession().get(getClassType(), id);
 	}
 
 	@Override
 	public void delete(final T obj) {
-		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			delete(obj, session);
-		} catch (final RuntimeException e) {
-			tx.rollback();
-			m_logger.warn("Had to roll back delete on " + obj, e);
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to delete on " + obj, e);
-			}
-		}
-	}
-
-	@Override
-	public void delete(final T obj, final Session session) {
-		session.delete(obj);
+		createSession().delete(obj);
 	}
 
 	@Override
 	public void save(final T obj) {
-		final Session session = createSession();
-		final Transaction tx = session.beginTransaction();
-		
-		try {
-			save(obj, session);
-		} catch (final RuntimeException e) {
-			m_logger.warn("Had to roll back save on " + obj, e);
-			tx.rollback();
-			throw e;
-		} finally {
-			try {
-				tx.commit();
-			} catch (final HibernateException e) {
-				m_logger.warn("Failed to commit save on " + obj, e);
-			}
-		}
-	}
-
-	@Override
-	public void save(final T obj, final Session session) {
 		m_logger.debug("saving: {}", obj);
-		session.saveOrUpdate(obj);
+		createSession().saveOrUpdate(obj);
 	}
 
 }

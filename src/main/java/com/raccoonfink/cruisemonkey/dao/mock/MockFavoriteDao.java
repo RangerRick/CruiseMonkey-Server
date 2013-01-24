@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.dao.FavoriteDao;
@@ -27,18 +26,8 @@ public class MockFavoriteDao implements FavoriteDao {
 	}
 
 	@Override
-	public Session createSession() {
-		return null;
-	}
-
-	@Override
 	public List<Favorite> findAll() {
 		return new ArrayList<Favorite>(m_favorites);
-	}
-
-	@Override
-	public List<Favorite> findAll(final Session session) {
-		return findAll();
 	}
 
 	@Override
@@ -57,27 +46,12 @@ public class MockFavoriteDao implements FavoriteDao {
 	}
 
 	@Override
-	public Favorite get(final Integer id, Session session) {
-		return get(id);
-	}
-
-	@Override
 	public void delete(final Favorite obj) {
 		m_favorites.remove(obj);
 	}
 
 	@Override
-	public void delete(Favorite obj, Session session) {
-		delete(obj);
-	}
-
-	@Override
 	public void save(final Favorite obj) {
-		m_favorites.add(obj);
-	}
-
-	@Override
-	public void save(final Favorite obj, Session session) {
 		m_favorites.add(obj);
 	}
 
@@ -93,11 +67,6 @@ public class MockFavoriteDao implements FavoriteDao {
 	}
 	
 	@Override
-	public List<Favorite> findByUser(final String userName, final Session session) {
-		return findByUser(userName);
-	}
-
-	@Override
 	public Favorite findByUserAndEventId(final String userName, final String eventId) {
 		for (final Favorite favorite : m_favorites) {
 			if (favorite.getUser() == userName && favorite.getEvent() == eventId) {
@@ -105,10 +74,5 @@ public class MockFavoriteDao implements FavoriteDao {
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public Favorite findByUserAndEventId(final String userName, final String eventId, final Session session) {
-		return findByUserAndEventId(userName, eventId);
 	}
 }

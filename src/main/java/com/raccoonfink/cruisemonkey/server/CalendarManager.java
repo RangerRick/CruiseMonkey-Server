@@ -81,8 +81,8 @@ public class CalendarManager implements InitializingBean {
 	
 	        if ("VEVENT".equals(name)) {
 	        	visitor.visitEvent(component);
-	        } else if ("VTIMEZONE".equals(name)) {
-	        	visitor.visitTimezone(component);
+//			} else if ("VTIMEZONE".equals(name)) {
+//	        	visitor.visitTimezone(component);
 	        } else {
 	            System.err.println("Warning: not sure how to handle " + name);
 	        }

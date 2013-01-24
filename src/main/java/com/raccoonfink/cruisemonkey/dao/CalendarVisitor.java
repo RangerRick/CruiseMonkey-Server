@@ -6,7 +6,7 @@ public interface CalendarVisitor {
 
 	void begin();
 	void visitEvent(final Component component);
-	void visitTimezone(final Component component);
+	// void visitTimezone(final Component component);
 	void end();
 
 }

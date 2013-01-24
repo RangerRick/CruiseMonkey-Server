@@ -1,6 +1,7 @@
 package com.raccoonfink.cruisemonkey.controllers;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,20 +49,29 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Autowired
 	EventService m_eventService;
 
+	@InjectParam("sessionFactory")
+	@Autowired
+	SessionFactory m_sessionFactory;
+
 	@Context
 	UriInfo m_uriInfo;
 
 	public EventRestService() {}
 
-	public EventRestService(@InjectParam("eventService") final EventService eventService) {
+	public EventRestService(
+		@InjectParam("eventService") final EventService eventService,
+		@InjectParam("sessionFactory") final SessionFactory sessionFactory
+	) {
 		super();
 		m_eventService = eventService;
+		m_sessionFactory = sessionFactory;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(m_eventService);
+		Assert.notNull(m_sessionFactory);
 	}
 
     @GET
@@ -66,13 +79,22 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Transactional(readOnly=true)
 	public List<Event> getEvents(@QueryParam("start") final Date start, @QueryParam("end") final Date end, @QueryParam("user") final String userName) {
     	m_logger.debug("getEvents: start = {}, end = {}, user = {}", start, end, userName);
-		final List<Event> events;
-		if (start != null && end != null) {
-			events = m_eventService.getEventsInRange(start, end, userName);
-		} else {
-			events = m_eventService.getEvents(userName);
+
+    	final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
+		
+		try {
+			if (start != null && end != null) {
+				return m_eventService.getEventsInRange(start, end, userName);
+			} else {
+				return m_eventService.getEvents(userName);
+			}
+		} catch (final HibernateException e) {
+			m_logger.debug("Failed to get events for user " + userName);
+			tx.rollback();
+			return new ArrayList<Event>();
+		} finally {
+			tx.commit();
 		}
-		return events;
 	}
 
 	@GET
@@ -81,19 +103,20 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Transactional(readOnly=true)
 	public Event getEvent(@PathParam("id") final String id) {
 		m_logger.debug("getEvent: id = {}", id);
-		return m_eventService.getEvent(id);
+
+    	final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
+		
+		try {
+			return m_eventService.getEvent(id);
+		} catch (final HibernateException e) {
+			m_logger.debug("Failed to get event " + id);
+			tx.rollback();
+			return null;
+		} finally {
+			tx.commit();
+		}
 	}
 
-	/*
-	 * 				builder.setParameter("createdBy", CM3.getNetworkState().getUsername());
-				builder.setParameter("summary", summary.getText());
-				builder.setParameter("description", summary.getText());
-				builder.setParameter("start", startString);
-				builder.setParameter("end", endString);
-				builder.setParameter("location", location.getText());
-				builder.setParameter("isPublic", isPublic.getValue().toString());
-
-	 */
 	@PUT
 	@Path("/{id}")
 	@Transactional
@@ -114,55 +137,65 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 			return Response.serverError().build();
 		}
 
-		final Event event = m_eventService.getEvent(eventId);
-		if (event == null) {
-			m_logger.debug("putEvent: Trying to modify an event that's not in the database!");
-			return Response.notModified().build();
-		} else {
-			if (!event.getCreatedBy().equals(userName)) {
-				m_logger.debug("putEvent: createdBy = {}, username = {}", event.getCreatedBy(), userName);
-				throw new WebApplicationException(401);
-			}
-			
-			if (summary != null) {
-				event.setSummary(summary);
-				modified = true;
-			}
-			if (description != null) {
-				event.setDescription(description);
-				modified = true;
-			}
-			if (start != null) {
-				try {
-					event.setStartDate(DateXmlAdapter.DATE_FORMAT.parse(start));
-					modified = true;
-				} catch (final ParseException e) {
-					throw new WebApplicationException(e);
-				}
-			}
-			if (end != null) {
-				try {
-					event.setEndDate(DateXmlAdapter.DATE_FORMAT.parse(end));
-					modified = true;
-				} catch (final ParseException e) {
-					throw new WebApplicationException(e);
-				}
-			}
-			if (location != null) {
-				event.setLocation(location);
-				modified = true;
-			}
-			if (isPublic != null) {
-				event.setIsPublic(isPublic);
-				modified = true;
-			}
-
-			if (!modified) {
+    	final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
+		
+		try {
+			final Event event = m_eventService.getEvent(eventId);
+			if (event == null) {
+				m_logger.debug("putEvent: Trying to modify an event that's not in the database!");
 				return Response.notModified().build();
+			} else {
+				if (!event.getCreatedBy().equals(userName)) {
+					m_logger.debug("putEvent: createdBy = {}, username = {}", event.getCreatedBy(), userName);
+					throw new WebApplicationException(401);
+				}
+				
+				if (summary != null) {
+					event.setSummary(summary);
+					modified = true;
+				}
+				if (description != null) {
+					event.setDescription(description);
+					modified = true;
+				}
+				if (start != null) {
+					try {
+						event.setStartDate(DateXmlAdapter.DATE_FORMAT.parse(start));
+						modified = true;
+					} catch (final ParseException e) {
+						throw new WebApplicationException(e);
+					}
+				}
+				if (end != null) {
+					try {
+						event.setEndDate(DateXmlAdapter.DATE_FORMAT.parse(end));
+						modified = true;
+					} catch (final ParseException e) {
+						throw new WebApplicationException(e);
+					}
+				}
+				if (location != null) {
+					event.setLocation(location);
+					modified = true;
+				}
+				if (isPublic != null) {
+					event.setIsPublic(isPublic);
+					modified = true;
+				}
+	
+				if (!modified) {
+					return Response.notModified().build();
+				}
+	
+				m_eventService.putEvent(event);
+				return Response.seeOther(getRedirectUri(m_uriInfo)).build();
 			}
-
-			m_eventService.putEvent(event);
-			return Response.seeOther(getRedirectUri(m_uriInfo)).build();
+		} catch (final HibernateException e) {
+			m_logger.debug("Failed to put event " + eventId);
+			tx.rollback();
+			return Response.serverError().build();
+		} finally {
+			tx.commit();
 		}
 	}
 
@@ -170,18 +203,31 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Path("/{id}")
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional(readOnly=true)
-	public void deleteEvent(@PathParam("id") final String id) {
+	public Response deleteEvent(@PathParam("id") final String id) {
 		m_logger.debug("deleteEvent: id = {}", id);
 		final String user = getCurrentUser();
-		final Event event = m_eventService.getEvent(id);
-		if (event == null) {
-			m_logger.debug("deleteEvent: Trying to delete an event that's not in the database!");
-		} else {
-			if (!event.getCreatedBy().equals(user)) {
-				m_logger.debug("deleteEvent: createdBy = {}, username = {}", event.getCreatedBy(), user);
-				throw new WebApplicationException(401);
+
+    	final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
+		
+		try {
+			final Event event = m_eventService.getEvent(id);
+			if (event == null) {
+				m_logger.debug("deleteEvent: Trying to delete an event that's not in the database!");
+				return Response.notModified().build();
+			} else {
+				if (!event.getCreatedBy().equals(user)) {
+					m_logger.debug("deleteEvent: createdBy = {}, username = {}", event.getCreatedBy(), user);
+					throw new WebApplicationException(401);
+				}
+				m_eventService.deleteEvent(event);
+				return Response.ok().build();
 			}
-			m_eventService.deleteEvent(event);
+		} catch (final HibernateException e) {
+			m_logger.debug("Failed to delete event " + id);
+			tx.rollback();
+			return Response.serverError().build();
+		} finally {
+			tx.commit();
 		}
 	}
 
@@ -190,7 +236,18 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@Transactional
 	public Response putEvent(final Event event) {
 		m_logger.debug("putEvent: event = {}", event);
-		m_eventService.putEvent(event, getCurrentUser());
-		return Response.seeOther(getRedirectUri(m_uriInfo, event.getId())).build();
+
+    	final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
+		
+		try {
+			m_eventService.putEvent(event, getCurrentUser());
+			return Response.seeOther(getRedirectUri(m_uriInfo, event.getId())).build();
+		} catch (final HibernateException e) {
+			m_logger.debug("Failed to put event " + event);
+			tx.rollback();
+			return Response.serverError().build();
+		} finally {
+			tx.commit();
+		}
 	}
 }

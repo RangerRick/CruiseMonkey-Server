@@ -1,5 +1,8 @@
 package com.raccoonfink.cruisemonkey.security;
 
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,6 +28,9 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
 	@Autowired
 	private UserDao m_userDao;
 
+	@Autowired
+	private SessionFactory m_sessionFactory;
+
 	static {
 		StatusNetServiceFactory.setHost(System.getProperty("statusNetHost", "c4.amberwood.net"));
 		StatusNetServiceFactory.setPort(Integer.valueOf(System.getProperty("statusNetPort", "80")));
@@ -36,6 +42,7 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
 	@Override
 	protected void doAfterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
+		Assert.notNull(m_sessionFactory);
 	}
 
 	@Override
@@ -53,28 +60,39 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
         	m_logger.debug("authentication attempted with empty username");
             throw new UsernameNotFoundException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.emptyUsername", "Username cannot be empty"));
         }
+
         final String password = token.getCredentials().toString();
         if (!StringUtils.hasLength(password)) {
         	m_logger.debug("authentication attempted with empty password");
             throw new InsufficientAuthenticationException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        UserDetails user = m_userDao.get(username);
-        m_logger.debug("user = {}", user);
-        if (user == null || !password.equals(user.getPassword())) {
-        	final StatusNetService sn = m_statusNetServiceFactory.getService(username, password);
-        	try {
-            	sn.authorize();
-            	user = sn.getUser();
-            	m_userDao.save((User)user);
-        	} catch (final Exception e) {
-        		m_logger.debug("exception while retrieving " + username, e);
-                throw new InsufficientAuthenticationException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
-        	}
-        }
+        final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
 
-        m_logger.debug("returning user = {}", user);
-        return user;
+		try {
+	        UserDetails user = m_userDao.get(username);
+	        m_logger.debug("user = {}", user);
+	        if (user == null || !password.equals(user.getPassword())) {
+	        	final StatusNetService sn = m_statusNetServiceFactory.getService(username, password);
+	        	try {
+	            	sn.authorize();
+	            	user = sn.getUser();
+	            	m_userDao.save((User)user);
+	        	} catch (final Exception e) {
+	        		m_logger.debug("exception while retrieving " + username, e);
+	                throw new InsufficientAuthenticationException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+	        	}
+	        }
+	
+	        m_logger.debug("returning user = {}", user);
+	        return user;
+		} catch (final HibernateException e) {
+			m_logger.warn("Failed to look up user " + username, e);
+			tx.rollback();
+			return null;
+		} finally {
+			tx.commit();
+		}
 	}
 
 }

@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
@@ -27,11 +26,6 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
-	public Session createSession() {
-		return null;
-	}
-
-	@Override
 	public Event get(final String id) {
 		for (final Event event : m_events) {
 			if (event.getId() == id) {
@@ -42,18 +36,8 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
-	public Event get(final String id, final Session session) {
-		return get(id);
-	}
-
-	@Override
 	public List<Event> findAll() {
 		return sortedEventList(m_events);
-	}
-
-	@Override
-	public List<Event> findAll(Session session) {
-		return findAll();
 	}
 
 	@Override
@@ -110,20 +94,10 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
-	public void delete(final Event event, final Session session) {
-		delete(event);
-	}
-
-	@Override
 	public void save(final Event event) {
 		m_events.add(event);
 	}
 	
-	@Override
-	public void save(final Event event, final Session session) {
-		save(event);
-	}
-
 	private List<Event> sortedEventList(final Collection<Event> events) {
 		final List<Event> newList = new ArrayList<Event>(events);
 		Collections.sort(newList, new Comparator<Event>() {
