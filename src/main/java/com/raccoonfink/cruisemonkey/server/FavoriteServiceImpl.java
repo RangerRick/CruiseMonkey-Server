@@ -2,6 +2,7 @@ package com.raccoonfink.cruisemonkey.server;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -60,7 +61,11 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit addFavorite on " + favorite, e);
+			}
 		}
 	}
 
@@ -85,7 +90,11 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit addFavorite on " + username + "/" + eventId, e);
+			}
 		}
 	}
 
@@ -111,7 +120,11 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit removeFavorite on " + username + "/" + id, e);
+			}
 		}
 	}
 
@@ -134,7 +147,11 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit removeFavorite on " + username + "/" + eventId, e);
+			}
 		}
 	}
 

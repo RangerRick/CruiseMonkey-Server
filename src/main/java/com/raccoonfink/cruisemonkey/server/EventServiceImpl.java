@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
@@ -68,7 +69,11 @@ public class EventServiceImpl implements EventService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit putEvent on " + event + "/" + userName, e);
+			}
 		}
 	}
 
@@ -102,7 +107,11 @@ public class EventServiceImpl implements EventService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit getPublicEvents on " + userName, e);
+			}
 		}
 	}
 
@@ -139,7 +148,11 @@ public class EventServiceImpl implements EventService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit getPublicEventsInRange on " + userName, e);
+			}
 		}
 	}
 	
@@ -157,7 +170,11 @@ public class EventServiceImpl implements EventService, InitializingBean {
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit deleteEvent on " + event, e);
+			}
 		}
 	}
 }

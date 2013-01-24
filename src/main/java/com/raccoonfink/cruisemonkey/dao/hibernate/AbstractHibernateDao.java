@@ -51,7 +51,11 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit findAll", e);
+			}
 		}
 	}
 
@@ -72,7 +76,11 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 		try {
 			return get(id, session);
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit get of " + id, e);
+			}
 		}
 	}
 
@@ -94,7 +102,11 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 			m_logger.warn("Had to roll back delete on " + obj, e);
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to delete on " + obj, e);
+			}
 		}
 	}
 
@@ -115,7 +127,11 @@ public abstract class AbstractHibernateDao<T,K extends Serializable> implements 
 			tx.rollback();
 			throw e;
 		} finally {
-			tx.commit();
+			try {
+				tx.commit();
+			} catch (final HibernateException e) {
+				m_logger.warn("Failed to commit save on " + obj, e);
+			}
 		}
 	}
 
