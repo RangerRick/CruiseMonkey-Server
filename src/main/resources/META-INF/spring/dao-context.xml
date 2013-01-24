@@ -19,10 +19,9 @@
 
     <context:annotation-config />
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-		p:driverClassName="org.hsqldb.jdbcDriver"
+	<bean id="dataSource" class="org.hsqldb.jdbc.JDBCDataSource"
 		p:url="jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true"
-		p:username="sa"
+		p:user="sa"
 		p:password="" />
 
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
