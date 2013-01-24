@@ -19,9 +19,10 @@
 
     <context:annotation-config />
 
-	<bean id="dataSource" class="org.hsqldb.jdbc.JDBCDataSource"
-		p:url="jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true"
-		p:user="sa"
+	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close"
+		p:driverClass="org.hsqldb.jdbcDriver"
+		p:jdbcUrl="jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true"
+		p:username="sa"
 		p:password="" />
 
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
