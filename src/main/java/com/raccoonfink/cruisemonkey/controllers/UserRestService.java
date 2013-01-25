@@ -52,7 +52,7 @@ public class UserRestService implements InitializingBean {
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
 	public List<User> getAllUsers() {
 		return m_userService.getUsers();
@@ -60,7 +60,7 @@ public class UserRestService implements InitializingBean {
 
 	@GET
 	@Path("/{username}")
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
 	public User getUser(@PathParam("username") final String username) {
 		return m_userService.getUser(username);

@@ -26,9 +26,18 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
+	public Favorite getFavorite(final String username, final Long id) {
+		final Favorite favorite = m_favoriteDao.findByPropertyValue("id", id);
+		if (favorite != null && favorite.getUser().equals(username)) {
+			return favorite;
+		}
+		return null;
+	}
+
+	@Override
 	public Favorite getFavorite(final String username, final String eventId) {
 		final Favorite favorite = m_favoriteDao.findByUserAndEventId(username, eventId);
-		if (favorite.getUser().equals(username)) {
+		if (favorite != null && favorite.getUser().equals(username)) {
 			return favorite;
 		}
 		return null;

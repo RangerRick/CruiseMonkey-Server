@@ -10,6 +10,8 @@ public interface FavoriteService {
 
 	public Favorite getFavorite(final String username, final String eventId);
 
+	public Favorite getFavorite(final String username, final Long id);
+
 	public void addFavorite(Favorite favorite);
 
 	public void addFavorite(final String username, final String eventId);

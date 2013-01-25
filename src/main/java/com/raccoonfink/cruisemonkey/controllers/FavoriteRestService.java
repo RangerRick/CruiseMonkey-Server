@@ -11,9 +11,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.slf4j.Logger;
@@ -83,68 +84,78 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 	}
 
     @GET
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
-	public List<Favorite> getFavorites(@QueryParam("user") final String userName) {
-		final String user = userName == null? getCurrentUser() : userName;
+    public List<Favorite> getFavorites() {
+		final String user = getCurrentUser();
 		m_logger.debug("user = {}", user);
-		
+
 		return m_favoriteService.getFavorites(user);
-	}
+    }
+
+    @GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(readOnly=true)
+    @Path("/{id}")
+    public Favorite getFavorite(final Long id) {
+		final String user = getCurrentUser();
+		m_logger.debug("user = {}", user);
+
+		return m_favoriteService.getFavorite(user, id);
+    }
 
 	@PUT
 	@Transactional
-	public Response putFavorite(@QueryParam("event") final String eventId) {
+	public void putFavorite(@QueryParam("event") final String eventId) {
 		final String userName = getCurrentUser();
 
 		m_logger.debug("user = {}, event = {}", userName, eventId);
-		if (userName == null || eventId == null) {
-			return Response.serverError().build();
+		if (userName == null) {
+			throw new WebApplicationException(new IllegalStateException("Unable to determine current user!"), Status.FORBIDDEN);
+		}
+		if (eventId == null) {
+			throw new WebApplicationException(new IllegalArgumentException("Event ID not specified."), Status.BAD_REQUEST);
 		}
 
 		m_favoriteService.addFavorite(userName, eventId);
 		final Favorite favorite = m_favoriteService.getFavorite(userName, eventId);
 		m_logger.debug("created: {}", favorite);
-		return Response.seeOther(getRedirectUri(m_uriInfo, favorite.getId())).build();
 	}
 
 	@POST
-	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response postFavorite(final Favorite favorite) {
+	public void postFavorite(final Favorite favorite) {
 		final String userName = getCurrentUser();
 		
-		if (!userName.equals(favorite.getUser())) {
-			throw new IllegalArgumentException("You cannot create favorites for other users!");
+		if (!userName.equalsIgnoreCase(favorite.getUser())) {
+			throw new WebApplicationException(new IllegalArgumentException("You cannot create favorites for other users!"), Status.FORBIDDEN);
 		}
 
 		m_favoriteService.addFavorite(favorite);
 		final Favorite saved = m_favoriteService.getFavorite(favorite.getUser(), favorite.getEvent());
-		m_logger.debug("saved favorite = {}", favorite);
-		return Response.seeOther(getRedirectUri(m_uriInfo, saved.getId())).build();
+		m_logger.debug("saved favorite = {}", saved);
 	}
 
 	@DELETE
 	@Path("/{id}")
-	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response deleteFavoriteById(@PathParam("id") final Long id) {
+	public void deleteFavoriteById(@PathParam("id") final Long id) {
 		final String userName = getCurrentUser();
 		m_logger.debug("user = {}, id = {}", userName, id);
 
 		m_favoriteService.removeFavorite(userName, id);
-		return Response.ok().build();
 	}
 
 	@DELETE
-	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response deleteFavoriteByEventId(@QueryParam("event") final String eventId) {
+	public void deleteFavoriteByEventId(@QueryParam("event") final String eventId) {
 		final String user = getCurrentUser();
 		m_logger.debug("user = {}, event = {}", user, eventId);
 
 		m_favoriteService.removeFavorite(user, eventId);
 		m_logger.debug("deleted favorite = {}, {}", user, eventId);
-		return Response.ok().build();
 	}
 }

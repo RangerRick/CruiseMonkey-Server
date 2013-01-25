@@ -77,7 +77,7 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 
     @GET
     @Path("/events")
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
 	public EventCollection getEventCollection() {
     	final String userName = getCurrentUser();
@@ -96,7 +96,7 @@ public class ApplicationRestService extends RestServiceBase implements Initializ
 	
     @POST
     @Path("/photos")
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Transactional
     public void uploadPhoto(@FormParam("file") final String file, @FormParam("filename") final String fileName) {

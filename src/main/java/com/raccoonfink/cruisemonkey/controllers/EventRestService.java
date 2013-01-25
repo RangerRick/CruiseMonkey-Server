@@ -15,7 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	}
 
     @GET
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
 	public List<Event> getEvents(@QueryParam("user") final String userName) {
     	m_logger.debug("getEvents: user = {}", userName);
@@ -73,7 +73,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 
 	@GET
 	@Path("/{id}")
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
 	public Event getEvent(@PathParam("id") final String id) {
 		m_logger.debug("getEvent: id = {}", id);
@@ -84,7 +84,7 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 	@PUT
 	@Path("/{id}")
 	@Transactional
-	public Response putEvent(
+	public void putEvent(
 		@PathParam("id") final String eventId,
 		@QueryParam("summary") final String summary,
 		@QueryParam("description") final String description,
@@ -97,18 +97,21 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 		boolean modified = false;
 
 		m_logger.debug("putEvent: user = {}, event = {}, isPublic = {}", userName, eventId, isPublic);
-		if (userName == null || eventId == null) {
-			return Response.serverError().build();
+		if (userName == null) {
+			throw new WebApplicationException(new IllegalStateException("Unable to determine current user!"), Status.FORBIDDEN);
+		}
+		if (eventId == null) {
+			throw new WebApplicationException(new IllegalArgumentException("Event ID not specified."), Status.BAD_REQUEST);
 		}
 
 		final Event event = m_eventService.getEvent(eventId);
 		if (event == null) {
 			m_logger.debug("putEvent: Trying to modify an event that's not in the database!");
-			return Response.notModified().build();
+			throw new WebApplicationException(new IllegalStateException("Trying to modify an event that's not in the database!"), Status.NOT_FOUND);
 		} else {
-			if (!event.getCreatedBy().equals(userName)) {
+			if (!event.getCreatedBy().equalsIgnoreCase(userName)) {
 				m_logger.debug("putEvent: createdBy = {}, username = {}", event.getCreatedBy(), userName);
-				throw new WebApplicationException(401);
+				throw new WebApplicationException(new IllegalStateException("Trying to modify an event created by a different user!"), Status.FORBIDDEN);
 			}
 			
 			if (summary != null) {
@@ -145,43 +148,40 @@ public class EventRestService extends RestServiceBase implements InitializingBea
 			}
 
 			if (!modified) {
-				return Response.notModified().build();
+				throw new WebApplicationException(Status.NOT_FOUND);
 			}
 
 			m_eventService.putEvent(event);
-			return Response.seeOther(getRedirectUri(m_uriInfo)).build();
 		}
 	}
 
 	@DELETE
 	@Path("/{id}")
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly=true)
-	public Response deleteEvent(@PathParam("id") final String id) {
+	public void deleteEvent(@PathParam("id") final String id) {
 		m_logger.debug("deleteEvent: id = {}", id);
 		final String user = getCurrentUser();
 
 		final Event event = m_eventService.getEvent(id);
 		if (event == null) {
 			m_logger.debug("deleteEvent: Trying to delete an event that's not in the database!");
-			return Response.notModified().build();
+			throw new WebApplicationException(new IllegalStateException("Trying to delete an event that's not in the database!"), Status.NOT_FOUND);
 		} else {
-			if (!event.getCreatedBy().equals(user)) {
+			if (!event.getCreatedBy().equalsIgnoreCase(user)) {
 				m_logger.debug("deleteEvent: createdBy = {}, username = {}", event.getCreatedBy(), user);
-				throw new WebApplicationException(401);
+				throw new WebApplicationException(new IllegalStateException("Trying to delete an event that was created by another user!"), Status.FORBIDDEN);
 			}
 			m_eventService.deleteEvent(event);
-			return Response.ok().build();
 		}
 	}
 
 	@POST
-	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response putEvent(final Event event) {
+	public void putEvent(final Event event) {
 		m_logger.debug("putEvent: event = {}", event);
 
 		m_eventService.putEvent(event, getCurrentUser());
-		return Response.seeOther(getRedirectUri(m_uriInfo, event.getId())).build();
 	}
 }

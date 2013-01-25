@@ -27,15 +27,23 @@ public class RestServiceBase implements InitializingBean {
 	}
 
     protected static URI getRedirectUri(final UriInfo m_uriInfo, final Object... pathComponents) {
-        if (pathComponents != null && pathComponents.length == 0) {
-            final URI requestUri = m_uriInfo.getRequestUri();
-            try {
-                return new URI(requestUri.getScheme(), requestUri.getHost(), requestUri.getPath().replaceAll("/$", "").replaceAll("\\?.*?$", ""), null);
+    	return getRedirectUri(m_uriInfo, true, pathComponents);
+    }
+
+    protected static URI getRedirectUri(final boolean stripQueryParams, final UriInfo m_uriInfo, final Object... pathComponents) {
+        if (pathComponents == null || pathComponents.length == 0) {
+        	final URI requestUri = m_uriInfo.getRequestUri();
+        	try {
+                final String path = requestUri.getPath().replaceAll("/$", "");
+				return new URI(requestUri.getScheme(), requestUri.getHost(), stripQueryParams? path.replaceAll("\\?.*?$", "") : path, null);
             } catch (final URISyntaxException e) {
                 return requestUri;
             }
         } else {
         	UriBuilder builder = m_uriInfo.getRequestUriBuilder();
+        	if (stripQueryParams) {
+        		builder = builder.replaceQuery("");
+        	}
             for (final Object component : pathComponents) {
                 if (component != null) {
                     builder = builder.path(component.toString());
