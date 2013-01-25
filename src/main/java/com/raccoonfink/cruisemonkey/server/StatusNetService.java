@@ -166,7 +166,7 @@ public class StatusNetService {
 
 			final User user = new User();
 
-			final String userName = m_credentials.getUserName();
+			final String userName = m_credentials.getUserName().toLowerCase();
 			user.setUsername(userName);
 			user.setPassword(m_credentials.getPassword());
 			user.setCreatedBy(userName);
@@ -182,7 +182,7 @@ public class StatusNetService {
 				final String fieldName = parser.getCurrentName();
 				current = parser.nextToken();
 				if ("name".equals(fieldName)) {
-					user.setName(parser.getText());
+					user.setFullName(parser.getText());
 				}
 			}
 

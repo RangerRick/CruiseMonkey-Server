@@ -60,14 +60,17 @@ public class DefaultAuthenticationProvider extends AbstractUserDetailsAuthentica
             throw new InsufficientAuthenticationException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
         }
 
-        UserDetails user = m_userDao.get(username);
+		final String userLowerCase = username.toLowerCase();
+        UserDetails user = m_userDao.get(userLowerCase);
         m_logger.debug("user = {}", user);
         if (user == null || !password.equals(user.getPassword())) {
-        	final StatusNetService sn = m_statusNetServiceFactory.getService(username, password);
+        	final StatusNetService sn = m_statusNetServiceFactory.getService(userLowerCase, password);
         	try {
             	sn.authorize();
-            	m_userDao.save((User)sn.getUser());
-            	user = m_userDao.get(username);
+            	final User snUser = (User)sn.getUser();
+            	snUser.setDisplayName(username);
+				m_userDao.save(snUser);
+            	user = m_userDao.get(userLowerCase);
         	} catch (final Exception e) {
         		m_logger.debug("exception while retrieving " + username, e);
                 throw new InsufficientAuthenticationException(messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));

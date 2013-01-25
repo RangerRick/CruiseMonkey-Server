@@ -49,7 +49,7 @@ public class CalendarTest {
 		manager.setVisitor(m_visitor);
         manager.updateNow();
         
-        final List<Event> events = m_eventDao.findAll();
+        final List<Event> events = m_eventDao.findAllAsList();
         assertEquals(2, events.size());
         assertEquals(1347312600000L, events.get(0).getStartDate().getTime());
     }
@@ -62,7 +62,7 @@ public class CalendarTest {
         manager.setUrl(new File("src/test/resources/before.ics").toURI().toURL());
         manager.updateNow();
         
-        final List<Event> beforeEvents = m_eventDao.findAll();
+        final List<Event> beforeEvents = m_eventDao.findAllAsList();
         assertEquals(2, beforeEvents.size());
         assertEquals(1347312600000L, beforeEvents.get(0).getStartDate().getTime());
         assertEquals("A", beforeEvents.get(0).getSummary());
@@ -71,7 +71,7 @@ public class CalendarTest {
 		manager.setUrl(new File("src/test/resources/after.ics").toURI().toURL());
         manager.updateNow();
         
-        final List<Event> afterEvents = m_eventDao.findAll();
+        final List<Event> afterEvents = m_eventDao.findAllAsList();
         assertEquals(2, afterEvents.size());
         assertEquals("A", afterEvents.get(0).getSummary());
         assertEquals("C", afterEvents.get(1).getSummary());
@@ -86,7 +86,7 @@ public class CalendarTest {
         manager.setUrl(new File("src/test/resources/jccc2-before.ics").toURI().toURL());
         manager.updateNow();
         
-        final List<Event> beforeEvents = m_eventDao.findAll();
+        final List<Event> beforeEvents = m_eventDao.findAllAsList();
         assertEquals(2, beforeEvents.size());
         assertEquals("DRAMA CLUB with Bill Corbett & Peter Sagal", beforeEvents.get(0).getSummary());
         assertEquals("JCCC2 \"Official\" Group Photo", beforeEvents.get(1).getSummary());
@@ -94,7 +94,7 @@ public class CalendarTest {
 		manager.setUrl(new File("src/test/resources/jccc2-after.ics").toURI().toURL());
         manager.updateNow();
         
-        final List<Event> afterEvents = m_eventDao.findAll();
+        final List<Event> afterEvents = m_eventDao.findAllAsList();
         assertEquals(66, afterEvents.size());
         
         final Event modifiedEvent = m_eventDao.get("u3lhp5hr1t68i8sescon20htps@google.com:20110103T220000");

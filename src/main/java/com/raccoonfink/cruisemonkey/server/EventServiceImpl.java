@@ -11,6 +11,7 @@ import org.springframework.util.Assert;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
+import com.raccoonfink.cruisemonkey.model.User;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -45,9 +46,15 @@ public class EventServiceImpl implements EventService, InitializingBean {
 
 	@Override
 	public void putEvent(final Event event, final String userName) {
-		if (event.getCreatedBy() == null) {
-			event.setCreatedBy(userName);
+		if (userName == null) {
+			throw new IllegalArgumentException("You must specify a username!");
 		}
+		final User user = m_userService.getUser(userName);
+		if (user == null) {
+			throw new UnsupportedOperationException("Attempting to save an event as a user that doesn't exist!");
+		}
+
+		event.setCreatedBy(user.getDisplayName());
 		m_eventDao.save(event);
 	}
 

@@ -30,7 +30,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @XmlAccessorType(XmlAccessType.NONE)
 @NodeEntity
 public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 
 	@GraphId
 	private Long m_id;
@@ -38,7 +38,9 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	@Indexed(fieldName="username", unique=true)
 	private String m_username;
 
-	private String m_name;
+	private String m_displayName;
+
+	private String m_fullName;
 
 	private String m_password;
 
@@ -46,10 +48,11 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		super();
 	}
 
-	public User(final String username, final String password, final String name) {
-		m_username = username;
-		m_password = password;
-		m_name     = name;
+	public User(final String username, final String displayName, final String password, final String name) {
+		m_username     = username;
+		m_displayName  = displayName;
+		m_password     = password;
+		m_fullName     = name;
 	}
 
 	public Long getId() {
@@ -73,14 +76,24 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		m_username = username;
 	}
 
-	@XmlElement(name="name")
-	@Column(name="name", length=256)
-	public String getName() {
-		return m_name;
+	@XmlElement(name="displayName")
+	@Column(name="displayName", length=64)
+	public String getDisplayName() {
+		return m_displayName;
 	}
 
-	public void setName(final String name) {
-		m_name = name;
+	public void setDisplayName(final String displayName) {
+		m_displayName = displayName;
+	}
+
+	@XmlElement(name="name")
+	@Column(name="name", length=256)
+	public String getFullName() {
+		return m_fullName;
+	}
+
+	public void setFullName(final String name) {
+		m_fullName = name;
 	}
 
 	@Override
@@ -133,12 +146,12 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 	public int compareTo(final User that) {
 		return new CompareToBuilder()
 			.append(this.m_username, that.m_username)
-			.append(this.m_name,     that.m_name)
+			.append(this.m_fullName, that.m_fullName)
 			.toComparison();
 	}
 
 	@Override
 	public String toString() {
-		return "User [username=" + m_username + ", name=" + m_name + ", password=" + m_password + "]";
+		return "User [username=" + m_username + ", displayName=" + m_displayName + ", name=" + m_fullName + ", password=HIDDEN]";
 	}
 }

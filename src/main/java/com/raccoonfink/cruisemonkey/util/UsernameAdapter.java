@@ -2,6 +2,8 @@ package com.raccoonfink.cruisemonkey.util;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import org.springframework.util.StringUtils;
+
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.User;
 
@@ -15,11 +17,11 @@ public class UsernameAdapter extends XmlAdapter<String,User> {
 
 	@Override
 	public User unmarshal(final String username) throws Exception {
-		return m_userDao.get(username);
+		return m_userDao.get(username.toLowerCase());
 	}
 
 	@Override
 	public String marshal(final User user) throws Exception {
-		return user.getUsername();
+		return StringUtils.hasLength(user.getDisplayName())? user.getDisplayName() : user.getUsername();
 	}
 }

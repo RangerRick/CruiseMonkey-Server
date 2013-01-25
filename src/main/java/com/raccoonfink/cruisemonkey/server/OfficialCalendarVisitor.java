@@ -63,14 +63,20 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 
     @Override
     public void end() {
-    	final List<Event> events = m_eventDao.findAll();
+    	final List<Event> events = m_eventDao.findAllAsList();
 
+    	int count = 0;
         for (final Event event : events) {
-        	if ("official".equals(event.getCreatedBy()) && event.getCreatedDate().getTime() < m_lastUpdated) {
-        		m_eventDao.delete(event);
+        	if ("official".equals(event.getCreatedBy())) {
+        		if (event.getCreatedDate().getTime() < m_lastUpdated) {
+            		m_eventDao.delete(event);
+        		} else {
+        			count++;
+        		}
         	}
         }
-        System.out.println("added " + m_eventDao.findAll().size() + " events");
+
+        System.out.println("added/refreshed " + count + " events");
     }
 
 	private Event getEvent(final Component component) {

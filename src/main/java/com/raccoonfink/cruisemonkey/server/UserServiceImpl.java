@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService, InitializingBean {
 
 	@Override
 	public User getUser(final String username) {
-		final User user = getScrubbedUser(m_userDao.get(username));
+		final User user = getScrubbedUser(m_userDao.get(username.toLowerCase()));
 		m_logger.debug("username = {}, found user: {}", username, user);
 		return user;
 	}
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService, InitializingBean {
 
 	private User getScrubbedUser(final User realUser) {
 		if (realUser == null) return null;
-		return new User(realUser.getUsername(), null, realUser.getName());
+		return new User(realUser.getUsername(), realUser.getDisplayName(), null, realUser.getFullName());
 	}
 
 }
