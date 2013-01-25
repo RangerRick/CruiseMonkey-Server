@@ -44,7 +44,7 @@ public class StatusNetService {
 
 	public StatusNetService(final String host, final int port, final String root, final String username, final String password) {
 		final HttpHost httpHost = new HttpHost(host, port, "http");
-		final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
+		final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username.toLowerCase(), password);
 
 		m_httpClient = getHttpClient(httpHost, credentials);
 
@@ -82,7 +82,7 @@ public class StatusNetService {
 	}
 	
 	public String getUsername() {
-		return m_credentials.getUserName();
+		return m_credentials.getUserName().toLowerCase();
 	}
 
 	public String getPassword() {
@@ -141,7 +141,7 @@ public class StatusNetService {
 			}
 		}
 
-		final HttpPost post = new HttpPost(getRoot() + "/api/users/show/" + getUsername().toLowerCase() + ".json");
+		final HttpPost post = new HttpPost(getRoot() + "/api/users/show/" + getUsername() + ".json");
 		
 		HttpResponse response;
 		try {

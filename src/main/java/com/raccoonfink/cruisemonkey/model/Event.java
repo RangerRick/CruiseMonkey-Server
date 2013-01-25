@@ -27,7 +27,7 @@ import com.raccoonfink.cruisemonkey.util.DateXmlAdapter;
 @XmlAccessorType(XmlAccessType.NONE)
 @NodeEntity
 public class Event extends AbstractRecord implements Serializable, Comparable<Event> {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	@Override
 	public String toString() {
@@ -41,7 +41,7 @@ public class Event extends AbstractRecord implements Serializable, Comparable<Ev
 	@GraphId
 	private Long m_graphId;
 
-	@Indexed(fieldName="id")
+	@Indexed(fieldName="id", unique=true)
 	@XmlID
 	@XmlAttribute(name="id")
 	private String m_id;

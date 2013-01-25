@@ -30,12 +30,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 @XmlAccessorType(XmlAccessType.NONE)
 @NodeEntity
 public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	@GraphId
 	private Long m_id;
 
-	@Indexed(fieldName="username")
+	@Indexed(fieldName="username", unique=true)
 	private String m_username;
 
 	private String m_name;
