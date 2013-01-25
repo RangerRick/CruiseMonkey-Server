@@ -141,7 +141,7 @@ public class StatusNetService {
 			}
 		}
 
-		final HttpPost post = new HttpPost(getRoot() + "/api/users/show/" + getUsername() + ".json");
+		final HttpPost post = new HttpPost(getRoot() + "/api/users/show/" + getUsername().toLowerCase() + ".json");
 		
 		HttpResponse response;
 		try {

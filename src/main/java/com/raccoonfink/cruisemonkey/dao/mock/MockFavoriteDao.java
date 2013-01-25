@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.hibernate.Criteria;
-
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.dao.FavoriteDao;
 import com.raccoonfink.cruisemonkey.model.Event;
@@ -21,7 +19,7 @@ public class MockFavoriteDao implements FavoriteDao {
 
 		final Event event = m_eventDao.findAll().iterator().next();
 		final Favorite favorite = new Favorite(event.getCreatedBy(), event.getId());
-		favorite.setId(1);
+		favorite.setId(1L);
 		m_favorites.add(favorite);
 	}
 
@@ -31,12 +29,7 @@ public class MockFavoriteDao implements FavoriteDao {
 	}
 
 	@Override
-	public List<Favorite> find(final Criteria criteria) {
-		throw new UnsupportedOperationException("not implemented");
-	}
-
-	@Override
-	public Favorite get(final Integer id) {
+	public Favorite get(final Long id) {
 		for (final Favorite favorite : m_favorites) {
 			if (favorite.getId() == id) {
 				return favorite;

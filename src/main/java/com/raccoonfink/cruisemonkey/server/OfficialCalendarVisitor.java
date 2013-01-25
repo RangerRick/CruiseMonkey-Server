@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.Created;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
@@ -16,10 +15,6 @@ import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Uid;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -43,9 +38,6 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
     @Autowired
     private EventDao m_eventDao;
 
-    @Autowired
-	private SessionFactory m_sessionFactory;
-
 	private long m_lastUpdated;
 
     public OfficialCalendarVisitor() {
@@ -55,7 +47,6 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_eventDao);
-		Assert.notNull(m_sessionFactory);
 		m_importUser = m_userDao.get("official");
 	}
 
@@ -72,13 +63,10 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 
     @Override
     public void end() {
-    	final Session session = m_sessionFactory.getCurrentSession();
-    	final Criteria criteria = session.createCriteria(Event.class)
-    			.add(Restrictions.lt("createdDate", new Date(m_lastUpdated)));
-    	final List<Event> events = m_eventDao.find(criteria);
+    	final List<Event> events = m_eventDao.findAll();
 
         for (final Event event : events) {
-        	if ("official".equals(event.getCreatedBy())) {
+        	if ("official".equals(event.getCreatedBy()) && event.getCreatedDate().getTime() < m_lastUpdated) {
         		m_eventDao.delete(event);
         	}
         }
@@ -95,7 +83,7 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 		final Location location = vevent.getLocation();
 		final DtStart dtStartDate = vevent.getStartDate();
 		final DtEnd dtEndDate = vevent.getEndDate();
-		final Created created = vevent.getCreated();
+		// final Created created = vevent.getCreated();
 		final Date startDate = new Date(dtStartDate.getDate().getTime());
 		final Date endDate = new Date(dtEndDate.getDate().getTime());
 		final Date createdDate = new Date(m_lastUpdated);

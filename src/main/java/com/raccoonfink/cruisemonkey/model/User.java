@@ -18,6 +18,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.eclipse.persistence.oxm.annotations.XmlReadOnly;
+import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.Indexed;
+import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,11 +28,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @XmlRootElement(name="user")
 @XmlAccessorType(XmlAccessType.NONE)
+@NodeEntity
 public class User extends AbstractRecord implements UserDetails, Comparable<User>, Serializable {
-	private static final long serialVersionUID = -3545473669883020357L;
+	private static final long serialVersionUID = 2L;
 
+	@GraphId
+	private Long m_id;
+
+	@Indexed(fieldName="username")
 	private String m_username;
+
 	private String m_name;
+
 	private String m_password;
 
 	public User() {
@@ -40,6 +50,14 @@ public class User extends AbstractRecord implements UserDetails, Comparable<User
 		m_username = username;
 		m_password = password;
 		m_name     = name;
+	}
+
+	public Long getId() {
+		return m_id;
+	}
+	
+	public void setId(final Long id) {
+		m_id = id;
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package com.raccoonfink.cruisemonkey.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -17,9 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -60,10 +56,6 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 	@Autowired
 	FavoriteService m_favoriteService;
 
-	@InjectParam("sessionFactory")
-	@Autowired
-	SessionFactory m_sessionFactory;
-
 	@Context
 	UriInfo m_uriInfo;
 
@@ -73,14 +65,12 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 			@InjectParam("favoriteDao") final FavoriteDao favoriteDao,
 			@InjectParam("eventDao") final EventDao eventDao,
 			@InjectParam("userDao") final UserDao userDao,
-			@InjectParam("userDao") final FavoriteService favoriteService,
-			@InjectParam("sessionFactory") final SessionFactory sessionFactory
+			@InjectParam("userDao") final FavoriteService favoriteService
 			) {
 		m_favoriteDao = favoriteDao;
 		m_eventDao = eventDao;
 		m_userDao = userDao;
 		m_favoriteService = favoriteService;
-		m_sessionFactory = sessionFactory;
 	}
 
 	@Override
@@ -90,7 +80,6 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 		Assert.notNull(m_eventDao);
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_favoriteService);
-		Assert.notNull(m_sessionFactory);
 	}
 
     @GET
@@ -100,38 +89,7 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 		final String user = userName == null? getCurrentUser() : userName;
 		m_logger.debug("user = {}", user);
 		
-		final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-		
-		try {
-			return m_favoriteService.getFavorites(user);
-		} catch (final HibernateException e) {
-			m_logger.warn("Failed to get favorites for " + userName, e);
-			tx.rollback();
-			return new ArrayList<Favorite>();
-		} finally {
-			tx.commit();
-		}
-	}
-
-	@GET
-	@Path("/{id}")
-	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-	@Transactional(readOnly=true)
-	public Favorite getFavorite(@PathParam("id") final Integer id) {
-		final String user = getCurrentUser();
-		m_logger.debug("user = {}, id = {}", user, id);
-
-		final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-		
-		try {
-			return m_favoriteService.getFavorite(user, id);
-		} catch (final HibernateException e) {
-			m_logger.warn("Failed to get favorite " + id, e);
-			tx.rollback();
-			return null;
-		} finally {
-			tx.commit();
-		}
+		return m_favoriteService.getFavorites(user);
 	}
 
 	@PUT
@@ -144,19 +102,10 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 			return Response.serverError().build();
 		}
 
-		final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-		
-		try {
-			final Favorite favorite = m_favoriteService.addFavorite(userName, eventId);
-			m_logger.debug("created: {}", favorite);
-			return Response.seeOther(getRedirectUri(m_uriInfo, favorite.getId())).build();
-		} catch (final HibernateException e) {
-			m_logger.warn("Failed to put favorite " + eventId, e);
-			tx.rollback();
-			return Response.serverError().build();
-		} finally {
-			tx.commit();
-		}
+		m_favoriteService.addFavorite(userName, eventId);
+		final Favorite favorite = m_favoriteService.getFavorite(userName, eventId);
+		m_logger.debug("created: {}", favorite);
+		return Response.seeOther(getRedirectUri(m_uriInfo, favorite.getId())).build();
 	}
 
 	@POST
@@ -169,41 +118,22 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 			throw new IllegalArgumentException("You cannot create favorites for other users!");
 		}
 
-		final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-		
-		try {
-			final Favorite saved = m_favoriteService.addFavorite(favorite);
-			m_logger.debug("saved favorite = {}", favorite);
-			return Response.seeOther(getRedirectUri(m_uriInfo, saved.getId())).build();
-		} catch (final HibernateException e) {
-			m_logger.warn("Failed to put favorite " + favorite.getEvent(), e);
-			tx.rollback();
-			return Response.serverError().build();
-		} finally {
-			tx.commit();
-		}
+		m_favoriteService.addFavorite(favorite);
+		final Favorite saved = m_favoriteService.getFavorite(favorite.getUser(), favorite.getEvent());
+		m_logger.debug("saved favorite = {}", favorite);
+		return Response.seeOther(getRedirectUri(m_uriInfo, saved.getId())).build();
 	}
 
 	@DELETE
 	@Path("/{id}")
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Transactional
-	public Response deleteFavoriteById(@PathParam("id") final Integer id) {
+	public Response deleteFavoriteById(@PathParam("id") final Long id) {
 		final String userName = getCurrentUser();
 		m_logger.debug("user = {}, id = {}", userName, id);
 
-		final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-		
-		try {
-			m_favoriteService.removeFavorite(userName, id);
-			return Response.ok().build();
-		} catch (final HibernateException e) {
-			m_logger.warn("Failed to put favorite " + id, e);
-			tx.rollback();
-			return Response.serverError().build();
-		} finally {
-			tx.commit();
-		}
+		m_favoriteService.removeFavorite(userName, id);
+		return Response.ok().build();
 	}
 
 	@DELETE
@@ -213,17 +143,8 @@ public class FavoriteRestService extends RestServiceBase implements Initializing
 		final String user = getCurrentUser();
 		m_logger.debug("user = {}, event = {}", user, eventId);
 
-		final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-		
-		try {
-			m_favoriteService.removeFavorite(user, eventId);
-			return Response.ok().build();
-		} catch (final HibernateException e) {
-			m_logger.warn("Failed to put favorite " + eventId, e);
-			tx.rollback();
-			return Response.serverError().build();
-		} finally {
-			tx.commit();
-		}
+		m_favoriteService.removeFavorite(user, eventId);
+		m_logger.debug("deleted favorite = {}, {}", user, eventId);
+		return Response.ok().build();
 	}
 }

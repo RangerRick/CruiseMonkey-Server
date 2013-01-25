@@ -15,13 +15,19 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
+import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.Indexed;
+import org.springframework.data.neo4j.annotation.NodeEntity;
+
 import com.raccoonfink.cruisemonkey.util.DateXmlAdapter;
 
 @Entity
 @XmlRootElement(name="event")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Event extends AbstractRecord implements Serializable {
-	private static final long serialVersionUID = 1L;
+@NodeEntity
+public class Event extends AbstractRecord implements Serializable, Comparable<Event> {
+	private static final long serialVersionUID = 2L;
 
 	@Override
 	public String toString() {
@@ -32,6 +38,10 @@ public class Event extends AbstractRecord implements Serializable {
 				+ m_isPublic + ", createdBy=" + getCreatedBy() + "]";
 	}
 
+	@GraphId
+	private Long m_graphId;
+
+	@Indexed(fieldName="id")
 	@XmlID
 	@XmlAttribute(name="id")
 	private String m_id;
@@ -45,14 +55,17 @@ public class Event extends AbstractRecord implements Serializable {
 	@XmlElement(name="location")
 	private String m_location;
 
+	@Indexed(fieldName="start")
 	@XmlElement(name="start")
 	@XmlJavaTypeAdapter(DateXmlAdapter.class)
 	private Date m_startDate;
 
+	@Indexed(fieldName="end")
 	@XmlElement(name="end")
 	@XmlJavaTypeAdapter(DateXmlAdapter.class)
 	private Date m_endDate;
 
+	@Indexed(fieldName="isPublic")
 	@XmlElement(name="isPublic")
 	private Boolean m_isPublic = false;
 
@@ -74,6 +87,14 @@ public class Event extends AbstractRecord implements Serializable {
 		m_endDate     = end;
 		m_location    = location;
 		m_isPublic    = isPublic;
+	}
+
+	public Long getGraphId() {
+		return m_graphId;
+	}
+	
+	public void setGraphId(final Long id) {
+		m_graphId = id;
 	}
 
 	@Id
@@ -104,4 +125,13 @@ public class Event extends AbstractRecord implements Serializable {
 	@Column(name="isPublic")
 	public Boolean getIsPublic() { return m_isPublic; }
 	public void setIsPublic(final Boolean isPublic) { m_isPublic = isPublic; }
+
+	@Override
+	public int compareTo(final Event that) {
+		return new CompareToBuilder()
+			.append(this.getStartDate(), that.getStartDate())
+			.append(this.getCreatedDate(), that.getCreatedDate())
+			.append(this.getSummary(), that.getSummary())
+			.toComparison();
+	}
 }

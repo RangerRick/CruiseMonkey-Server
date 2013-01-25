@@ -10,12 +10,15 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.springframework.data.neo4j.annotation.Indexed;
+
 import com.raccoonfink.cruisemonkey.util.DateXmlAdapter;
 
 @MappedSuperclass
 @XmlRootElement(name="record")
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class AbstractRecord implements Record {
+	@Indexed(fieldName="createdBy")
 	@XmlElement(name="created-by")
 	private String m_createdBy;
 

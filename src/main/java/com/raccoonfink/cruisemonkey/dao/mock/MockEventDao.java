@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
-import org.hibernate.Criteria;
 
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
@@ -26,9 +25,18 @@ public class MockEventDao implements EventDao {
 	}
 
 	@Override
+	public Event get(final Long id) {
+		for (final Event event : m_events) {
+			if (event.getGraphId() == id) {
+				return event;
+			}
+		}
+		return null;
+	}
+
 	public Event get(final String id) {
 		for (final Event event : m_events) {
-			if (event.getId() == id) {
+			if (event.getId().equals(id)) {
 				return event;
 			}
 		}
@@ -38,11 +46,6 @@ public class MockEventDao implements EventDao {
 	@Override
 	public List<Event> findAll() {
 		return sortedEventList(m_events);
-	}
-
-	@Override
-	public List<Event> find(final Criteria criteria) {
-		throw new UnsupportedOperationException("not implemented");
 	}
 
 	@Override

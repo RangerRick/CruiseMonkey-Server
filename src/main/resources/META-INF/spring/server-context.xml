@@ -22,17 +22,12 @@
     <bean id="eventService" class="com.raccoonfink.cruisemonkey.server.EventServiceImpl" />
     <bean id="favoriteService" class="com.raccoonfink.cruisemonkey.server.FavoriteServiceImpl" />
 
-	<!-- 
-	<bean id="calendarVisitor" class="com.raccoonfink.cruisemonkey.server.OfficialCalendarVisitor">
-		<property name="userDao" ref="userDaoProxy" />
-		<property name="eventDao" ref="eventDaoProxy" />
-	</bean>
+	<bean id="calendarVisitor" class="com.raccoonfink.cruisemonkey.server.OfficialCalendarVisitor" depends-on="userInitializer" />
 
 	<bean id="calendarManager" class="com.raccoonfink.cruisemonkey.server.CalendarManager">
 	  <property name="visitor" ref="calendarVisitor" />
-	  <property name="url" value="https://www.google.com/calendar/ical/nh76o8dgn9d86b7n3p3uofg1q0%40group.calendar.google.com/public/basic.ics" />
+	  <property name="url" value="https://www.google.com/calendar/ical/oodako86iesrongpavma4l3jtg%40group.calendar.google.com/public/basic.ics" />
 	</bean>
-	-->
 
 	<bean id="springApplicationContext" class="com.raccoonfink.cruisemonkey.util.SpringApplicationContext"/>
 

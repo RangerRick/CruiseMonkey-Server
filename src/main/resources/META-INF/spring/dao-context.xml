@@ -7,6 +7,7 @@
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
 
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
@@ -15,68 +16,21 @@
 		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/data/neo4j http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
 	">
 
+	<context:spring-configured />
     <context:annotation-config />
+    <!-- <context:component-scan base-package="com.raccoonfink.cruisemonkey" /> -->
 
-	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close"
-		p:driverClass="org.hsqldb.jdbcDriver"
-		p:jdbcUrl="jdbc:hsqldb:file:/tmp/cruisemonkey.db;shutdown=true"
-		p:username="sa"
-		p:password="" />
+	<neo4j:config storeDirectory="target/neo4j-db"/>
+	<neo4j:repositories base-package="com.raccoonfink.cruisemonkey" />
 
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="packagesToScan" value="com.raccoonfink.cruisemonkey.model" />
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.show_sql">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.connection.pool_size">1</prop>
-				<prop key="hibernate.connection.autocommit">false</prop>
-				<prop key="hibernate.current_session_context_class">thread</prop>
-			</props>
-		</property>
-	</bean>
+    <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.neo4j.GraphUserDao" />
+    <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.neo4j.GraphEventDao" />
+    <bean id="favoriteDao" class="com.raccoonfink.cruisemonkey.dao.neo4j.GraphFavoriteDao" />
 
-	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactory"/>
-	</bean>
-
-	<bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
-		<property name="transactionManager" ref="transactionManager" />
-		<property name="transactionAttributes">
-			<props>
-				<prop key="save">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-	</bean>
-
-    <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateUserDao" />
-    <bean id="eventDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateEventDao" />
-    <bean id="favoriteDao" class="com.raccoonfink.cruisemonkey.dao.hibernate.HibernateFavoriteDao" />
     <bean id="userInitializer" class="com.raccoonfink.cruisemonkey.server.UserInitializer" />
-    <bean id="officialScheduleInitializer" class="com.raccoonfink.cruisemonkey.server.OfficialScheduleInitializer" depends-on="userInitializer" />
+    <!-- <bean id="officialScheduleInitializer" class="com.raccoonfink.cruisemonkey.server.OfficialScheduleInitializer" depends-on="userInitializer" /> -->
 
-	<!--
-	<bean id="userDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<qualifier value="proxy" />
-		<property name="target" ref="userDao" />
-		<property name="interceptorNames"><list><value>transactionInterceptor</value></list></property>
-	</bean>
-	<bean id="eventDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<qualifier value="proxy" />
-		<property name="target" ref="eventDao" />
-		<property name="interceptorNames"><list><value>transactionInterceptor</value></list></property>
-	</bean>
-	<bean id="favoriteDaoProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<qualifier value="proxy" />
-		<property name="target" ref="favoriteDao" />
-		<property name="interceptorNames"><list><value>transactionInterceptor</value></list></property>
-	</bean>
-	-->
-
-    <tx:annotation-driven proxy-target-class="true" />
 </beans>

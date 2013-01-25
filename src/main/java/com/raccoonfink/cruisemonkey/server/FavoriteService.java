@@ -8,14 +8,14 @@ public interface FavoriteService {
 
 	public List<Favorite> getFavorites(final String username);
 
-	public Favorite getFavorite(final String username, final Integer id);
+	public Favorite getFavorite(final String username, final String eventId);
 
-	public Favorite addFavorite(Favorite favorite);
+	public void addFavorite(Favorite favorite);
 
-	public Favorite addFavorite(final String username, final String eventId);
+	public void addFavorite(final String username, final String eventId);
 
 	public void removeFavorite(final String username, final String eventId);
 
-	public void removeFavorite(final String username, Integer id);
+	public void removeFavorite(final String username, Long id);
 
 }

@@ -1,8 +1,5 @@
 package com.raccoonfink.cruisemonkey.security;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,9 +16,6 @@ public class DefaultUserDetailsService implements UserDetailsService, Initializi
 	@Autowired
 	private UserDao m_userDao;
 	
-	@Autowired
-	private SessionFactory m_sessionFactory;
-
 	public DefaultUserDetailsService() {
 	}
 
@@ -36,17 +30,7 @@ public class DefaultUserDetailsService implements UserDetailsService, Initializi
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-    	final Transaction tx = m_sessionFactory.getCurrentSession().beginTransaction();
-
-    	try {
     		return m_userDao.get(username);
-    	} catch (final HibernateException e) {
-    		m_logger.warn("Failed to get user " + username, e);
-    		tx.rollback();
-    		return null;
-    	} finally {
-    		tx.commit();
-    	}
 	}
 
 }

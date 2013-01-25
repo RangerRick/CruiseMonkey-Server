@@ -13,21 +13,29 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.Indexed;
+import org.springframework.data.neo4j.annotation.NodeEntity;
+
 @Entity
 @XmlRootElement(name="favorite")
 @XmlAccessorType(XmlAccessType.NONE)
 @Table(name="favorites", uniqueConstraints = {
 	@UniqueConstraint(columnNames={"user", "event"})
 })
+@NodeEntity
 public class Favorite implements Serializable {
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
+	@GraphId
 	@XmlAttribute(name="id")
-	private Integer m_id;
+	private Long m_id;
 
+	@Indexed(fieldName="user")
 	@XmlAttribute(name="user")
 	private String m_user;
 
+	@Indexed(fieldName="event")
 	@XmlAttribute(name="event")
 	private String m_event;
 
@@ -43,10 +51,10 @@ public class Favorite implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(name="id", nullable=false)
-	public Integer getId() {
+	public Long getId() {
 		return m_id;
 	}
-	public void setId(final Integer id) {
+	public void setId(final Long id) {
 		m_id = id;
 	}
 

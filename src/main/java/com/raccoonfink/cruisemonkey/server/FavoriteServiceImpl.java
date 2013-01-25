@@ -26,8 +26,8 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	public Favorite getFavorite(final String username, final Integer id) {
-		final Favorite favorite = m_favoriteDao.get(id);
+	public Favorite getFavorite(final String username, final String eventId) {
+		final Favorite favorite = m_favoriteDao.findByUserAndEventId(username, eventId);
 		if (favorite.getUser().equals(username)) {
 			return favorite;
 		}
@@ -40,19 +40,17 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 	}
 
 	@Override
-	public Favorite addFavorite(final Favorite favorite) {
+	public void addFavorite(final Favorite favorite) {
 		if (favorite == null) {
 			throw new IllegalArgumentException("You must pass a favorite object!");
 		}
 		
 		final Favorite dbFavorite = m_favoriteDao.findByUserAndEventId(favorite.getUser(), favorite.getEvent());
-		if (dbFavorite != null) return dbFavorite;
-		m_favoriteDao.save(favorite);
-		return favorite;
+		if (dbFavorite == null) m_favoriteDao.save(favorite);
 	}
 
 	@Override
-	public Favorite addFavorite(final String username, final String eventId) {
+	public void addFavorite(final String username, final String eventId) {
 		if (username == null || eventId == null) {
 			throw new IllegalArgumentException("You must specify a username and eventId!");
 		}
@@ -62,11 +60,10 @@ public class FavoriteServiceImpl implements FavoriteService, InitializingBean {
 			favorite = new Favorite(username, eventId);
 			m_favoriteDao.save(favorite);
 		}
-		return m_favoriteDao.get(favorite.getId());
 	}
 
 	@Override
-	public void removeFavorite(final String username, final Integer id) {
+	public void removeFavorite(final String username, final Long id) {
 		if (username == null || id == null) {
 			throw new IllegalArgumentException("You must specify a user and favorite ID!");
 		}

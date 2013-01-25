@@ -1,15 +1,8 @@
 package com.raccoonfink.cruisemonkey.server;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,6 +12,8 @@ import org.springframework.util.Assert;
 import com.raccoonfink.cruisemonkey.dao.EventDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 public class EventServiceImpl implements EventService, InitializingBean {
 	final Logger m_logger = LoggerFactory.getLogger(EventServiceImpl.class);
 
@@ -27,9 +22,6 @@ public class EventServiceImpl implements EventService, InitializingBean {
 
 	@Autowired
 	private UserService m_userService;
-
-	@Autowired
-	private SessionFactory m_sessionFactory;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -47,11 +39,6 @@ public class EventServiceImpl implements EventService, InitializingBean {
 	}
 
 	@Override
-	public List<Event> getEventsInRange(final Date start, final Date end, final String userName) {
-		return new ArrayList<Event>(m_eventDao.findInRange(start, end, userName));
-	}
-
-	@Override
 	public void putEvent(final Event event) {
 		m_eventDao.save(event);
 	}
@@ -64,59 +51,21 @@ public class EventServiceImpl implements EventService, InitializingBean {
 		m_eventDao.save(event);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Event> getPublicEvents(final String userName) {
 		if (userName == null) throw new IllegalArgumentException("You must provide a username!");
 
-		final Session session = m_sessionFactory.getCurrentSession();
+		final List<Event> events = new ArrayList<Event>();
 
-		final Criteria criteria = session.createCriteria(Event.class);
-		criteria.add(
-			Restrictions.or(
-				new Criterion[] {
-						Restrictions.eq("createdBy", userName).ignoreCase(),
-						Restrictions.eq("createdBy", "official").ignoreCase(),
-						Restrictions.eq("isPublic", true)
-				}
-			)
-		);
-
-		criteria.addOrder(Order.asc("startDate"))
-			.addOrder(Order.asc("createdDate"))
-			.addOrder(Order.asc("summary"));
-
-		return (List<Event>)criteria.list();
+		for (final Event event : m_eventDao.findAll()) {
+			if (event.getCreatedBy().equalsIgnoreCase(userName) || event.getCreatedBy().equals("official") || event.getIsPublic() == true) {
+				events.add(event);
+			}
+		}
+		Collections.sort(events);
+		return events;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Event> getPublicEventsInRange(final Date start, final Date end, final String userName) {
-		if (userName == null) throw new IllegalArgumentException("You must provide a username!");
-
-		final Session session = m_sessionFactory.getCurrentSession();
-
-		final Criteria criteria = session.createCriteria(Event.class);
-		criteria.add(
-			Restrictions.or(
-				new Criterion[] {
-						Restrictions.eq("createdBy", userName).ignoreCase(),
-						Restrictions.eq("createdBy", "official").ignoreCase(),
-						Restrictions.eq("isPublic", true)
-				}
-			)
-		);
-
-		criteria.add(Restrictions.ge("startDate", start))
-			.add(Restrictions.le("endDate", end));
-
-		criteria.addOrder(Order.asc("startDate"))
-			.addOrder(Order.asc("createdDate"))
-			.addOrder(Order.asc("summary"));
-
-		return (List<Event>)criteria.list();
-	}
-	
 	@Override
 	public void deleteEvent(final Event event) {
 		if (event == null) throw new IllegalArgumentException("You must provide an event to delete!");

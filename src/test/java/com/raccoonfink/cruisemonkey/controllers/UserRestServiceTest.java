@@ -11,8 +11,8 @@ import org.junit.Test;
 import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.dao.mock.MockUserDao;
 import com.raccoonfink.cruisemonkey.model.User;
-import com.raccoonfink.cruisemonkey.server.UserServiceImpl;
 import com.raccoonfink.cruisemonkey.server.UserService;
+import com.raccoonfink.cruisemonkey.server.UserServiceImpl;
 
 public class UserRestServiceTest {
 	private UserRestService m_restService;
