@@ -90,11 +90,13 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
 
 		String summaryString = summary.getValue().trim();
 		final String locationString = location.getValue().trim();
-		final String removeThis = " - " + locationString;
+		String removeThis = " - " + locationString;
 		if (summaryString.endsWith(removeThis)) {
-			// System.err.println("old summaryString: '" + summaryString + "'");
 			summaryString = summaryString.substring(0, summaryString.length() - removeThis.length());
-			// System.err.println("new summaryString: '" + summaryString + "'");
+		}
+		removeThis = locationString + " - ";
+		if (summaryString.startsWith(removeThis)) {
+			summaryString = summaryString.substring(removeThis.length(), summaryString.length());
 		}
 
 		final Event existingEvent = m_eventDao.get(id);

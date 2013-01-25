@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -18,7 +19,7 @@ import org.springframework.util.Assert;
 import com.raccoonfink.cruisemonkey.dao.CalendarVisitor;
 
 public class CalendarManager implements InitializingBean {
-	private static final int MINUTES = 5;
+	private static final int MINUTES = 60;
 
 	private URL m_url;
 	private CalendarVisitor m_visitor;
@@ -51,7 +52,7 @@ public class CalendarManager implements InitializingBean {
 
 		System.err.println("Scheduling calendar update every " + MINUTES + " minutes.");
 		getRunnable().run();
-		// m_executor.schedule(getRunnable(), MINUTES, TimeUnit.MINUTES);
+		m_executor.schedule(getRunnable(), MINUTES, TimeUnit.MINUTES);
 	}
 
 	private Runnable getRunnable() {
