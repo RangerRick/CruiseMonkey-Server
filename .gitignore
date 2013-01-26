@@ -10,3 +10,4 @@ cruisemonkey.properties
 cruisemonkey.script
 cruisemonkey.tmp
 target
+neo4j-db

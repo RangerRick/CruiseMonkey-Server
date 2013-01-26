@@ -23,7 +23,7 @@
     <context:annotation-config />
     <!-- <context:component-scan base-package="com.raccoonfink.cruisemonkey" /> -->
 
-	<neo4j:config storeDirectory="target/neo4j-db"/>
+	<neo4j:config storeDirectory="neo4j-db"/>
 	<neo4j:repositories base-package="com.raccoonfink.cruisemonkey" />
 
     <bean id="userDao" class="com.raccoonfink.cruisemonkey.dao.neo4j.GraphUserDao" />
