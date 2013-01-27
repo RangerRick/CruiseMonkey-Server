@@ -27,7 +27,7 @@
 	<bean id="calendarManager" class="com.raccoonfink.cruisemonkey.server.CalendarManager">
 		<property name="visitor" ref="calendarVisitor" />
 		<property name="url" value="https://www.google.com/calendar/ical/oodako86iesrongpavma4l3jtg%40group.calendar.google.com/public/basic.ics" />
-		<property name="startOnInit" value="true" />
+		<property name="startOnInit" value="false" />
 	</bean>
 
 	<bean id="springApplicationContext" class="com.raccoonfink.cruisemonkey.util.SpringApplicationContext"/>

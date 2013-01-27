@@ -1,9 +1,11 @@
 package com.raccoonfink.cruisemonkey.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -27,18 +29,12 @@ public class CalendarTest {
 	
 	@Autowired
 	private OfficialCalendarVisitor m_visitor;
+
+	private DateFormat m_simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
 	@Before
 	public void setUp() {
-		/*
-		final HibernateEventDao hibernateEventDao = new HibernateEventDao();
-		m_eventDao = hibernateEventDao;
-		@SuppressWarnings("deprecation")
-		final SessionFactory sf = new Configuration().configure().buildSessionFactory();
-		hibernateEventDao.setSessionFactory(sf);
-		m_visitor = new OfficialCalendarVisitor();
-		m_visitor.setEventDao(m_eventDao);
-		*/
+		m_eventDao.deleteAll();
 	}
 
 	@Test
@@ -50,6 +46,7 @@ public class CalendarTest {
         manager.updateNow();
         
         final List<Event> events = m_eventDao.findAllAsList();
+        Collections.sort(events);
         assertEquals(2, events.size());
         assertEquals(1347312600000L, events.get(0).getStartDate().getTime());
     }
@@ -63,6 +60,7 @@ public class CalendarTest {
         manager.updateNow();
         
         final List<Event> beforeEvents = m_eventDao.findAllAsList();
+        Collections.sort(beforeEvents);
         assertEquals(2, beforeEvents.size());
         assertEquals(1347312600000L, beforeEvents.get(0).getStartDate().getTime());
         assertEquals("A", beforeEvents.get(0).getSummary());
@@ -72,35 +70,28 @@ public class CalendarTest {
         manager.updateNow();
         
         final List<Event> afterEvents = m_eventDao.findAllAsList();
+        Collections.sort(afterEvents);
+        System.err.println("events = " + afterEvents);
         assertEquals(2, afterEvents.size());
+        assertEquals(1347312600000L, beforeEvents.get(0).getStartDate().getTime());
         assertEquals("A", afterEvents.get(0).getSummary());
         assertEquals("C", afterEvents.get(1).getSummary());
 	}
 
 	@Test
-    public void testOfficialCalendarVisitorUpdateJccc2() throws Exception {
-        // final URL url = new URL("https://www.google.com/calendar/ical/nh76o8dgn9d86b7n3p3uofg1q0%40group.calendar.google.com/public/basic.ics");
-
+	public void testJccc3() throws Exception {
 		final CalendarManager manager = new CalendarManager();
 		manager.setVisitor(m_visitor);
-        manager.setUrl(new File("src/test/resources/jccc2-before.ics").toURI().toURL());
+        manager.setUrl(new File("src/test/resources/jccc3.ics").toURI().toURL());
         manager.updateNow();
         
-        final List<Event> beforeEvents = m_eventDao.findAllAsList();
-        assertEquals(2, beforeEvents.size());
-        assertEquals("DRAMA CLUB with Bill Corbett & Peter Sagal", beforeEvents.get(0).getSummary());
-        assertEquals("JCCC2 \"Official\" Group Photo", beforeEvents.get(1).getSummary());
+        final List<Event> events = m_eventDao.findAllAsList();
+        Collections.sort(events);
 
-		manager.setUrl(new File("src/test/resources/jccc2-after.ics").toURI().toURL());
-        manager.updateNow();
-        
-        final List<Event> afterEvents = m_eventDao.findAllAsList();
-        assertEquals(66, afterEvents.size());
-        
-        final Event modifiedEvent = m_eventDao.get("u3lhp5hr1t68i8sescon20htps@google.com:20110103T220000");
-        assertEquals("DRAMA CLUB with Bill Corbett & Peter Sagal - Culinary Arts Center 2", modifiedEvent.getSummary());
-        
-        final Event deletedEvent = m_eventDao.get("9p9ueqvvu0t9moajheeodo4ros@google.com");
-        assertNull(deletedEvent);
+        System.err.println("=========================================================================================");
+        for (final Event event : events) {
+        	System.err.println(m_simpleFormat .format(event.getStartDate()) + "-" + m_simpleFormat.format(event.getEndDate()) + ": " + event.getSummary());
+        }
+        assertEquals(35, events.size());
 	}
 }

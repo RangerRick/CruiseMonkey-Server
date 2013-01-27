@@ -1,12 +1,23 @@
 package com.raccoonfink.cruisemonkey.dao;
 
-import net.fortuna.ical4j.model.Component;
+import java.util.Date;
 
 public interface CalendarVisitor {
 
-	void begin();
-	void visitEvent(final Component component);
-	// void visitTimezone(final Component component);
-	void end();
+	void visitCalendarStart();
+	// void visitTimezone(final String timezoneId);
+
+	void visitEventStart();
+	void visitEventDateTimeStart(final Date date);
+	void visitEventDateTimeEnd(final Date date);
+	void visitEventId(String value);
+	void visitEventDescription(String value);
+	void visitEventLocation(String value);
+	void visitEventSummary(String value);
+	void visitEventEnd();
+
+	void visitCalendarEnd();
+
+
 
 }
