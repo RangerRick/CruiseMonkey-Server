@@ -109,8 +109,8 @@ public class CalendarManager implements InitializingBean {
 		DateTime to;
 
 		try {
-			from = new DateTime("20130210T000000Z");
-			to   = new DateTime("20130217T000000Z");
+			from = new DateTime("20130209T000000Z");
+			to   = new DateTime("20130218T000000Z");
 			final Period period = new Period(from, to);
 
 			int count = 0;
