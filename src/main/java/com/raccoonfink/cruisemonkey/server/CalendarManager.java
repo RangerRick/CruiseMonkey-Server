@@ -2,6 +2,8 @@ package com.raccoonfink.cruisemonkey.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
@@ -25,6 +27,7 @@ import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Uid;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -102,8 +105,12 @@ public class CalendarManager implements InitializingBean {
 
 		final Set<String> rendered = new HashSet<String>();
 
+		TimeZone timeZone = null;
+
 		final Component timeZoneComponent = calendar.getComponent("VTIMEZONE");
-		final TimeZone timeZone = new TimeZone(new VTimeZone(timeZoneComponent.getProperties()));
+		if (timeZoneComponent != null && timeZoneComponent.getProperties() != null && timeZoneComponent.getProperties().size() > 0) {
+			timeZone = new TimeZone(new VTimeZone(timeZoneComponent.getProperties()));
+		}
 
 		DateTime from;
 		DateTime to;
@@ -151,7 +158,7 @@ public class CalendarManager implements InitializingBean {
 			}
 			
 			System.err.println("count = " + count);
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -182,9 +189,19 @@ public class CalendarManager implements InitializingBean {
 
 	private Calendar getCalendar(final URL url) throws IOException, ParserException {
 		final InputStream is = url.openStream();
-	    final CalendarBuilder builder = new CalendarBuilder();
-	    final Calendar calendar = builder.build(is);
-	    is.close();
+		final StringWriter sw = new StringWriter();
+		IOUtils.copy(is, sw);
+		IOUtils.closeQuietly(sw);
+		IOUtils.closeQuietly(is);
+
+		// System.err.println("calendar for " + url + ":");
+		// System.err.println(sw.toString());
+
+		final StringReader sr = new StringReader(sw.toString());
+		final CalendarBuilder builder = new CalendarBuilder();
+	    final Calendar calendar = builder.build(sr);
+	    IOUtils.closeQuietly(sr);
+
 		return calendar;
 	}
 

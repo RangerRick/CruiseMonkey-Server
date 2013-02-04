@@ -28,7 +28,7 @@ public class CalendarTest {
 	private EventDao m_eventDao;
 	
 	@Autowired
-	private OfficialCalendarVisitor m_visitor;
+	private GoogleCalendarVisitor m_visitor;
 
 	private DateFormat m_simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	

@@ -22,6 +22,16 @@ public class UserInitializer implements InitializingBean {
 		User user = m_userDao.get("official");
 		if (user == null) {
 			user = new User("official", "official", UUID.randomUUID().toString(), "Official Calendar");
+			System.err.println("Official User Password: " + user.getPassword());
+			m_userDao.save(user);
+		} else {
+			System.err.println("already have a user: " + user);
+		}
+
+		user = m_userDao.get("unofficial");
+		if (user == null) {
+			user = new User("unofficial", "unofficial", UUID.randomUUID().toString(), "Unofficial Calendar");
+			System.err.println("Unofficial User Password: " + user.getPassword());
 			m_userDao.save(user);
 		} else {
 			System.err.println("already have a user: " + user);

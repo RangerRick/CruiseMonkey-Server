@@ -13,7 +13,7 @@ import com.raccoonfink.cruisemonkey.dao.UserDao;
 import com.raccoonfink.cruisemonkey.model.Event;
 import com.raccoonfink.cruisemonkey.model.User;
 
-public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBean {
+public class GoogleCalendarVisitor implements CalendarVisitor, InitializingBean {
     private User m_importUser;
 
     @Autowired
@@ -22,17 +22,28 @@ public class OfficialCalendarVisitor implements CalendarVisitor, InitializingBea
     @Autowired
     private EventDao m_eventDao;
 
-	private Date m_lastUpdated;
+    private String m_user;
+
+    private Date m_lastUpdated;
 	private Event m_currentEvent;
 
-    public OfficialCalendarVisitor() {
+    public GoogleCalendarVisitor() {
     }
 
-	@Override
+    public String getUser() {
+    	return m_user;
+    }
+    
+    public void setUser(final String user) {
+    	m_user = user;
+    }
+
+    @Override
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(m_userDao);
 		Assert.notNull(m_eventDao);
-		m_importUser = m_userDao.get("official");
+		Assert.notNull(m_user);
+		m_importUser = m_userDao.get(m_user);
 	}
 
 

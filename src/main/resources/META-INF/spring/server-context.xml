@@ -22,14 +22,25 @@
     <bean id="eventService" class="com.raccoonfink.cruisemonkey.server.EventServiceImpl" />
     <bean id="favoriteService" class="com.raccoonfink.cruisemonkey.server.FavoriteServiceImpl" />
 
-	<bean id="calendarVisitor" class="com.raccoonfink.cruisemonkey.server.OfficialCalendarVisitor" depends-on="userInitializer" />
-
-	<bean id="calendarManager" class="com.raccoonfink.cruisemonkey.server.CalendarManager">
-		<property name="visitor" ref="calendarVisitor" />
+	<bean id="officialCalendarVisitor" class="com.raccoonfink.cruisemonkey.server.GoogleCalendarVisitor" depends-on="userInitializer">
+	    <property name="user" value="official" />
+    </bean>
+	<bean id="unofficialCalendarVisitor" class="com.raccoonfink.cruisemonkey.server.GoogleCalendarVisitor" depends-on="userInitializer">
+		<property name="user" value="unofficial" />
+	</bean>
+	
+	<bean id="officialCalendarManager" class="com.raccoonfink.cruisemonkey.server.CalendarManager" lazy-init="false">
+		<property name="visitor" ref="officialCalendarVisitor" />
 		<property name="url" value="https://www.google.com/calendar/ical/oodako86iesrongpavma4l3jtg%40group.calendar.google.com/public/basic.ics" />
 		<property name="startOnInit" value="true" />
 	</bean>
 
-	<bean id="springApplicationContext" class="com.raccoonfink.cruisemonkey.util.SpringApplicationContext"/>
+	<bean id="unofficialCalendarManager" class="com.raccoonfink.cruisemonkey.server.CalendarManager" lazy-init="false">
+		<property name="visitor" ref="unofficialCalendarVisitor" />
+		<property name="url" value="https://www.google.com/calendar/ical/a44hanjf1j59m5bdbm7h3obqgs%40group.calendar.google.com/public/basic.ics" />
+		<property name="startOnInit" value="true" />
+	</bean>
+
+		<bean id="springApplicationContext" class="com.raccoonfink.cruisemonkey.util.SpringApplicationContext"/>
 
 </beans>
