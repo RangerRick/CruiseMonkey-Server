@@ -129,7 +129,7 @@ public class GoogleCalendarVisitor implements CalendarVisitor, InitializingBean 
 
     	int count = 0;
         for (final Event event : events) {
-        	if ("official".equals(event.getCreatedBy())) {
+        	if (m_user.equals(event.getCreatedBy())) {
         		if (event.getCreatedDate().getTime() < m_lastUpdated.getTime()) {
             		m_eventDao.delete(event);
         		} else {

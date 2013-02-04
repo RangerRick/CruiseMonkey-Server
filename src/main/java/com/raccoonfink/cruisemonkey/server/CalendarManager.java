@@ -194,8 +194,8 @@ public class CalendarManager implements InitializingBean {
 		IOUtils.closeQuietly(sw);
 		IOUtils.closeQuietly(is);
 
-		// System.err.println("calendar for " + url + ":");
-		// System.err.println(sw.toString());
+		System.err.println("calendar for " + url + ":");
+		System.err.println(sw.toString());
 
 		final StringReader sr = new StringReader(sw.toString());
 		final CalendarBuilder builder = new CalendarBuilder();
