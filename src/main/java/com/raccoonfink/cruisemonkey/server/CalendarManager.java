@@ -101,8 +101,6 @@ public class CalendarManager implements InitializingBean {
 
 	@SuppressWarnings("unchecked")
 	public static void visitCalendar(final Calendar calendar, final CalendarVisitor visitor) {
-		visitor.visitCalendarStart();
-
 		final Set<String> rendered = new HashSet<String>();
 
 		TimeZone timeZone = null;
@@ -121,7 +119,15 @@ public class CalendarManager implements InitializingBean {
 			final Period period = new Period(from, to);
 
 			int count = 0;
-			for (final Component c : (List<Component>)calendar.getComponents("VEVENT")) {
+			final List<Component> components = (List<Component>)calendar.getComponents("VEVENT");
+			if (components.size() == 0) {
+				System.err.println("No events found!  Assuming we should abort.");
+				return;
+			}
+
+			visitor.visitCalendarStart();
+
+			for (final Component c : components) {
 	        	final VEvent vevent = new VEvent(c.getProperties());
 
 				final PeriodList list = c.calculateRecurrenceSet(period);
@@ -153,9 +159,9 @@ public class CalendarManager implements InitializingBean {
 					}
 				}
 
-	    		/*
-				*/
 			}
+
+			visitor.visitCalendarEnd();
 			
 			System.err.println("count = " + count);
 		} catch (final ParseException e) {
@@ -163,7 +169,6 @@ public class CalendarManager implements InitializingBean {
 			e.printStackTrace();
 		}
 
-	    visitor.visitCalendarEnd();
 	}
 
 	private static void handleVEvent(final String id, final VEvent vevent, final CalendarVisitor visitor, TimeZone timeZone, final Date startDate, final Date endDate) {
@@ -194,8 +199,8 @@ public class CalendarManager implements InitializingBean {
 		IOUtils.closeQuietly(sw);
 		IOUtils.closeQuietly(is);
 
-		System.err.println("calendar for " + url + ":");
-		System.err.println(sw.toString());
+//		System.err.println("calendar for " + url + ":");
+//		System.err.println(sw.toString());
 
 		final StringReader sr = new StringReader(sw.toString());
 		final CalendarBuilder builder = new CalendarBuilder();
